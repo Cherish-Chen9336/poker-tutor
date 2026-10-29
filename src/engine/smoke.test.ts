@@ -5,20 +5,16 @@ import { createBrowserEngine } from "@pokertools/engine/browser";
 import { evaluateStrings, rankBoard, rankDescription } from "@pokertools/evaluator";
 import { ActionType, Street } from "@pokertools/types";
 import pokersolver from "pokersolver";
+import { totalChips } from "./test-helpers";
 
 const { Hand } = pokersolver;
-
-function totalChips(engine: ReturnType<typeof createBrowserEngine>): number {
-  const stacks = engine.state.players.reduce((sum, p) => sum + (p?.stack ?? 0), 0);
-  const pots = engine.state.pots.reduce((sum, pot) => sum + pot.amount, 0);
-  return stacks + pots;
-}
 
 function newHeadsUpTable() {
   const engine = createBrowserEngine({ smallBlind: 1, bigBlind: 2, maxPlayers: 6 });
   engine.sit(0, "you", "You", 200);
   engine.sit(1, "bot", "Bot", 200);
   engine.deal();
+  expect(totalChips(engine)).toBe(400); // blinds are counted while still in front of players
   return engine;
 }
 

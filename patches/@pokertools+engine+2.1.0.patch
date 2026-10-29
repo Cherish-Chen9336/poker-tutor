@@ -1,0 +1,38 @@
+diff --git a/node_modules/@pokertools/engine/dist/rules/side-pots.js b/node_modules/@pokertools/engine/dist/rules/side-pots.js
+index 774d948..326c266 100644
+--- a/node_modules/@pokertools/engine/dist/rules/side-pots.js
++++ b/node_modules/@pokertools/engine/dist/rules/side-pots.js
+@@ -64,12 +64,27 @@ function calculateSidePots(state) {
+                     })),
+                 });
+             }
+-            pots.push({
+-                amount: potAmount,
+-                eligibleSeats,
+-                type: i === 0 ? "MAIN" : "SIDE",
+-                capPerPlayer: current.amount,
+-            });
++            // poker-tutor patch: levels created only by folded players' investments
++            // share the same eligible seats. Merge them into one pot so the pot is
++            // split once; splitting each level separately misassigns odd chips.
++            const previous = pots[pots.length - 1];
++            if (previous &&
++                previous.eligibleSeats.length === eligibleSeats.length &&
++                previous.eligibleSeats.every((seat, index) => seat === eligibleSeats[index])) {
++                pots[pots.length - 1] = {
++                    ...previous,
++                    amount: previous.amount + potAmount,
++                    capPerPlayer: current.amount,
++                };
++            }
++            else {
++                pots.push({
++                    amount: potAmount,
++                    eligibleSeats,
++                    type: pots.length === 0 ? "MAIN" : "SIDE",
++                    capPerPlayer: current.amount,
++                });
++            }
+         }
+         prevAmount = current.amount;
+     }
