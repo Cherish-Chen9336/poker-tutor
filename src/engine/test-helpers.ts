@@ -1,36 +1,15 @@
 // Shared helpers for engine tests: rigged decks and chip accounting.
 import { PokerEngine } from "@pokertools/engine/browser";
-import { getCardCode } from "@pokertools/evaluator";
-import type { Action, ActionType } from "@pokertools/types";
+import { deckTopFor, shuffleDrawsFor } from "../game/fixed-deal";
+import { ActionType, type Action } from "@pokertools/types";
 
 /**
- * The engine's unshuffled deck order (copied from its utils/deck.js, which
- * isn't exported): card code = rank * 4 + suit, ranks 2..A, suits s/h/d/c.
- */
-function createDeck(): number[] {
-  return Array.from({ length: 52 }, (_, code) => code);
-}
-
-/**
- * Returns a random source that makes the engine's Fisher-Yates shuffle
- * produce a deck starting with `topCards` (e.g. ["As", "Kd"]), followed by
- * the remaining cards in their default order. Calls after the shuffle
- * (the engine also draws one number for the hand ID) return 0.
+ * Returns a random source that makes the engine's shuffle produce a deck
+ * starting with `topCards` (e.g. ["As", "Kd"]). Later calls (the engine also
+ * draws one number for the hand ID) return 0.
  */
 export function riggedRandom(topCards: string[]): () => number {
-  const defaultDeck = createDeck();
-  const top = topCards.map(getCardCode);
-  const target = [...top, ...defaultDeck.filter((code) => !top.includes(code))];
-
-  // Replay the shuffle backwards: for each position i from the end, pick the
-  // index j that swaps the target card into place.
-  const working = [...defaultDeck];
-  const draws: number[] = [];
-  for (let i = working.length - 1; i > 0; i--) {
-    const j = working.indexOf(target[i]);
-    draws.push((j + 0.5) / (i + 1));
-    [working[i], working[j]] = [working[j], working[i]];
-  }
+  const draws = shuffleDrawsFor(topCards);
   let next = 0;
   return () => draws[next++] ?? 0;
 }
@@ -76,4 +55,33 @@ export function act(
 /** Net chips each seat won or lost this hand, given starting stacks. */
 export function netResults(engine: PokerEngine, startingStacks: number[]): number[] {
   return startingStacks.map((start, seat) => (engine.state.players[seat]?.stack ?? 0) - start);
+}
+
+/**
+ * Creates an engine whose first hand gives each seat the listed hole cards
+ * and deals the listed 5-card board. Every seat in `stacks` must have chips.
+ */
+export function fixedTable(hands: string[][], board: string[], stacks: number[]): PokerEngine {
+  return riggedTable(deckTopFor({ hands, board }), stacks);
+}
+
+/** True if the engine would accept this action from the player in `seat` now. */
+export function isLegal(
+  engine: PokerEngine,
+  seat: number,
+  type: ActionType.FOLD | ActionType.CHECK | ActionType.CALL | ActionType.BET | ActionType.RAISE,
+  amount?: number,
+): boolean {
+  const playerId = engine.state.players[seat]!.id;
+  const action = (amount === undefined ? { type, playerId } : { type, playerId, amount }) as Action;
+  return engine.validate(action).valid;
+}
+
+/** Plays the rest of the hand passively: each player checks, or calls if facing a bet. */
+export function checkDown(engine: PokerEngine): void {
+  while (engine.state.actionTo !== null) {
+    const playerId = engine.state.players[engine.state.actionTo]!.id;
+    const check = { type: ActionType.CHECK, playerId } as Action;
+    engine.act(engine.validate(check).valid ? check : ({ type: ActionType.CALL, playerId } as Action));
+  }
 }

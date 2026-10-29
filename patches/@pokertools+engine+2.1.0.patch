@@ -1,3 +1,57 @@
+diff --git a/node_modules/@pokertools/engine/dist/actions/dealing.js b/node_modules/@pokertools/engine/dist/actions/dealing.js
+index f088081..b29fed0 100644
+--- a/node_modules/@pokertools/engine/dist/actions/dealing.js
++++ b/node_modules/@pokertools/engine/dist/actions/dealing.js
+@@ -271,9 +271,12 @@ function handleDeal(state, action) {
+     // them now skips a blind who posted all-in (their stack is zero), which can
+     // rotate action past the only actionable player and leave actionTo null.
+     const firstToAct = (0, action_order_1.getFirstToAct)(newState, blindPositions?.bigBlindSeat);
++    // poker-tutor patch: posting the blinds can already end the betting (e.g.
++    // heads-up, the small blind is all-in for less than the big blind). Leave
++    // nobody to act so the reducer deals the board out.
+     return {
+         ...newState,
+-        actionTo: firstToAct,
++        actionTo: (0, action_order_1.isActionComplete)(newState) ? null : firstToAct,
+     };
+ }
+ /**
+diff --git a/node_modules/@pokertools/engine/dist/rules/action-order.js b/node_modules/@pokertools/engine/dist/rules/action-order.js
+index 69d8d00..3eaee06 100644
+--- a/node_modules/@pokertools/engine/dist/rules/action-order.js
++++ b/node_modules/@pokertools/engine/dist/rules/action-order.js
+@@ -147,6 +147,7 @@ function isActionComplete(state) {
+     let activeCount = 0;
+     let actedCount = 0;
+     let allInCount = 0;
++    let lastActiveBet = 0;
+     for (let seat = 0; seat < state.players.length; seat++) {
+         const player = state.players[seat];
+         if (!player)
+@@ -158,6 +159,7 @@ function isActionComplete(state) {
+         if (player.status === types_1.PlayerStatus.ACTIVE && player.stack > 0) {
+             activeCount++;
+             const playerBet = state.currentBets.get(seat) ?? 0;
++            lastActiveBet = playerBet;
+             // Player has matched bet and acted
+             if (playerBet === currentBet && hasActedThisStreet(state, seat)) {
+                 actedCount++;
+@@ -172,6 +174,15 @@ function isActionComplete(state) {
+         // currentBets here strands that hand instead of running out the board.
+         return state.handNumber > 0 && state.winners === null && allInCount > 0;
+     }
++    // poker-tutor patch: when only one player with chips is left and everyone
++    // else still in the hand is all-in, nobody can respond to a bet. Once that
++    // player has matched every chip actually bet, the betting is over (even if
++    // they haven't acted this street, e.g. after the last other player with
++    // chips folded, or when the blinds put everyone else all-in). The nominal
++    // big blind is ignored here: nobody is left to contest the difference.
++    if (activeCount === 1 && allInCount > 0 && lastActiveBet >= Math.max(0, ...state.currentBets.values())) {
++        return true;
++    }
+     return activeCount > 0 && activeCount === actedCount;
+ }
+ /**
 diff --git a/node_modules/@pokertools/engine/dist/rules/side-pots.js b/node_modules/@pokertools/engine/dist/rules/side-pots.js
 index 774d948..326c266 100644
 --- a/node_modules/@pokertools/engine/dist/rules/side-pots.js

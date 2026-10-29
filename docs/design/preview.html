@@ -1,0 +1,741 @@
+<title>Poker Tutor Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a lamp-lit card room. The felt table is the hero; the coach sits beside it like a dealer's notes, stacking below it on phones. */
+:root {
+  --room: #15110e;
+  --lamp: #2b2119;
+  --panel: #1f1915;
+  --panel-hi: #29211b;
+  --line: #3a3027;
+  --ink: #f3ede2;
+  --muted: #a99e8c;
+  --brass: #d4ab55;
+  --brass-dim: rgba(212, 171, 85, 0.35);
+  --brass-ink: #1e1607;
+  --felt: #1f6c4a;
+  --felt-deep: #0c3925;
+  --felt-print: rgba(243, 237, 226, 0.09);
+  --rail: #3c2417;
+  --rail-hi: #5c3a24;
+  --card: #fbf9f3;
+  --card-edge: #d6cfbf;
+  --suit-red: #bd2530;
+  --suit-black: #1b1b1d;
+  --back-a: #7e1b27;
+  --back-b: #9c2c39;
+  --good: #86cfa1;
+  --warn: #e6b866;
+  --shadow: rgba(0, 0, 0, 0.45);
+
+  --f-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --f-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --cw-board: 56px;
+  --cw-hero: 52px;
+  --cw-mini: 26px;
+  --seat-w: 104px;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { background: var(--room); color: var(--ink); }
+body {
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.55;
+  background: radial-gradient(ellipse 90% 60% at 50% -10%, var(--lamp) 0%, var(--room) 70%) var(--room);
+  min-height: 100%;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 48px;
+}
+.shell { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+/* Header */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: 10px; }
+.brand h1 { font-family: var(--f-display); font-weight: 700; font-size: 28px; letter-spacing: 0.01em; margin: 0; line-height: 1.1; }
+.brand .tag { font-family: var(--f-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--brass); border: 1px solid var(--brass-dim); border-radius: 4px; padding: 2px 6px; }
+.tabs { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+.tabs button {
+  font: 500 14px var(--f-body); color: var(--muted); background: transparent; border: 0; border-radius: 999px;
+  padding: 7px 16px; cursor: pointer;
+}
+.tabs button[aria-selected="true"] { background: var(--brass); color: var(--brass-ink); }
+.tabs button:hover:not([aria-selected="true"]) { color: var(--ink); }
+button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+/* Play layout */
+.play { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; align-items: start; }
+
+/* Table */
+.table-wrap { position: relative; padding: 58px 70px 74px; }
+.table {
+  position: relative; aspect-ratio: 16 / 9; width: 100%; border-radius: 999px;
+  background: radial-gradient(ellipse at 50% 42%, var(--felt) 0%, var(--felt-deep) 88%);
+  border: 16px solid var(--rail);
+  box-shadow: 0 0 0 2px var(--rail-hi), inset 0 0 0 2px var(--brass-dim), inset 0 10px 40px var(--shadow), 0 24px 60px var(--shadow);
+}
+.felt-print {
+  position: absolute; left: 50%; top: 73%; transform: translate(-50%, -50%); text-align: center; pointer-events: none;
+  color: var(--felt-print); white-space: nowrap;
+}
+.felt-print b { display: block; font-family: var(--f-display); font-size: clamp(16px, 3vw, 30px); letter-spacing: 0.08em; font-weight: 700; }
+.felt-print span { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; }
+
+.center { position: absolute; left: 50%; top: 43%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.pot { display: flex; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 13px; background: rgba(0, 0, 0, 0.32); padding: 3px 12px 3px 5px; border-radius: 999px; min-height: 26px; }
+.pot[hidden] { display: none !important; }
+.board { display: flex; gap: 6px; }
+.slot { width: var(--cw-board); aspect-ratio: 5 / 7; border-radius: 7px; border: 1.5px dashed var(--felt-print); }
+
+/* Seats: positions are percentages of the table, clockwise from the bottom. */
+.s0 { --sx: 50; --sy: 100; } .s1 { --sx: 9; --sy: 78; } .s2 { --sx: 9; --sy: 22; }
+.s3 { --sx: 50; --sy: 0; } .s4 { --sx: 91; --sy: 22; } .s5 { --sx: 91; --sy: 78; }
+.seat {
+  position: absolute; left: calc(var(--sx) * 1%); top: calc(var(--sy) * 1%); transform: translate(-50%, -50%);
+  width: var(--seat-w); display: flex; flex-direction: column; align-items: center; gap: 4px; transition: opacity 0.3s;
+}
+.seat.s0 { top: calc(100% + 10px); }
+.seat.folded { opacity: 0.42; }
+.seat.folded .hand { min-height: 0; }
+.plate {
+  width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 5px 8px 6px;
+  display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 7px; align-items: center; box-shadow: 0 6px 16px var(--shadow);
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.avatar { grid-row: span 2; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 600 12px var(--f-body); background: var(--panel-hi); color: var(--muted); border: 1px solid var(--line); }
+.seat.you .avatar { background: var(--brass); color: var(--brass-ink); border-color: var(--brass); }
+.name { font-weight: 600; font-size: 13px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stack { font-family: var(--f-mono); font-size: 12px; color: var(--muted); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.seat.focus .plate { border-color: var(--brass); box-shadow: 0 0 0 3px var(--brass-dim), 0 6px 16px var(--shadow); }
+.seat.winner .plate { border-color: var(--good); box-shadow: 0 0 0 3px rgba(134, 207, 161, 0.3), 0 6px 16px var(--shadow); }
+.act {
+  font-family: var(--f-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; padding: 1px 7px; border-radius: 4px;
+  background: rgba(0, 0, 0, 0.55); color: var(--ink); min-height: 18px; white-space: nowrap;
+}
+.act:empty { visibility: hidden; }
+.act.raise, .act.bet { color: var(--brass); }
+.act.fold { color: var(--muted); }
+.hand { display: flex; justify-content: center; min-height: calc(var(--cw-mini) * 1.4); }
+.hand .card + .card { margin-left: -8px; }
+.seat.you .hand { min-height: calc(var(--cw-hero) * 1.4); }
+.seat.you .hand .card + .card, .hand .card.hero + .card.hero { margin-left: 4px; }
+.seat:not(.you) .card.hero { --w: calc(var(--cw-hero) * 0.82); width: calc(var(--cw-hero) * 0.82); }
+.seat.s3 { flex-direction: column-reverse; }
+.result { max-width: 100%; font-size: 11.5px; color: var(--ink); background: rgba(0, 0, 0, 0.55); border-radius: 6px; padding: 2px 7px; text-align: center; line-height: 1.3; }
+
+.bet {
+  position: absolute; left: calc(50% + (var(--sx) - 50) * 0.6%); top: calc(50% + (var(--sy) - 50) * 0.52%); transform: translate(-50%, -50%);
+  display: flex; align-items: center; gap: 5px; font-family: var(--f-mono); font-size: 12.5px; font-variant-numeric: tabular-nums;
+  background: rgba(0, 0, 0, 0.3); padding: 2px 9px 2px 3px; border-radius: 999px;
+}
+.chip {
+  width: 18px; height: 18px; border-radius: 50%; background: var(--brass); border: 3px dashed var(--card); box-shadow: 0 1px 2px var(--shadow); flex: none;
+}
+.dealer {
+  position: absolute; left: calc(50% + (var(--sx) - 50) * 0.8% + 44px); top: calc(50% + (var(--sy) - 50) * 0.78%); transform: translate(-50%, -50%);
+  width: 24px; height: 24px; border-radius: 50%; background: var(--card); color: var(--suit-black); font: 700 12px var(--f-body);
+  display: grid; place-items: center; box-shadow: 0 2px 4px var(--shadow), inset 0 0 0 2px var(--card-edge);
+}
+.dealer.s0 { left: calc(50% + 92px); top: 84%; }
+
+/* Cards */
+.card {
+  position: relative; width: var(--cw-board); aspect-ratio: 5 / 7; border-radius: 7px; background: var(--card); color: var(--suit-black);
+  box-shadow: 0 2px 6px var(--shadow), inset 0 0 0 1px var(--card-edge); flex: none; transition: opacity 0.3s, transform 0.3s;
+}
+.card.red { color: var(--suit-red); }
+.card .ix { position: absolute; left: 9%; top: 5%; display: flex; flex-direction: column; align-items: center; line-height: 0.95; }
+.card .r { font-family: var(--f-display); font-weight: 700; font-size: calc(var(--w) * 0.34); letter-spacing: -0.04em; }
+.card .su { font-size: calc(var(--w) * 0.24); }
+.card .pip { position: absolute; right: 10%; bottom: 6%; font-size: calc(var(--w) * 0.46); line-height: 1; }
+.card.board-c { --w: var(--cw-board); }
+.card.hero { --w: var(--cw-hero); width: var(--cw-hero); }
+.card.mini { --w: var(--cw-mini); width: var(--cw-mini); border-radius: 4px; }
+.card.back { background: repeating-linear-gradient(45deg, var(--back-a) 0 3px, var(--back-b) 3px 6px); box-shadow: 0 2px 5px var(--shadow), inset 0 0 0 2px var(--card); }
+.card.mini.face .pip { display: none; }
+.card.mini.face .r { font-size: calc(var(--w) * 0.42); }
+.card.mini.face .su { font-size: calc(var(--w) * 0.36); }
+.card.dim { opacity: 0.38; }
+.card.lift { transform: translateY(-5px); box-shadow: 0 0 0 2px var(--good), 0 6px 12px var(--shadow); }
+.card.fresh { animation: deal 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes deal { from { opacity: 0; transform: translateY(-14px) rotate(-4deg) scale(0.92); } }
+
+/* Coach */
+.coach { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+.coach-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.street { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); }
+.count { font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.progress { height: 3px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--brass); transition: width 0.3s; }
+.coach h2 { font-family: var(--f-display); font-size: 25px; line-height: 1.15; margin: 0; text-wrap: balance; font-weight: 700; }
+.coach p { margin: 0; color: var(--ink); max-width: 62ch; }
+.term { color: var(--brass); font-weight: 600; }
+.decide { display: flex; flex-direction: column; gap: 10px; background: var(--panel-hi); border-radius: 12px; padding: 14px; }
+.decide-label { font-size: 12px; font-family: var(--f-mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.actions button {
+  flex: 1 1 0; min-width: 84px; font: 600 14px var(--f-body); padding: 10px 12px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+}
+.actions button.aggr { background: var(--brass); color: var(--brass-ink); border-color: var(--brass); }
+.actions button:hover { filter: brightness(1.12); }
+.feedback { font-size: 14px; color: var(--warn); min-height: 0; margin: 0; }
+.feedback:empty { display: none; }
+.nav { display: flex; gap: 8px; }
+.nav button { font: 600 14px var(--f-body); padding: 10px 16px; border-radius: 10px; cursor: pointer; border: 1px solid var(--line); background: transparent; color: var(--ink); }
+.nav .next { flex: 1; background: var(--ink); color: var(--room); border-color: var(--ink); }
+.nav button:disabled { opacity: 0.35; cursor: default; }
+.history { border-top: 1px solid var(--line); padding-top: 12px; }
+.history h3 { margin: 0 0 6px; font-size: 12px; font-family: var(--f-mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); font-weight: 500; }
+.history ol { margin: 0; padding: 0; list-style: none; font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); display: flex; flex-direction: column; gap: 3px; max-height: 168px; overflow: auto; }
+.history li:last-child { color: var(--ink); }
+.history li .st { color: var(--brass); }
+.kbd { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
+
+/* Learn */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+.panel > h2 { font-family: var(--f-display); font-size: 30px; margin: 0 0 4px; font-weight: 700; text-wrap: balance; }
+.panel > p.lede { margin: 0 0 20px; color: var(--muted); max-width: 65ch; }
+.learn { display: flex; flex-direction: column; gap: 18px; }
+.jump { display: flex; gap: 8px; flex-wrap: wrap; }
+.jump button { font: 500 13px var(--f-body); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.jump button:hover { border-color: var(--brass); }
+.panel h3.sub { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); font-weight: 500; margin: 22px 0 10px; }
+
+.flow { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.flow li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; padding: 10px 0; position: relative; }
+.flow li + li { border-top: 1px solid var(--line); }
+.flow .dot { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--brass-dim); color: var(--brass); display: grid; place-items: center; font: 700 14px var(--f-display); }
+.flow h4 { margin: 0; font-size: 15px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.flow p { margin: 2px 0 0; color: var(--muted); font-size: 14px; max-width: 64ch; }
+.pill { font: 500 10.5px var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--brass); background: rgba(212, 171, 85, 0.12); border-radius: 4px; padding: 1px 6px; }
+.note { margin: 14px 0 0; padding: 10px 14px; background: var(--panel-hi); border-radius: 10px; font-size: 14px; max-width: 72ch; }
+.moves { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.move { background: var(--panel-hi); border-radius: 10px; padding: 10px 12px; }
+.move b { display: block; font-size: 14px; }
+.move span { font-size: 13.5px; color: var(--muted); }
+
+.ranks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.rank { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto minmax(170px, 0.8fr); gap: 8px 16px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.rank .n { font-family: var(--f-display); font-size: 22px; color: var(--brass); text-align: right; font-weight: 700; }
+.rank h3 { margin: 0; font-size: 15px; }
+.rank p { margin: 0; font-size: 13.5px; color: var(--muted); }
+.rank .row { display: flex; gap: 4px; }
+.odds { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: baseline; font-variant-numeric: tabular-nums; }
+.odds .pct { font-family: var(--f-mono); font-size: 14px; color: var(--ink); }
+.odds .one-in { font-size: 12.5px; color: var(--muted); text-align: right; }
+.odds .bar { grid-column: 1 / -1; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.odds .bar i { display: block; height: 100%; min-width: 2px; background: var(--brass); border-radius: 0 4px 4px 0; }
+.odds-head { display: flex; justify-content: flex-end; font: 500 11px var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+
+.tips { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.tip { background: var(--panel-hi); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.tip h3 { margin: 0; font-family: var(--f-display); font-size: 18px; font-weight: 700; }
+.tip p { margin: 0; color: var(--muted); font-size: 14px; }
+.rank .card { --w: 34px; width: 34px; }
+.rank .card .pip { display: none; }
+.rank .card .r { font-size: 14px; }
+.rank .card .su { font-size: 11px; }
+.soon { margin-top: 18px; font-size: 13.5px; color: var(--muted); }
+
+/* Review */
+.timeline { display: flex; flex-direction: column; gap: 18px; }
+.street-block h3 { margin: 0 0 6px; font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); font-weight: 500; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.street-block h3 .cards { display: inline-flex; gap: 3px; }
+.street-block ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 2px; }
+.lesson { margin-top: 20px; border-left: 3px solid var(--good); padding: 10px 14px; background: var(--panel-hi); border-radius: 0 10px 10px 0; }
+.lesson b { color: var(--good); }
+
+[role="tabpanel"][hidden] { display: none !important; }
+
+@media (max-width: 960px) {
+  .play { grid-template-columns: minmax(0, 1fr); }
+  .coach { position: static; }
+}
+@media (max-width: 640px) {
+  :root { --cw-board: 38px; --cw-hero: 44px; --cw-mini: 20px; --seat-w: 78px; }
+  body { font-size: 14.5px; padding-block: 12px 32px; }
+  .brand h1 { font-size: 23px; }
+  .table-wrap { padding: 50px 30px 70px; }
+  .table { aspect-ratio: 4 / 5; border-width: 11px; }
+  .bet { left: calc(50% + (var(--sx) - 50) * 0.5%); top: calc(50% + (var(--sy) - 50) * 0.62%); }
+  .dealer { left: calc(50% + (var(--sx) - 50) * 0.8% + 36px); top: calc(50% + (var(--sy) - 50) * 0.76%); }
+  .dealer.s0 { left: calc(50% + 74px); top: 88%; }
+  .s1 { --sx: 3; --sy: 82; } .s2 { --sx: 3; --sy: 17; } .s4 { --sx: 97; --sy: 17; } .s5 { --sx: 97; --sy: 82; }
+  .center { top: 48%; }
+  .result { font-size: 10.5px; padding: 2px 5px; }
+  .board { gap: 4px; }
+  .plate { padding: 4px 6px; grid-template-columns: 20px minmax(0, 1fr); column-gap: 5px; }
+  .avatar { width: 20px; height: 20px; font-size: 10px; }
+  .name { font-size: 12px; } .stack { font-size: 11px; }
+  .rank { grid-template-columns: 26px minmax(0, 1fr); }
+  .rank .row, .rank .odds { grid-column: 2; }
+  .panel { padding: 18px; }
+  .coach h2 { font-size: 22px; }
+  .felt-print { top: 70%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card.fresh { animation: none; }
+  * { transition: none !important; }
+}
+</style>
+
+<div class="shell">
+  <header class="top">
+    <div class="brand"><h1>Poker Tutor</h1><span class="tag">Preview</span></div>
+    <nav class="tabs" role="tablist" aria-label="App areas">
+      <button role="tab" id="tab-learn" aria-controls="panel-learn" aria-selected="false">Learn</button>
+      <button role="tab" id="tab-play" aria-controls="panel-play" aria-selected="true">Play</button>
+      <button role="tab" id="tab-review" aria-controls="panel-review" aria-selected="false">Review</button>
+    </nav>
+  </header>
+
+  <section id="panel-play" role="tabpanel" aria-labelledby="tab-play">
+    <div class="play">
+      <div class="table-wrap">
+        <div class="table" id="table" aria-label="Poker table"></div>
+      </div>
+      <aside class="coach" aria-label="Coach">
+        <div class="coach-head"><span class="street" id="street"></span><span class="count" id="count"></span></div>
+        <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+        <h2 id="title"></h2>
+        <p id="text"></p>
+        <div class="decide" id="decide" hidden>
+          <span class="decide-label">Your move</span>
+          <div class="actions" id="actions"></div>
+          <p class="feedback" id="feedback" aria-live="polite"></p>
+        </div>
+        <div class="nav">
+          <button id="back" type="button">Back</button>
+          <button id="next" class="next" type="button">Next</button>
+        </div>
+        <span class="kbd">Tip: use the ← and → keys to step through.</span>
+        <div class="history">
+          <h3>Hand history</h3>
+          <ol id="log"></ol>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="panel-learn" role="tabpanel" aria-labelledby="tab-learn" hidden>
+    <div class="learn">
+      <div class="jump" aria-label="Jump to section">
+        <button type="button" data-jump="learn-flow">How a hand works</button>
+        <button type="button" data-jump="learn-ranks">Hand rankings and odds</button>
+        <button type="button" data-jump="learn-tips">Tips for beginners</button>
+      </div>
+
+      <div class="panel" id="learn-flow">
+        <h2>How a hand works</h2>
+        <p class="lede">Every hand follows the same steps. There are up to four betting rounds, one after each new set of cards.</p>
+        <ol class="flow" id="flow"></ol>
+        <p class="note">A hand can end at any moment: if everyone else folds, the last player left wins the pot without showing any cards.</p>
+        <h3 class="sub">Your choices on your turn</h3>
+        <div class="moves" id="moves"></div>
+      </div>
+
+      <div class="panel" id="learn-ranks">
+        <h2>Hand rankings and odds</h2>
+        <p class="lede">Your hand is the best five cards out of seven: your two hole cards plus the five shared cards. Each hand beats every hand below it. The odds show how often seven cards make that hand if you stay to the river.</p>
+        <div class="odds-head" aria-hidden="true">Chance with 7 cards (Hold'em)</div>
+        <ol class="ranks" id="ranks"></ol>
+        <p class="note">Surprised? With seven cards, you make <b>one pair</b> (43.8%) and <b>two pair</b> (23.5%) more often than <b>nothing at all</b> (17.4%). That is why a single pair is often not enough to win.</p>
+        <p class="note">These odds are for Texas Hold'em, where you pick your best five from seven cards. Tables for <b>five-card</b> poker look very different (for example, high card is 50.1% there) because fewer cards give fewer chances to make a pair or better.</p>
+      </div>
+
+      <div class="panel" id="learn-tips">
+        <h2>Tips for beginners</h2>
+        <p class="lede">Six habits that most new players take a long time to learn. The coach will remind you of them during play.</p>
+        <ol class="tips" id="tips"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-review" role="tabpanel" aria-labelledby="tab-review" hidden>
+    <div class="panel">
+      <h2>Hand review</h2>
+      <p class="lede" id="review-lede"></p>
+      <div class="timeline" id="timeline"></div>
+      <div class="lesson" id="lesson" hidden><b>Key lesson: the kicker.</b> You and Leo both had a pair of kings. When pairs tie, the highest other card decides. Your ace beat his queen.</div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const SUITS = { s: "♠", h: "♥", d: "♦", c: "♣" };
+  const SUIT_NAMES = { s: "spades", h: "hearts", d: "diamonds", c: "clubs" };
+  const RANK_NAMES = { A: "Ace", K: "King", Q: "Queen", J: "Jack", T: "10" };
+  const SEATS = ["You", "Mia", "Leo", "Sam", "Ava", "Kai"];
+  const BUTTON = 0;
+  const START = 200;
+  const HOLE = { 0: ["Ah", "Ks"], 2: ["Kc", "Qd"] };
+
+  function cardHTML(code, cls) {
+    const r = code[0] === "T" ? "10" : code[0];
+    const s = code[1];
+    const red = s === "h" || s === "d";
+    const label = (RANK_NAMES[code[0]] || r) + " of " + SUIT_NAMES[s];
+    return '<div class="card face ' + (red ? "red " : "") + cls + '" role="img" aria-label="' + label + '">' +
+      '<span class="ix"><span class="r">' + r + '</span><span class="su">' + SUITS[s] + '</span></span>' +
+      '<span class="pip" aria-hidden="true">' + SUITS[s] + '</span></div>';
+  }
+  const backHTML = (cls) => '<div class="card back ' + cls + '" role="img" aria-label="Face-down card"></div>';
+
+  // Events change the table; each step groups events with the coach's words.
+  const post = (seat, to) => ({ t: "post", seat, to });
+  const fold = (seat) => ({ t: "fold", seat });
+  const check = (seat) => ({ t: "check", seat });
+  const call = (seat, to) => ({ t: "call", seat, to });
+  const bet = (seat, to) => ({ t: "bet", seat, to });
+  const raise = (seat, to) => ({ t: "raise", seat, to });
+  const collect = { t: "collect" };
+  const board = (...cards) => ({ t: "board", cards });
+
+  const steps = [
+    { street: "Before the deal", title: "Take a seat",
+      text: 'Six players sit down with <b>200 chips</b> each. The white <span class="term">D</span> disc is the <span class="term">dealer button</span>. This hand it is in front of you, and it moves one seat to the left after every hand.',
+      events: [], log: null },
+    { street: "Preflop", title: "The blinds",
+      text: 'The two players to the left of the button must bet before seeing any cards. Mia posts the <span class="term">small blind</span> (1) and Leo the <span class="term">big blind</span> (2). This forced money means every hand has something to win.',
+      events: [post(1, 1), post(2, 2)], focus: [1, 2], log: "Mia posts 1 · Leo posts 2" },
+    { street: "Preflop", title: "Your hole cards",
+      text: 'Everyone gets two private cards, called <span class="term">hole cards</span>. You have <b>A♥ K♠</b>, "Ace-King", one of the strongest starting hands. Nobody can see your cards, and you can\'t see theirs.',
+      events: [{ t: "deal" }], focus: [0], log: "Cards dealt · You: A♥ K♠" },
+    { street: "Preflop", title: "Sam acts first",
+      text: 'Before the flop, the player to the <b>left of the big blind</b> acts first. Sam folds: he gives up this hand and puts nothing more in.',
+      events: [fold(3)], focus: [3], log: "Sam folds" },
+    { street: "Preflop", title: "Two more folds",
+      text: 'Ava and Kai fold too. This is normal: most hands are folded before the flop, and good players fold far more often than they play.',
+      events: [fold(4), fold(5)], focus: [4, 5], log: "Ava folds · Kai folds" },
+    { street: "Preflop", title: "Your turn",
+      text: 'To stay in, you must at least match the big blind of 2. With a hand this strong, the usual move is to <span class="term">raise</span>: make the bet bigger. Pick one, and the next step explains why.',
+      focus: [0],
+      decision: { options: [
+        { label: "Fold", fb: "Folding Ace-King here throws away one of the best starting hands. Try another move." },
+        { label: "Call 2", fb: "Calling is legal, but strong hands usually raise. Raising builds the pot and pushes weaker hands out. Try again." },
+        { label: "Raise to 6", ok: true, aggr: true },
+      ] },
+      events: [raise(0, 6)], log: "You raise to 6" },
+    { street: "Preflop", title: "Why raise to 6?",
+      text: '<b>Why raise?</b> Ace-King is strong, so you want more chips in the pot and fewer opponents. After your raise, staying in costs 6 instead of 2, so players with weak hands tend to fold. You also take the lead: if others just call, they often check to you on the flop.<br><br><b>Why 6?</b> About three times the big blind is the standard size for a first raise. It is big enough to make weak hands pay, and small enough that you lose little if someone has a better hand. "Raise <i>to</i> 6" means your total bet is 6.',
+      events: [], focus: [0], log: null },
+    { street: "Preflop", title: "Mia folds, Leo calls",
+      text: 'Mia folds, but her small blind of 1 stays in the pot. Leo <span class="term">calls</span>. Facing a bet, a player has only three choices: <b>fold</b>, <b>call</b> (put in exactly the same amount), or <b>raise</b>. Calling is the only way to stay in without raising, so his chips always match yours. He already had 2 in, so he adds 4 to reach 6.',
+      events: [fold(1), call(2, 6)], focus: [1, 2], log: "Mia folds · Leo calls 6" },
+    { street: "Flop", title: "The flop",
+      text: 'The bets go into the pot (13 chips). Three shared cards are dealt face up: the <span class="term">flop</span>. Anyone can use them. With your K♠ you now have a <b>pair of kings</b>, the highest pair possible on this board, called <span class="term">top pair</span>.',
+      events: [collect, board("Kd", "9c", "4h")], focus: [], log: "Flop K♦ 9♣ 4♥ · pot 13" },
+    { street: "Flop", title: "Leo checks",
+      text: 'After the flop, the first player still in the hand to the left of the button acts first. Leo <span class="term">checks</span>: he passes without betting.',
+      events: [check(2)], focus: [2], log: "Leo checks" },
+    { street: "Flop", title: "Your turn",
+      text: 'Nobody has bet, so you can check too, or make the first bet. With top pair, betting is the usual play: weaker hands must pay to keep going. A bet of 8 is about two-thirds of the 13-chip pot, a common size.',
+      focus: [0],
+      decision: { options: [
+        { label: "Check", fb: "Checking is allowed, but with top pair you usually bet so weaker hands pay to see more cards. Try again." },
+        { label: "Bet 8", ok: true, aggr: true },
+      ] },
+      events: [bet(0, 8)], log: "You bet 8" },
+    { street: "Turn", title: "Leo calls. The turn",
+      text: 'Leo calls again: he matches your 8 to stay in. A player who keeps calling usually has something decent but not enough to raise. The pot grows to 29. The fourth shared card, the <span class="term">turn</span>, is the 2♠. A low card like this rarely changes who is ahead.',
+      events: [call(2, 8), collect, board("2s")], focus: [2], log: "Leo calls 8 · Turn 2♠ · pot 29" },
+    { street: "Turn", title: "Leo checks again",
+      text: 'Leo checks again. You are still ahead of most hands he could have.',
+      events: [check(2)], focus: [2], log: "Leo checks" },
+    { street: "Turn", title: "Your turn",
+      text: 'Bet again or check? Your pair of kings with an ace is still strong, so keep betting. 18 is about 60% of the 29-chip pot, similar in size to your flop bet.',
+      focus: [0],
+      decision: { options: [
+        { label: "Check", fb: "Checking is possible, but your hand is still strong. Betting makes Leo's weaker hands pay. Try again." },
+        { label: "Bet 18", ok: true, aggr: true },
+      ] },
+      events: [bet(0, 18)], log: "You bet 18" },
+    { street: "River", title: "Leo calls. The river",
+      text: 'Leo calls 18 to match you once more, and the pot is now 65. The fifth and last shared card, the <span class="term">river</span>, is the 7♦. No more cards are coming.',
+      events: [call(2, 18), collect, board("7d")], focus: [2], log: "Leo calls 18 · River 7♦ · pot 65" },
+    { street: "River", title: "Leo checks",
+      text: 'Leo checks a third time. This is the last betting round.',
+      events: [check(2)], focus: [2], log: "Leo checks" },
+    { street: "River", title: "Your turn",
+      text: 'Betting is reasonable here, and so is checking. If you check, the hand goes straight to the showdown with no extra risk.',
+      focus: [0],
+      decision: { options: [
+        { label: "Check", ok: true },
+        { label: "Bet 30", aggr: true, fb: "Betting is a fine choice too. For this walkthrough, let's check and see the showdown." },
+      ] },
+      events: [check(0)], log: "You check" },
+    { street: "Showdown", title: "Showdown",
+      text: 'Betting is over, so the remaining players reveal their cards. Leo shows first because he was first to act. You both have a <b>pair of kings</b>. The next-best card decides: your <b>ace</b> beats his queen. That deciding card is the <span class="term">kicker</span>.',
+      events: [{ t: "show", seat: 2 }, { t: "show", seat: 0 }], focus: [0, 2], showdown: true, log: "Leo shows K♣ Q♦ · You show A♥ K♠" },
+    { street: "Hand over", title: "You win 65 chips",
+      text: 'You collect the whole pot. You started with 200 and now have <b>233</b>, a gain of 33. Open the <b>Review</b> tab to see the full hand again, step by step.',
+      events: [{ t: "award", seat: 0 }], focus: [0], showdown: true, winner: 0, log: "You win 65 with a pair of kings, ace kicker" },
+  ];
+
+  const RESULT = { 0: "Pair of kings · ace kicker", 2: "Pair of kings · queen kicker" };
+  const BEST = { 0: ["Ah", "Ks", "Kd", "9c", "7d"], 2: ["Kc", "Qd", "Kd", "9c", "7d"] };
+
+  function fresh() {
+    return {
+      players: SEATS.map((name, seat) => ({ name, seat, stack: START, bet: 0, folded: false, dealt: false, shown: seat === 0, act: "" })),
+      pot: 0, board: [], winner: null,
+    };
+  }
+  function put(p, to) { p.stack -= to - p.bet; p.bet = to; }
+  function apply(st, e) {
+    const p = st.players[e.seat];
+    switch (e.t) {
+      case "post": put(p, e.to); p.act = e.to === 1 ? "SB" : "BB"; break;
+      case "deal": st.players.forEach((q) => (q.dealt = true)); break;
+      case "fold": p.folded = true; p.act = "Fold"; break;
+      case "check": p.act = "Check"; break;
+      case "call": put(p, e.to); p.act = "Call"; break;
+      case "bet": put(p, e.to); p.act = "Bet"; break;
+      case "raise": put(p, e.to); p.act = "Raise"; break;
+      case "collect":
+        st.players.forEach((q) => { st.pot += q.bet; q.bet = 0; if (!q.folded) q.act = ""; });
+        break;
+      case "board": st.board.push(...e.cards); break;
+      case "show": p.shown = true; break;
+      case "award": p.stack += st.pot; st.pot = 0; st.winner = e.seat; break;
+    }
+  }
+  // State shown at step i: everything before it, plus step i itself unless it is waiting for your decision.
+  function stateAt(i) {
+    const st = fresh();
+    for (let j = 0; j <= i; j++) {
+      if (j === i && steps[j].decision) break;
+      steps[j].events.forEach((e) => apply(st, e));
+    }
+    return st;
+  }
+
+  const $ = (id) => document.getElementById(id);
+  const hot = window.claude && window.claude.hot;
+  let step = 0;
+  let tab = "play";
+  let seenBoard = 0;
+  let seenDeal = false;
+
+  function renderTable() {
+    const st = stateAt(step);
+    const s = steps[step];
+    const focus = new Set(s.focus || []);
+    const showBest = !!s.showdown;
+    let html = '<div class="felt-print" aria-hidden="true"><b>POKER TUTOR</b><span>No-limit hold\'em · blinds 1/2</span></div>';
+
+    html += '<div class="center"><div class="pot"' + (st.pot ? "" : " hidden") + '><span class="chip"></span>Pot ' + st.pot + '</div><div class="board">';
+    for (let k = 0; k < 5; k++) {
+      const c = st.board[k];
+      if (!c) { html += '<div class="slot" aria-hidden="true"></div>'; continue; }
+      let cls = "board-c";
+      if (k >= seenBoard) cls += " fresh";
+      if (showBest) cls += BEST[0].includes(c) ? " lift" : " dim";
+      html += cardHTML(c, cls);
+    }
+    html += "</div></div>";
+
+    st.players.forEach((p) => {
+      const isYou = p.seat === 0;
+      let cls = "seat s" + p.seat + (isYou ? " you" : "") + (p.folded ? " folded" : "") +
+        (focus.has(p.seat) && st.winner === null ? " focus" : "") + (st.winner === p.seat ? " winner" : "");
+      let hand = "";
+      if (p.dealt && !p.folded) {
+        const deal = !seenDeal ? " fresh" : "";
+        if (p.shown && HOLE[p.seat]) {
+          hand = HOLE[p.seat].map((c) => {
+            let extra = "hero";
+            if (showBest) extra += BEST[p.seat].includes(c) ? " lift" : " dim";
+            return cardHTML(c, extra + deal);
+          }).join("");
+        } else {
+          hand = backHTML("mini" + deal) + backHTML("mini" + deal);
+        }
+      }
+      const actCls = p.act.toLowerCase();
+      const result = showBest && p.shown && RESULT[p.seat] ? '<div class="result">' + RESULT[p.seat] + "</div>" : "";
+      html += '<div class="' + cls + '"><div class="act ' + actCls + '">' + p.act + '</div>' +
+        '<div class="hand">' + hand + "</div>" + result +
+        '<div class="plate"><span class="avatar" aria-hidden="true">' + (isYou ? "★" : p.name[0]) + '</span>' +
+        '<span class="name">' + p.name + '</span><span class="stack">' + p.stack + "</span></div></div>";
+      if (p.bet) html += '<div class="bet s' + p.seat + '"><span class="chip"></span>' + p.bet + "</div>";
+    });
+    html += '<div class="dealer s' + BUTTON + '" aria-label="Dealer button">D</div>';
+    $("table").innerHTML = html;
+    seenBoard = st.board.length;
+    seenDeal = st.players[0].dealt;
+  }
+
+  function renderCoach() {
+    const s = steps[step];
+    $("street").textContent = s.street;
+    $("count").textContent = "Step " + (step + 1) + " of " + steps.length;
+    $("bar").style.width = ((step + 1) / steps.length) * 100 + "%";
+    $("title").textContent = s.title;
+    $("text").innerHTML = s.text;
+    $("feedback").textContent = "";
+    const d = s.decision;
+    $("decide").hidden = !d;
+    $("next").disabled = !!d;
+    $("next").textContent = step === steps.length - 1 ? "Replay the hand" : d ? "Choose a move" : "Next";
+    $("back").disabled = step === 0;
+    if (d) {
+      $("actions").innerHTML = d.options.map((o, k) =>
+        '<button type="button" data-k="' + k + '"' + (o.aggr ? ' class="aggr"' : "") + ">" + o.label + "</button>").join("");
+    }
+    const lines = [];
+    for (let j = 0; j <= step; j++) {
+      if (steps[j].log && !(j === step && steps[j].decision)) lines.push('<li><span class="st">' + steps[j].street + "</span> · " + steps[j].log + "</li>");
+    }
+    $("log").innerHTML = lines.join("") || '<li>The hand has not started yet.</li>';
+    $("log").scrollTop = $("log").scrollHeight;
+  }
+
+  function renderReview() {
+    const done = step === steps.length - 1;
+    $("review-lede").textContent = done
+      ? "The whole hand, street by street. In the full app, the coach adds notes on each of your decisions."
+      : "Finish the guided hand on the Play tab to see the full review. So far:";
+    const groups = [];
+    for (let j = 0; j <= step; j++) {
+      const s = steps[j];
+      if (!s.log || (j === step && s.decision)) continue;
+      let g = groups[groups.length - 1];
+      if (!g || g.street !== s.street) { g = { street: s.street, items: [] }; groups.push(g); }
+      g.items.push(s.log);
+    }
+    const streetCards = { Flop: ["Kd", "9c", "4h"], Turn: ["2s"], River: ["7d"] };
+    $("timeline").innerHTML = groups.length
+      ? groups.map((g) => '<div class="street-block"><h3>' + g.street +
+          (streetCards[g.street] ? '<span class="cards">' + streetCards[g.street].map((c) => cardHTML(c, "mini")).join("") + "</span>" : "") +
+          "</h3><ul>" + g.items.map((t) => "<li>" + t + "</li>").join("") + "</ul></div>").join("")
+      : "<p>Nothing has happened yet.</p>";
+    $("lesson").hidden = !done;
+  }
+
+  function renderLearn() {
+    const flow = [
+      ["Blinds", false, "The two players to the left of the dealer button post forced bets: the small blind and the big blind (here 1 and 2)."],
+      ["Hole cards", false, "Everyone gets two private cards, face down."],
+      ["Preflop", true, "Betting starts with the player to the left of the big blind and goes clockwise."],
+      ["Flop", true, "Three shared cards are dealt face up. Betting starts with the first player still in the hand to the left of the button."],
+      ["Turn", true, "A fourth shared card, then another betting round."],
+      ["River", true, "The fifth and last shared card, then the final betting round."],
+      ["Showdown", false, "Players still in the hand reveal their cards. The best five-card hand wins the pot. Equal hands split it."],
+      ["Next hand", false, "The dealer button moves one seat to the left, so the blinds move too, and a new hand begins."],
+    ];
+    $("flow").innerHTML = flow.map((f, k) =>
+      '<li><span class="dot">' + (k + 1) + "</span><div><h4>" + f[0] + (f[1] ? ' <span class="pill">Betting round</span>' : "") +
+      "</h4><p>" + f[2] + "</p></div></li>").join("");
+
+    const moves = [
+      ["Fold", "Give up the hand. Chips you already put in stay in the pot."],
+      ["Check", "Pass without betting. Only possible when nobody has bet this round."],
+      ["Call", "Match the current bet exactly. The way to stay in without raising."],
+      ["Bet", "Put chips in when nobody has bet yet this round. The smallest bet is the big blind."],
+      ["Raise", 'Make the current bet bigger. "Raise to 6" means your total becomes 6, not 6 more.'],
+    ];
+    $("moves").innerHTML = moves.map((m) => '<div class="move"><b>' + m[0] + "</b><span>" + m[1] + "</span></div>").join("");
+
+    // Exact counts of 7-card hands by best 5-card hand, out of C(52,7) = 133,784,560.
+    const TOTAL = 133784560;
+    const ranks = [
+      ["Royal flush", "A, K, Q, J, 10, all of one suit.", ["As", "Ks", "Qs", "Js", "Ts"], 4324],
+      ["Straight flush", "Five cards in a row, all of one suit.", ["9h", "8h", "7h", "6h", "5h"], 37260],
+      ["Four of a kind", "Four cards of the same rank.", ["Qc", "Qd", "Qh", "Qs", "7d"], 224848],
+      ["Full house", "Three of a kind plus a pair.", ["Js", "Jh", "Jd", "4c", "4s"], 3473184],
+      ["Flush", "Any five cards of one suit.", ["Ad", "Jd", "8d", "6d", "2d"], 4047644],
+      ["Straight", "Five cards in a row, mixed suits.", ["Tc", "9d", "8s", "7h", "6c"], 6180020],
+      ["Three of a kind", "Three cards of the same rank.", ["7s", "7h", "7c", "Kd", "3s"], 6461620],
+      ["Two pair", "Two different pairs.", ["Kh", "Kc", "5d", "5s", "9h"], 31433400],
+      ["One pair", "Two cards of the same rank.", ["Ac", "Ad", "Qs", "8h", "4c"], 58627800],
+      ["High card", "No combination. The highest card plays.", ["Ah", "Jc", "9d", "6s", "3h"], 23294460],
+    ];
+    const maxCount = Math.max(...ranks.map((r) => r[3]));
+    const pct = (c) => {
+      const v = (c / TOTAL) * 100;
+      return v.toPrecision(3) + "%";
+    };
+    const oneIn = (c) => {
+      const v = TOTAL / c;
+      return "1 in " + (v >= 100 ? Math.round(v).toLocaleString("en-US") : v.toFixed(1));
+    };
+    $("ranks").innerHTML = ranks.map((r, k) =>
+      '<li class="rank"><span class="n">' + (k + 1) + '</span><div><h3>' + r[0] + "</h3><p>" + r[1] + "</p></div>" +
+      '<div class="row">' + r[2].map((c) => cardHTML(c, "")).join("") + "</div>" +
+      '<div class="odds" title="' + r[0] + ": " + pct(r[3]) + ", " + oneIn(r[3]) + ' seven-card hands"><span class="pct">' + pct(r[3]) +
+      '</span><span class="one-in">' + oneIn(r[3]) + '</span><span class="bar" aria-hidden="true"><i style="width:' +
+      ((r[3] / maxCount) * 100).toFixed(2) + '%"></i></span></div></li>').join("");
+
+    const tips = [
+      ["Play fewer hands", "Fold most starting hands. Begin with pairs and two high cards, such as A-K, A-Q, or K-Q."],
+      ["Position is power", "Acting last, on or near the button, lets you see what everyone else does first. Play more hands late and fewer early."],
+      ["Raise, don't just call", "If nobody has entered the pot yet and your hand is worth playing, raise. Just calling the big blind gives everyone a cheap look at the flop."],
+      ["Bet your strong hands", "Bet about half to two-thirds of the pot, so worse hands pay to keep going."],
+      ["Read the board", "Before you bet, ask what could beat you. Three cards of one suit can mean a flush; cards in a row can mean a straight."],
+      ["Know when to let go", "Folding a decent hand against heavy betting is often right. Never play bigger to win back what you lost; players call that tilt."],
+    ];
+    $("tips").innerHTML = tips.map((t) => '<li class="tip"><h3>' + t[0] + "</h3><p>" + t[1] + "</p></li>").join("");
+  }
+
+  function setTab(name) {
+    tab = name;
+    ["learn", "play", "review"].forEach((t) => {
+      $("tab-" + t).setAttribute("aria-selected", String(t === name));
+      $("panel-" + t).hidden = t !== name;
+    });
+    if (name === "review") renderReview();
+    if (name === "play") { seenBoard = 99; seenDeal = true; renderTable(); }
+  }
+
+  function go(i) {
+    step = Math.max(0, Math.min(steps.length - 1, i));
+    if (i < 0) return;
+    renderTable();
+    renderCoach();
+  }
+
+  $("next").addEventListener("click", () => {
+    if (step === steps.length - 1) { seenBoard = 0; seenDeal = false; go(0); }
+    else go(step + 1);
+  });
+  $("back").addEventListener("click", () => { seenBoard = 99; go(step - 1); });
+  $("actions").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button[data-k]");
+    if (!b) return;
+    const o = steps[step].decision.options[Number(b.dataset.k)];
+    if (o.ok) go(step + 1);
+    else $("feedback").textContent = o.fb;
+  });
+  ["learn", "play", "review"].forEach((t) => $("tab-" + t).addEventListener("click", () => setTab(t)));
+  document.querySelector(".jump").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button[data-jump]");
+    if (b) $(b.dataset.jump).scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  });
+  document.addEventListener("keydown", (ev) => {
+    if (tab !== "play" || ev.target.closest("input, textarea")) return;
+    if (ev.key === "ArrowRight" && !steps[step].decision) go(step + 1);
+    if (ev.key === "ArrowLeft") { seenBoard = 99; go(step - 1); }
+  });
+
+  function start(saved) {
+    renderLearn();
+    step = Number.isInteger(saved && saved.step) ? saved.step : 0;
+    seenBoard = step ? 99 : 0;
+    seenDeal = step > 2;
+    go(step);
+    setTab((saved && saved.tab) || "play");
+  }
+  if (hot && hot.snapshot) hot.snapshot(() => ({ step, tab }));
+  if (hot && hot.ready) hot.ready(start); else start((hot && hot.data) || {});
+})();
+</script>

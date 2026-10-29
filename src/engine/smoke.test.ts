@@ -1,5 +1,5 @@
 // Step 1 smoke test: confirms the poker libraries install, run, and agree
-// with an independent hand ranker. Detailed rules tests come in Step 2.
+// with an independent hand ranker. Detailed rules tests are in scenarios.test.ts.
 import { describe, expect, it } from "vitest";
 import { createBrowserEngine } from "@pokertools/engine/browser";
 import { evaluateStrings, rankBoard, rankDescription } from "@pokertools/evaluator";

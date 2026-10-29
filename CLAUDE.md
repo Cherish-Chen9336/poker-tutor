@@ -20,7 +20,7 @@ A single-player browser app for learning Texas Hold'em from zero: the learner pl
 Decided 2026-10-28 together with Codex (thread `01a1823c-03a5-7e90-9101-798007d1ecff`).
 
 - TypeScript + React + Vite. Vitest for tests. Oxlint for linting.
-- Node 24 (see `.nvmrc`), because `@pokertools/engine` requires it. Run `nvm use` before running npm commands.
+- Node 24 (see `.nvmrc`), because `@pokertools/engine` requires it. Run `nvm use` before running npm commands. `npm ci` warns "EBADENGINE" because the library also asks for npm 12.2+, while Node 24 ships npm 11; this is harmless, but CI must not set `engine-strict`.
 - **Engine:** `@pokertools/engine` 2.1.0, which handles dealing, betting, side pots, and refunds of uncalled bets.
 - **Hand ranking:** `@pokertools/evaluator` 2.1.0. A lower score is a stronger hand.
 - **Cross-check:** `pokersolver` (dev only) independently confirms the evaluator. Its types are in `src/types/pokersolver.d.ts`.
@@ -31,11 +31,16 @@ Decided 2026-10-28 together with Codex (thread `01a1823c-03a5-7e90-9101-798007d1
 
 ## Library rules
 
-- Always create engines with `createBrowserEngine` from `@pokertools/engine/browser`. The default engine's shuffler uses Node's `crypto` module, which does not exist in browsers.
+- App code (screens, bots, lessons) uses only the adapter in `src/game/` (`Table` and the types in `src/game/types.ts`), never `@pokertools` directly. Only `src/game/` and the engine tests import the library.
+- The adapter builds its engine with `new PokerEngine` and a random source that uses queued shuffle numbers for a fixed deal and otherwise `getBrowserRNG()` (Web Crypto). Never rely on the engine's default shuffler: it uses Node's `crypto` module, which does not exist in browsers.
 - The evaluator's `HandRank` is a `const enum` and `getHandRank` is not exported. Use `rankBoard` and `rankDescription` instead.
-- `@pokertools` is young (7 GitHub stars). App code must access it only through an app-owned adapter, so the library could be replaced. Rules tests must pass before UI is built on top of it.
-- **Local patch** (`patches/@pokertools+engine+2.1.0.patch`, reapplied by `postinstall`): `calculateSidePots` merges pot levels that have identical eligible seats. Without it, when folded players had invested different amounts, a tied pot was split level by level and odd chips went to the wrong player (14/16 instead of 15/15). The regression test is in `src/engine/rules.test.ts`. The bug was not reported upstream as of 2026-10-29. Recheck the patch whenever the library is upgraded.
-- `createBrowserEngine` ignores a supplied `randomProvider`. Tests and guided lessons build fixed deals with `new PokerEngine({ randomProvider: riggedRandom(...) })` (see `src/engine/test-helpers.ts`). Normal play must keep using `createBrowserEngine`.
+- `@pokertools` is young (7 GitHub stars), which is why it sits behind the adapter and could be replaced. The rules tests (`src/engine/scenarios.test.ts`) must pass before UI is built on top of it.
+- **Local patch** (`patches/@pokertools+engine+2.1.0.patch`, reapplied by `postinstall`). Neither bug was reported upstream as of 2026-10-29. Recheck the patch whenever the library is upgraded. It fixes two bugs:
+  - `calculateSidePots` (`side-pots.js`) merges pot levels that have identical eligible seats. Without it, when folded players had invested different amounts, a tied pot was split level by level and odd chips went to the wrong player (14/16 instead of 15/15). Regression test: `src/engine/rules.test.ts`.
+  - `isActionComplete` (`action-order.js`) ends the betting when only one player with chips is left against all-in opponents and has matched every chip actually bet; `handleDeal` (`dealing.js`) runs that check right after the blinds are posted. Without it, that player was still asked to act: folding crashed the engine ("Side pot has no eligible players") or gave up a pot that should have gone to showdown. Found by Codex. Regression tests: scenarios 20 and 21.
+- **Empty seats:** with 3+ players and an empty or busted seat, the engine can make the same player post the big blind twice in a row (it treats empty seats as dead blind positions). Going down to heads-up works correctly. Until this is solved, `Table.dealHand()` refuses 3+ player tables with a gap. **Open decision for Step 6:** top up busted bots between hands so seats never empty, or have the adapter place the blinds itself.
+- `createBrowserEngine` ignores a supplied `randomProvider`, so the adapter doesn't use it. Fixed deals (`src/game/fixed-deal.ts`) work by reversing the engine's Fisher-Yates shuffle, which assumes the unshuffled deck is card codes 0–51 in order. The rigged-deck test in `src/engine/rules.test.ts` guards that assumption.
+- The engine accepts some loose input that the adapter rejects on purpose: "bet" when there is already a bet (it turns it into a raise), amounts above a player's stack (it treats them as all-in), and bets or raises when no opponent has chips left to respond. The adapter's legal moves are cross-checked against the engine in `src/game/table.test.ts`.
 - Chip totals must count stacks, pots, and `currentBets`. Bets in front of players are not in `pots` until the street ends.
 
 ## Teaching correctness
@@ -49,8 +54,8 @@ Decided 2026-10-28 together with Codex (thread `01a1823c-03a5-7e90-9101-798007d1
 Revised 2026-10-29 after a whole-plan review with Codex.
 
 1. ✅ Setup and library smoke tests (`src/engine/smoke.test.ts`)
-2. **Visual preview:** a clickable sketch of the table and one narrated example hand, so Ella can picture the app
-3. **Engine validation and adapter:** rules tests from `docs/rules-scenarios.md` (Claude verifies the expected results against the TDA rules; Ella reviews whether the explanations make sense to a beginner), plus the app-owned adapter (legal actions and amounts, player views without hidden cards, settlement, fixed deals for tests and lessons)
+2. ✅ **Visual preview:** a clickable sketch of the table and one narrated example hand. Saved as the design reference in `docs/design/preview.html`: a dark "card room" look (Bodoni Moda, Instrument Sans, IBM Plex Mono), a coach that explains *why*, and hand odds for 7 cards (2 private + 5 shared), not 5.
+3. ✅ **Engine validation and adapter:** rules tests from `docs/rules-scenarios.md` (Claude verifies the expected results against the TDA rules; Ella reviews whether the explanations make sense to a beginner), plus the app-owned adapter (legal actions and amounts, player views without hidden cards, settlement, fixed deals for tests and lessons)
 4. **Learn:** about six short lessons with quick checks. Cover the goal and winning when everyone else folds, 2 private vs. 5 shared cards, hand rankings, the button and blinds, actions ("raise to" vs. "raise by"), and the showdown, ending with a guided practice hand. Early lessons use fixed examples plus the evaluator; the guided hand uses the real engine through the adapter. Never build a second betting engine.
 5. **Heads-up play** against one simple bot with a coach panel, plus a basic post-hand review
 6. **Six players, live hints, and win odds**
@@ -59,6 +64,10 @@ Throughout the plan:
 - Deploy early to GitHub Pages, and add CI on Node 24 (`npm ci`, test, lint, build).
 - Build mobile-friendly layouts, keyboard controls, and card labels that don't rely on color alone.
 - Save lesson progress in the browser, with a reset option.
+
+Notes for Steps 4–6 (from the Step 3 review with Codex):
+- Give each bot its own `table.view(seat)`, never the engine state, so bots can't see hidden cards.
+- The adapter keeps no hand history yet. Before building Review, record each accepted move with the viewer's `TableView` at that moment, so reviews judge decisions only on what the player knew then.
 
 Bots use one documented, reproducible policy that sees only that bot's cards and public information. Out of scope for v1: strategy grading, multiple bot personalities, advanced odds modeling.
 
