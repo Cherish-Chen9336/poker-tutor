@@ -1,6 +1,6 @@
 // Hand strength for lessons and diagrams, in the app's own terms. Cards are
 // codes like "As" (ace of spades) and "Th" (ten of hearts).
-import { evaluateStrings, rankBoard, rankDescription } from "@pokertools/evaluator";
+import { evaluate, evaluateStrings, getCardCodes, rankBoard, rankDescription } from "@pokertools/evaluator";
 
 export type Comparison = "a" | "b" | "tie";
 
@@ -70,4 +70,32 @@ export function oneCardOdds(a: string[], b: string[], board: string[]): Odds {
     }
   }
   return { wins, ties, total, equity: (wins + ties / 2) / total };
+}
+
+/**
+ * Two known hands all-in before the flop: counts every possible 5-card board
+ * (1,712,304 of them) by result for hand `a`.
+ */
+export function allBoardsOdds(a: string[], b: string[]): { wins: number; ties: number; losses: number; total: number } {
+  const used = new Set([...a, ...b]);
+  const rest = getCardCodes([..."23456789TJQKA"].flatMap((r) => [..."shdc"].map((s) => r + s)).filter((c) => !used.has(c)));
+  const [a1, a2] = getCardCodes(a);
+  const [b1, b2] = getCardCodes(b);
+  let wins = 0;
+  let ties = 0;
+  let total = 0;
+  const n = rest.length;
+  for (let i = 0; i < n; i++)
+    for (let j = i + 1; j < n; j++)
+      for (let k = j + 1; k < n; k++)
+        for (let l = k + 1; l < n; l++)
+          for (let m = l + 1; m < n; m++) {
+            const board = [rest[i], rest[j], rest[k], rest[l], rest[m]];
+            const x = evaluate([a1, a2, ...board]);
+            const y = evaluate([b1, b2, ...board]);
+            total++;
+            if (x < y) wins++;
+            else if (x === y) ties++;
+          }
+  return { wins, ties, losses: total - wins - ties, total };
 }

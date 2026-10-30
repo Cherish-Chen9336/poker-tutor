@@ -2,7 +2,7 @@
 // results by the evaluator, game situations by the real engine (Table),
 // arithmetic by exact math. "review" questions need a person instead.
 import { describe, expect, it } from "vitest";
-import { bestFive, compareHands, handName, handScore, oneCardOdds } from "../game/hands";
+import { allBoardsOdds, bestFive, compareHands, handName, handScore, oneCardOdds } from "../game/hands";
 import { Table } from "../game/table";
 import type { Move } from "../game/types";
 import lessonsDoc from "../../docs/lessons.md?raw";
@@ -317,6 +317,31 @@ const checks: Record<string, () => void> = {
     // 9 of 47 unseen cards are hearts, versus 13 of 52 with no cards seen.
     expect(9 / 47).toBeLessThan(13 / 52);
     expectAnswer("L10-Q3", 0);
+  },
+  "L11-Q1": () => {
+    // Bluffing 50 into 100 breaks even when the fold rate f gives f × 100 = (1 − f) × 50.
+    const f = 50 / (100 + 50);
+    expect(f * 100 - (1 - f) * 50).toBeCloseTo(0);
+    expect((f * 100).toFixed(0)).toBe("33");
+    expectAnswer("L11-Q1", 0);
+  },
+  "L13-Q2": () => {
+    const odds = allBoardsOdds(["Ah", "As"], ["Kc", "Kd"]);
+    expect(odds.total).toBe(1_712_304);
+    expect(((odds.losses / odds.total) * 100).toFixed(1)).toBe("18.6");
+    expect(((odds.ties / odds.total) * 100).toFixed(1)).toBe("0.4");
+    expectAnswer("L13-Q2", 1);
+  },
+  "L14-Q1": () => {
+    expect((1 * 0.6 - 0.4) / 1).toBeCloseTo(0.2);
+    expectAnswer("L14-Q1", 1);
+  },
+  "L14-Q2": () => {
+    // Growth per bet at 20% (twice Kelly for a 55% even-money bet) is about zero, and slightly below.
+    const growth = 0.55 * Math.log(1.2) + 0.45 * Math.log(0.8);
+    expect(Math.abs(growth)).toBeLessThan(0.0005);
+    expect(growth).toBeLessThan(0);
+    expectAnswer("L14-Q2", 1);
   },
 };
 

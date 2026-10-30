@@ -347,6 +347,19 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 .verdict.mistake .verdict-tag { color: var(--bad); background: rgba(239, 138, 128, 0.12); }
 .verdict.good .verdict-tag { color: var(--good); background: rgba(134, 207, 161, 0.12); }
 
+/* Lessons 11–14 */
+.tree { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.branch { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.branch .node { margin: 0; }
+.branch .node.sub { color: var(--brass); font: 500 13px var(--f-mono); letter-spacing: 0.04em; margin: 6px 0 8px; }
+.branch ul { list-style: none; margin: 0; padding: 0 0 0 12px; border-left: 2px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.leaf { display: flex; justify-content: space-between; gap: 10px; font-size: 14.5px; }
+.leaf b { font-family: var(--f-mono); font-weight: 500; white-space: nowrap; }
+.leaf.win b { color: var(--good); }
+.leaf.lose b { color: var(--bad); }
+.leaf.zero b { color: var(--muted); }
+.formula { background: var(--panel-hi); border-radius: 10px; padding: 12px 16px; }
+
 /* Quick checks */
 .quiz { margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 16px; max-width: 68ch; }
 .quiz h2 { font-family: var(--f-display); font-size: 26px; margin: 0; }

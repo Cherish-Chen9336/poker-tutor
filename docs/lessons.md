@@ -635,14 +635,14 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 **L11-Q2.** In the tiny game, why does the player with the strong hands need some bluffs?
 - A. Bluffs win more than value bets
-- B. **Without bluffs, the opponent can fold to every bet and lose nothing extra**
+- B. **Without bluffs, the opponent can fold to every bet and lose nothing extra** ✓
 - C. The rules require it
 - *Why:* If every bet means the best hand, folding is always right. Bluffs make calling worthwhile, so your strong hands get paid.
 - *Checked by:* review
 
 **L11-Q3.** Your opponent never folds. Should you bluff?
 - A. Yes, at least 1 time in 3
-- B. **No; bet your good hands instead**
+- B. **No; bet your good hands instead** ✓
 - *Why:* A bluff only wins when the opponent folds. Against someone who always calls, every bluff loses.
 - *Checked by:* review
 
@@ -664,13 +664,13 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 **L12-Q1.** Two situations look the same: same cards, same pot, same bet to call. In one, you put 60 of the pot's chips in; in the other, your opponent did. Should your decision differ?
 - A. Yes, protect your 60
-- B. **No; only the pot and the price matter now**
+- B. **No; only the pot and the price matter now** ✓
 - *Why:* The chips in the pot are the same either way. Who put them there doesn't change what a call wins or costs from here.
 - *Checked by:* review
 
 **L12-Q2.** Which earlier fact is a good reason to consider calling?
 - A. "I've already put in a lot"
-- B. **"The pot is big compared with the price of calling"**
+- B. **"The pot is big compared with the price of calling"** ✓
 - *Why:* A bigger pot lowers the chance you need to break even. Your own past spending doesn't.
 - *Checked by:* review
 
@@ -700,13 +700,13 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 **L13-Q1.** You made a call that needed 11% and had 20%. You lost the hand. Was the call a mistake?
 - A. Yes, because you lost
-- B. **No; it was right for the information you had**
+- B. **No; it was right for the information you had** ✓
 - *Why:* A call that wins more than it costs on average is right, even though it loses most single tries.
 - *Checked by:* review
 
 **L13-Q2.** A♥ A♠ all-in before the flop against K♣ K♦ loses about how often?
 - A. Almost never
-- B. **About 1 time in 5 (18.6%)**
+- B. **About 1 time in 5 (18.6%)** ✓
 - C. About half the time
 - *Why:* Counted over all 1,712,304 boards, the kings win 18.6% and 0.4% are ties. Strong favorites still lose often.
 - *Checked by:* math (exact count of all boards)
@@ -725,9 +725,19 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 **What Kelly does and doesn't promise:** it makes your bankroll grow fastest *over the long run*. It doesn't promise profit in the short run, and the swings along the way are large.
 
-**Betting too much is worse than betting too little.** In the 55% example:
-- Half Kelly (5%) still gets about 75% of the long-run growth, with much smaller swings.
-- Twice Kelly (20%) gets about *no* growth at all, despite the edge.
+**Betting too much is worse than betting too little.** Take a typical run of 100 bets in the 55% example: 55 wins and 45 losses. Each win multiplies your bankroll by (1 + the fraction you bet), and each loss by (1 − that fraction). The order doesn't matter, because multiplying gives the same answer in any order. Starting with 100:
+
+| You risk each time | After 55 wins and 45 losses |
+|---|---|
+| Half Kelly (5%) | about 146 (1.05⁵⁵ × 0.95⁴⁵) |
+| Kelly (10%) | about 165 (1.10⁵⁵ × 0.90⁴⁵) |
+| Twice Kelly (20%) | about 99 (1.20⁵⁵ × 0.80⁴⁵) |
+
+- **Half Kelly** grows at about three-quarters of Kelly's speed (as a growth rate per bet), with much smaller swings.
+- **Twice Kelly** ends up about where it started, even though you won 55% of the time. Losing 20% takes you to 80, and winning 20% from there only gets you back to 96. That drag eats the whole edge.
+- Real runs are luckier or unluckier than "55 out of 100", but over many bets this is the typical result.
+
+**Kelly is a guide, not a rule.** Each player chooses how much to risk: full Kelly, half, a quarter, or a simple rule of their own. A smaller fraction grows more slowly but swings less, and it hurts less if you've overestimated your edge.
 
 **Why poker players risk much less than Kelly:**
 - In poker, you never know your exact chance of winning, and your edge comes and goes with your opponents and your own play.
@@ -742,21 +752,21 @@ This lesson explains the math; it isn't advice about real money.
 
 **L14-Q1.** An even-money bet wins 60% of the time. What fraction does Kelly suggest?
 - A. 60%
-- B. **20%**
+- B. **20%** ✓
 - C. 10%
 - *Why:* (1 × 0.6 − 0.4) ÷ 1 = 0.2, so 20% of your bankroll.
 - *Checked by:* math
 
 **L14-Q2.** In the 55% example, what happens if you always bet twice the Kelly fraction (20%)?
 - A. You grow twice as fast
-- B. **You grow about not at all over the long run**
+- B. **You grow about not at all over the long run** ✓
 - C. You can't lose
 - *Why:* Betting too much makes the losses hurt more than the wins help. At twice Kelly, the long-run growth drops to about zero.
 - *Checked by:* math
 
 **L14-Q3.** Why do poker players usually risk less than Kelly suggests?
 - A. Kelly is only for casinos
-- B. **They never know their exact edge, and overbetting is the costly mistake**
+- B. **They never know their exact edge, and overbetting is the costly mistake** ✓
 - C. Poker doesn't involve risk
 - *Why:* Kelly needs a known chance of winning. In poker the edge is uncertain, so a smaller fraction protects against overestimating it.
 - *Checked by:* review

@@ -4,11 +4,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import lessonsDoc from "../../docs/lessons.md?raw";
-import { compareHands, handName } from "../game/hands";
+import { allBoardsOdds, compareHands, handName } from "../game/hands";
 import { Table } from "../game/table";
 import type { Move } from "../game/types";
 import { Lesson3, Lesson6 } from "./content/rules-lessons";
 import { Lesson9 } from "./content/thinking-lessons";
+import { Lesson11, Lesson13, Lesson14 } from "./content/after-play-lessons";
 
 /** Visible text of a lesson, with card pictures read as their labels ("A♥" style isn't used; tokens become names). */
 function shown(Lesson: () => React.ReactNode): string {
@@ -95,5 +96,35 @@ describe("lesson text claims", () => {
     // The error isn't steady: the shortcut is a little low with few outs and too high with many.
     expect(4 * 4).toBeLessThan(exact(4) * 100);
     expect(4 * 15).toBeGreaterThan(exact(15) * 100);
+  });
+  it("lesson 11: the toy game's balance points", () => {
+    stated(Lesson11, "your opponent's call breaks even when 1 bet in 4 is a bluff. You get there by betting all your best hands and bluffing with 1 in 3 of your \"nothing\" hands.");
+    stated(Lesson11, "If your opponent calls 2 times in 3, your bluffs break even: you win 100 one time in 3 and lose 50 two times in 3.");
+    const P = 100;
+    const B = 50;
+    // Bet every best hand (half the time) and 1 in 3 of the "nothing" hands: 1 bet in 4 is a bluff.
+    const bluffShare = (0.5 / 3) / (0.5 + 0.5 / 3);
+    expect(bluffShare).toBeCloseTo(0.25);
+    expect(bluffShare).toBeCloseTo(B / (P + 2 * B));
+    expect(bluffShare * (P + B) - (1 - bluffShare) * B).toBeCloseTo(0); // calling breaks even
+    expect((1 / 3) * P - (2 / 3) * B).toBeCloseTo(0); // bluffing breaks even against calls 2 times in 3
+    expect(1 / 3).toBeCloseTo(B / (P + B)); // the fold rate a bluff needs
+  });
+
+  it("lesson 13: aces against kings, and how the kings win", () => {
+    stated(Lesson13, "wins 81.1% of the time, loses 18.6%, and ties 0.4% (counted over all 1,712,304 possible boards).");
+    const odds = allBoardsOdds(["Ah", "As"], ["Kc", "Kd"]);
+    const pct = (n: number) => ((n / odds.total) * 100).toFixed(1);
+    expect([odds.total, pct(odds.wins), pct(odds.losses), pct(odds.ties)]).toEqual([1_712_304, "81.1", "18.6", "0.4"]);
+    expect(compareHands(["Kc", "Kd"], ["Ah", "As"], ["Kh", "7c", "2d", "9s", "4h"])).toBe("a");
+  });
+
+  it("lesson 14: Kelly's table and the twice-Kelly drag", () => {
+    stated(Lesson14, "Losing 20% takes you to 80, and winning 20% from there only gets you back to 96.");
+    const after = (f: number) => 100 * (1 + f) ** 55 * (1 - f) ** 45;
+    expect([after(0.05), after(0.1), after(0.2)].map(Math.round)).toEqual([146, 165, 99]);
+    const rate = (f: number) => 0.55 * Math.log(1 + f) + 0.45 * Math.log(1 - f);
+    expect(rate(0.05) / rate(0.1)).toBeCloseTo(0.75, 2); // "about three-quarters of Kelly's speed"
+    expect(100 * 0.8 * 1.2).toBeCloseTo(96);
   });
 });

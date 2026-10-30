@@ -75,6 +75,7 @@ function update(next: HandRecord[]) {
 }
 
 let counter = 0;
+const NO_HANDS: HandRecord[] = [];
 
 export function useHands() {
   const state = useSyncExternalStore(
@@ -83,6 +84,7 @@ export function useHands() {
       return () => listeners.delete(onChange);
     },
     currentHands,
+    () => NO_HANDS, // when rendered outside a browser (tests), there are no saved hands
   );
   const addHand = useCallback((record: HandRecord) => {
     const stamped: HandRecord = { ...record, id: `${Date.now().toString(36)}-${(counter++).toString(36)}`, playedAt: new Date().toISOString() };
