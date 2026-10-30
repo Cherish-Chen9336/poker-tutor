@@ -3,15 +3,11 @@
 // player A lost the first 3 outright (a tie breaks the streak); we then look at
 // A's starting hand in the 4th. Every hand is a fresh shuffle, so the chance of
 // a premium hand there is the same as anywhere: 34/1326.
-import { getBrowserRNG } from "@pokertools/engine/browser";
 import { compareHands } from "./hands";
 
 export const DECK = "23456789TJQKA".split("").flatMap((rank) => "shdc".split("").map((suit) => rank + suit));
 
-/** The app's random source for simulations: Web Crypto, never the engine's default shuffle. */
-export function secureRandom(): () => number {
-  return getBrowserRNG();
-}
+export { secureRandom } from "./random";
 
 /** A-A, K-K, Q-Q, or A-K (any suits). */
 export function isPremium(hole: string[]): boolean {

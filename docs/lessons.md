@@ -592,3 +592,171 @@ Same cards, different prices, different answers. The price matters as much as yo
 - B. No, that's the gambler's fallacy
 - *Why:* Within one hand, cards you've seen are gone from the deck. The fallacy is only about separate shuffles.
 - *Checked by:* review
+
+---
+
+# After you start playing (Step 5)
+
+These four lessons come after the Play area opens, so they can point back to hands you've played.
+
+## Lesson 11: Why bluffing works
+
+**A bluff** is a bet with a hand that's probably worse, hoping better hands fold. It can seem like a trick, but game theory (the math of decisions against an opponent who is also thinking) shows that good play *needs* some bluffs.
+
+**A tiny game to see why.** It's the river. The pot is 100. You either have the best possible hand or nothing at all, with equal chances, and your opponent knows that. Your opponent always holds a medium hand: it beats nothing and loses to your best hand. You may check (then the cards are shown) or bet exactly 50. If you bet, your opponent calls or folds. Nothing else can happen.
+
+[Diagram: a two-branch tree. "Best hand" → bet. "Nothing" → bet (bluff) or check. Opponent → call or fold, with the chips won or lost at each end.]
+
+- **If you never bluff,** every bet means the best hand. Your opponent simply folds to every bet, so your strong hands win only the 100 that was already there.
+- **If you always bluff,** your bets mean nothing. Your opponent calls every time, and each bluff loses 50.
+- **In between, there's a balance.** Calling costs 50 to win 150 (the pot plus your bet), so your opponent's call breaks even when 1 bet in 4 is a bluff. You get there by betting all your best hands and bluffing with 1 in 3 of your "nothing" hands. Then your opponent can't do better by always calling or always folding.
+- **The same balance works the other way.** If your opponent calls 2 times in 3, your bluffs break even: you win 100 one time in 3 and lose 50 two times in 3.
+
+Choosing between moves at random, in fixed proportions, is called a **mixed strategy**. The point isn't to be random for its own sake; it's to keep your bets from telling your opponent what you hold.
+
+**The formulas from this game** (pot P, bet B, no other choices):
+- A bluff breaks even if your opponent folds more than **B ÷ (P + B)** of the time.
+- Your opponent's calls break even when **B ÷ (P + 2B)** of your bets are bluffs.
+
+These hold only in this toy game. Real hands have many in-between holdings, more betting rounds, and ties.
+
+**Two practical lessons:**
+- Against someone who never folds, don't bluff. Bet your good hands bigger instead.
+- Against someone who folds too often, bluff more. This app's bot sometimes bluffs, and so should you, occasionally.
+
+### Quick checks
+
+**L11-Q1.** The pot is 100 and you bluff 50. How often must your opponent fold for the bluff to break even?
+- A. **One time in 3 (33%)** ✓
+- B. Half the time
+- C. One time in 4 (25%)
+- *Why:* You risk 50 to win 100. Folding 1 time in 3 wins 100 once and loses 50 twice: 100 − 100 = 0.
+- *Checked by:* math
+
+**L11-Q2.** In the tiny game, why does the player with the strong hands need some bluffs?
+- A. Bluffs win more than value bets
+- B. **Without bluffs, the opponent can fold to every bet and lose nothing extra**
+- C. The rules require it
+- *Why:* If every bet means the best hand, folding is always right. Bluffs make calling worthwhile, so your strong hands get paid.
+- *Checked by:* review
+
+**L11-Q3.** Your opponent never folds. Should you bluff?
+- A. Yes, at least 1 time in 3
+- B. **No; bet your good hands instead**
+- *Why:* A bluff only wins when the opponent folds. Against someone who always calls, every bluff loses.
+- *Checked by:* review
+
+---
+
+## Lesson 12: Sunk cost
+
+**A sunk cost** is something you've already paid and can't get back. The trap is letting it drive your next decision: "I've already put 60 in, so I can't fold now."
+
+**Chips in the pot aren't yours anymore.** Once you bet, those chips belong to the pot. Folding doesn't lose them again; they were already gone. The only question is: from here, does the next call pay off on average?
+
+**But don't ignore everything earlier.** Two things from the past still matter:
+- **The size of the pot.** Your earlier bets made the pot bigger. The bigger the pot, the smaller the chance of winning you need for the same call to pay off (Lesson 9). For example, calling 20 to win a pot of 40 needs a 33% chance: 20 ÷ (40 + 20). Calling the same 20 to win a pot of 180 needs only 10%: 20 ÷ (180 + 20). That's a real reason to call, and it's the same no matter *who* put those chips in.
+- **What the betting told you.** How your opponent bet earlier is information about their hand.
+
+**A test you can use:** imagine someone else had put in your earlier chips, and you just sat down in this exact spot with this pot. Would you call? If yes, call. If no, your earlier chips are no reason to.
+
+### Quick checks
+
+**L12-Q1.** Two situations look the same: same cards, same pot, same bet to call. In one, you put 60 of the pot's chips in; in the other, your opponent did. Should your decision differ?
+- A. Yes, protect your 60
+- B. **No; only the pot and the price matter now**
+- *Why:* The chips in the pot are the same either way. Who put them there doesn't change what a call wins or costs from here.
+- *Checked by:* review
+
+**L12-Q2.** Which earlier fact is a good reason to consider calling?
+- A. "I've already put in a lot"
+- B. **"The pot is big compared with the price of calling"**
+- *Why:* A bigger pot lowers the chance you need to break even. Your own past spending doesn't.
+- *Checked by:* review
+
+---
+
+## Lesson 13: Resulting
+
+**Resulting** means judging a decision by how it turned out. In poker that's a trap, because luck decides single hands.
+
+**A good decision can lose.** In Lesson 9's Case 2, calling was right: you needed 11.1% and had 20.5%. Yet you lose that hand about 4 times in 5. Losing it doesn't make the call a mistake.
+
+**A bad decision can win.** Calling in Case 1 (needing 33.3% with 20.5%) loses chips on average. When the heart comes, it wins this time, but it's still a bad habit.
+
+**Even the best spots lose often.** Before the flop, A♥ A♠ all-in against K♣ K♦ wins 81.1% of the time, loses 18.6%, and ties 0.4% (counted over all 1,712,304 possible boards). If you play that spot 10 times, you'll likely lose it at least once.
+
+**Why can the aces lose?** When both players are all-in before the flop, no one can fold anymore, but all 5 shared cards are still to come, and they can change who's ahead:
+- **A king comes.** Two kings are still in the deck. If one lands on the board, the kings become three of a kind (or better) and beat the pair of aces. For example, with a board of K♥ 7♣ 2♦ 9♠ 4♥, the kings have K-K-K and the aces have just a pair. This decides about 16 boards in 100.
+- **The kings make a straight or a flush.** For example, four clubs on the board give K♣ a flush, and the aces have no club. This decides about 2.6 boards in 100.
+- **Together, that's the 18.6%.** The aces' pair is better *now*, but it isn't a finished hand until the river.
+
+**How to judge instead:**
+- Ask what you knew *at the moment you decided*: your cards, the board, the pot, the price, and what the betting suggested.
+- Ask whether the decision made sense with that information, before looking at how it ended. The Review screen shows each decision this way.
+- One result proves little. Many results together can tell you whether a habit works.
+
+### Quick checks
+
+**L13-Q1.** You made a call that needed 11% and had 20%. You lost the hand. Was the call a mistake?
+- A. Yes, because you lost
+- B. **No; it was right for the information you had**
+- *Why:* A call that wins more than it costs on average is right, even though it loses most single tries.
+- *Checked by:* review
+
+**L13-Q2.** A♥ A♠ all-in before the flop against K♣ K♦ loses about how often?
+- A. Almost never
+- B. **About 1 time in 5 (18.6%)**
+- C. About half the time
+- *Why:* Counted over all 1,712,304 boards, the kings win 18.6% and 0.4% are ties. Strong favorites still lose often.
+- *Checked by:* math (exact count of all boards)
+
+---
+
+## Lesson 14: Bankroll and the Kelly criterion
+
+**Your bankroll** is the money you set aside for a game. This app uses play chips only, but the idea matters for any risky choice: how much of what you have should you risk at once?
+
+**The Kelly criterion** (John Kelly, Bell Labs, 1956) answers that for a simple, repeated bet where you know your exact chance of winning. For a bet that pays b for each 1 you risk, with chance p of winning and no ties:
+
+**Kelly fraction = (b × p − (1 − p)) ÷ b**, or nothing if that comes out at zero or less.
+
+**Example:** an even-money bet (b = 1) that wins 55% of the time. Kelly says risk (0.55 − 0.45) ÷ 1 = **10%** of your bankroll each time.
+
+**What Kelly does and doesn't promise:** it makes your bankroll grow fastest *over the long run*. It doesn't promise profit in the short run, and the swings along the way are large.
+
+**Betting too much is worse than betting too little.** In the 55% example:
+- Half Kelly (5%) still gets about 75% of the long-run growth, with much smaller swings.
+- Twice Kelly (20%) gets about *no* growth at all, despite the edge.
+
+**Why poker players risk much less than Kelly:**
+- In poker, you never know your exact chance of winning, and your edge comes and goes with your opponents and your own play.
+- If you overestimate your edge, Kelly tells you to bet too much, and too much is the costly direction.
+- So players use fractions of Kelly, or simple rules such as keeping many times the amount they bring to one table.
+
+**Don't use Kelly on single hands.** It's about how much of your bankroll to bring and risk over many games, not how much to bet in one pot. Inside a hand, use pot odds (Lesson 9).
+
+This lesson explains the math; it isn't advice about real money.
+
+### Quick checks
+
+**L14-Q1.** An even-money bet wins 60% of the time. What fraction does Kelly suggest?
+- A. 60%
+- B. **20%**
+- C. 10%
+- *Why:* (1 × 0.6 − 0.4) ÷ 1 = 0.2, so 20% of your bankroll.
+- *Checked by:* math
+
+**L14-Q2.** In the 55% example, what happens if you always bet twice the Kelly fraction (20%)?
+- A. You grow twice as fast
+- B. **You grow about not at all over the long run**
+- C. You can't lose
+- *Why:* Betting too much makes the losses hurt more than the wins help. At twice Kelly, the long-run growth drops to about zero.
+- *Checked by:* math
+
+**L14-Q3.** Why do poker players usually risk less than Kelly suggests?
+- A. Kelly is only for casinos
+- B. **They never know their exact edge, and overbetting is the costly mistake**
+- C. Poker doesn't involve risk
+- *Why:* Kelly needs a known chance of winning. In poker the edge is uncertain, so a smaller fraction protects against overestimating it.
+- *Checked by:* review
