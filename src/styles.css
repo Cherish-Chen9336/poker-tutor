@@ -1,0 +1,147 @@
+/* A lamp-lit card room (see docs/design/preview.html): dark wood and brass, with felt green for the table. */
+:root {
+  --room: #15110e;
+  --lamp: #2b2119;
+  --panel: #1f1915;
+  --panel-hi: #29211b;
+  --line: #3a3027;
+  --ink: #f3ede2;
+  --muted: #a99e8c;
+  --brass: #d4ab55;
+  --brass-dim: rgba(212, 171, 85, 0.35);
+  --brass-ink: #1e1607;
+  --felt: #1f6c4a;
+  --felt-deep: #0c3925;
+  --card: #fbf9f3;
+  --card-edge: #d6cfbf;
+  --suit-red: #bd2530;
+  --suit-black: #1b1b1d;
+  --good: #86cfa1;
+  --warn: #e6b866;
+  --bad: #ef8a80;
+  --shadow: rgba(0, 0, 0, 0.45);
+
+  --f-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --f-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--room); }
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.55;
+  background: radial-gradient(ellipse 90% 60% at 50% -10%, var(--lamp) 0%, var(--room) 70%) var(--room);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 40px;
+}
+a { color: var(--brass); }
+a:hover { color: var(--ink); }
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; border-radius: 4px; }
+h1:focus { outline: none; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.shell { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+
+/* Header */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap; }
+.brand {
+  font-family: var(--f-display); font-weight: 700; font-size: 28px; line-height: 1.1; letter-spacing: 0.01em;
+  color: var(--ink); text-decoration: none;
+}
+.brand:hover { color: var(--brass); }
+.tabs { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+.tabs a {
+  font: 500 15px var(--f-body); color: var(--muted); text-decoration: none; border-radius: 999px;
+  padding: 8px 18px; min-height: 40px; display: inline-flex; align-items: center;
+}
+.tabs a:hover { color: var(--ink); }
+.tabs a[aria-current="page"] { background: var(--brass); color: var(--brass-ink); }
+
+/* Panels */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
+.panel h1 { font-family: var(--f-display); font-size: 34px; line-height: 1.12; font-weight: 700; margin: 0 0 8px; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 62ch; font-size: 17px; }
+.note { margin: 18px 0 0; padding: 12px 16px; background: var(--panel-hi); border-radius: 10px; max-width: 70ch; }
+.note.warn { border-left: 3px solid var(--warn); }
+.eyebrow {
+  margin: 0 0 6px; font: 500 12px var(--f-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass);
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+}
+
+/* Buttons and button-like links */
+.button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px;
+  font: 600 15px var(--f-body); padding: 10px 18px; border-radius: 10px; cursor: pointer; text-decoration: none;
+  border: 1px solid var(--line); background: transparent; color: var(--ink);
+}
+.button:hover { border-color: var(--brass); color: var(--ink); }
+.button.primary { background: var(--brass); color: var(--brass-ink); border-color: var(--brass); }
+.button.primary:hover { filter: brightness(1.1); color: var(--brass-ink); }
+.button.quiet { color: var(--muted); border-color: transparent; padding-inline: 8px; }
+.button.quiet:hover { color: var(--ink); }
+.button.danger { border-color: var(--bad); color: var(--bad); }
+
+/* Learn home */
+.learn { display: flex; flex-direction: column; gap: 26px; }
+.progress-row { display: flex; align-items: center; gap: 16px 24px; flex-wrap: wrap; margin-top: 22px; }
+.meter { flex: 1 1 240px; max-width: 420px; }
+.meter-label { margin: 0 0 6px; font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.meter-label b { color: var(--ink); font-family: var(--f-mono); }
+.bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--brass); border-radius: 3px; transition: width 0.3s; }
+
+.unit { display: flex; flex-direction: column; gap: 12px; }
+.unit-head h2 { font-family: var(--f-display); font-size: 24px; font-weight: 700; margin: 0; }
+.unit-head p { margin: 2px 0 0; color: var(--muted); }
+.lesson-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.lesson-card {
+  display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 4px 16px; align-items: center;
+  padding: 14px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  color: var(--ink); text-decoration: none; transition: border-color 0.2s, background 0.2s;
+}
+.lesson-card:hover { border-color: var(--brass); background: var(--panel-hi); color: var(--ink); }
+.lesson-card .num {
+  width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--brass-dim); color: var(--brass);
+  display: grid; place-items: center; font: 700 18px var(--f-display);
+}
+.lesson-card .body { display: flex; flex-direction: column; min-width: 0; }
+.lesson-card .title { font-weight: 600; font-size: 16.5px; }
+.lesson-card .summary { color: var(--muted); font-size: 14.5px; }
+.status { font: 500 12px var(--f-mono); letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; }
+.status.done { color: var(--good); background: rgba(134, 207, 161, 0.12); padding: 2px 8px; border-radius: 4px; }
+.reset { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--muted); }
+
+/* Lesson page */
+.lesson .back { display: inline-block; margin-bottom: 18px; font-size: 15px; text-decoration: none; }
+.pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+
+/* Footer */
+.foot { display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); padding-top: 8px; border-top: 1px solid var(--line); }
+
+@media (max-width: 640px) {
+  body { font-size: 15.5px; padding-block: 12px 32px; }
+  .brand { font-size: 24px; }
+  .top { flex-direction: column; align-items: stretch; }
+  .tabs a { flex: 1; justify-content: center; padding-inline: 8px; }
+  .panel { padding: 20px 18px; }
+  .panel h1 { font-size: 28px; }
+  .lede { font-size: 16px; }
+  .progress-row .button { width: 100%; }
+  .lesson-card { grid-template-columns: 36px minmax(0, 1fr); padding: 12px 14px; gap: 2px 12px; }
+  .lesson-card .num { width: 34px; height: 34px; font-size: 16px; grid-row: span 2; }
+  .lesson-card .status { grid-column: 2; justify-self: start; margin-top: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
