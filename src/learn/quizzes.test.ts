@@ -2,11 +2,13 @@
 // results by the evaluator, game situations by the real engine (Table),
 // arithmetic by exact math. "review" questions need a person instead.
 import { describe, expect, it } from "vitest";
-import { bestFive, compareHands, handName, handScore } from "../game/hands";
+import { bestFive, compareHands, handName, handScore, oneCardOdds } from "../game/hands";
 import { Table } from "../game/table";
 import type { Move } from "../game/types";
 import lessonsDoc from "../../docs/lessons.md?raw";
-import { formatPercent, RANK_LADDER, SEVEN_CARD_TOTAL } from "./diagram-data";
+import { formatPercent, LESSON9_EXAMPLE, RANK_LADDER, SEVEN_CARD_TOTAL } from "./diagram-data";
+import { GUIDED_HANDS } from "./guided-hands";
+import { GuidedRun } from "./guided-run";
 import { QUIZZES, type Question } from "./quizzes";
 
 const ALL = Object.values(QUIZZES).flat();
@@ -52,6 +54,16 @@ function play(t: Table, moves: [number, Move][]) {
 const call: Move = { type: "call" };
 const check: Move = { type: "check" };
 const fold: Move = { type: "fold" };
+
+/** Plays a guided hand to the end. */
+function guided(id: number): GuidedRun {
+  const run = new GuidedRun(GUIDED_HANDS.find((h) => h.id === id)!);
+  while (run.pending) run.tryMove(run.pending.move);
+  return run;
+}
+
+const LESSON9 = LESSON9_EXAMPLE;
+const percent = (x: number, digits = 1) => (x * 100).toFixed(digits);
 
 const checks: Record<string, () => void> = {
   "L1-Q1": () => {
@@ -248,6 +260,63 @@ const checks: Record<string, () => void> = {
   "L7-Q3": () => {
     expect(compareHands(["Ah", "Kh"], ["As", "Ks"], ["Qd", "Jc", "Th", "2s", "3c"])).toBe("tie");
     expectAnswer("L7-Q3", 1);
+  },
+  "L8-Q1": () => {
+    const run = guided(1);
+    const flop = run.log.findIndex((line) => line.startsWith("Flop:"));
+    expect(run.log[flop + 1]).toBe("The bot checks.");
+    expect(run.view().bigBlindSeat).toBe(1 - run.youSeat);
+    expectAnswer("L8-Q1", 1);
+  },
+  "L8-Q2": () => {
+    const run = guided(1);
+    expect(run.view().winners?.[0].amount).toBe(56);
+    expect(run.table.netResults()[run.youSeat]).toBe(28);
+    expectAnswer("L8-Q2", 1);
+  },
+  "L8-Q3": () => {
+    const run = guided(2);
+    expect(run.table.netResults()[run.youSeat]).toBe(-2);
+    expectAnswer("L8-Q3", 1);
+  },
+  "L8-Q4": () => {
+    const run = guided(3);
+    const view = run.view();
+    expect(view.board).toHaveLength(3);
+    expect(view.seats[1 - run.youSeat]!.status).toBe("folded");
+    expect(view.seats[1 - run.youSeat]!.cards).toBeNull();
+    expect(view.winners?.[0].bestHand).toBeNull();
+    expectAnswer("L8-Q4", 0);
+  },
+
+  "L9-Q1": () => {
+    expect(20 / (60 + 20)).toBe(0.25);
+    expectAnswer("L9-Q1", 1);
+  },
+  "L9-Q2": () => {
+    const odds = oneCardOdds(LESSON9.you, LESSON9.opponent, LESSON9.board);
+    expect([odds.wins, odds.ties, odds.total]).toEqual([9, 0, 44]);
+    expect(percent(odds.equity)).toBe("20.5");
+    expect(percent(50 / 150)).toBe("33.3");
+    expect(Math.round(odds.equity * 150 - 50)).toBe(-19);
+    expectAnswer("L9-Q2", 1);
+  },
+  "L9-Q3": () => {
+    const odds = oneCardOdds(LESSON9.you, LESSON9.opponent, LESSON9.board);
+    expect(percent(25 / 225)).toBe("11.1");
+    expect(Math.round(odds.equity * 225 - 25)).toBe(21);
+    expect(odds.equity).toBeLessThan(0.5); // "you'll lose most of the time"
+    expectAnswer("L9-Q3", 0);
+  },
+  "L9-Q4": () => {
+    expect(8 * 4).toBe(32);
+    expect(percent(1 - (39 / 47) * (38 / 46))).toBe("31.5");
+    expectAnswer("L9-Q4", 1);
+  },
+  "L10-Q3": () => {
+    // 9 of 47 unseen cards are hearts, versus 13 of 52 with no cards seen.
+    expect(9 / 47).toBeLessThan(13 / 52);
+    expectAnswer("L10-Q3", 0);
   },
 };
 

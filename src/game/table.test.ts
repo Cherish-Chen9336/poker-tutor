@@ -57,6 +57,8 @@ describe("fixed deals and hidden cards", () => {
     const shown = table.view(null);
     expect(shown.handOver).toBe(true);
     expect(shown.seats[0]!.cards).toEqual(["As", "Ah"]);
+    // The app shows every hand at a showdown, including the loser's.
+    expect(shown.seats[1]!.cards).toEqual(["Ks", "Kh"]);
     expect(shown.winners).toEqual([expect.objectContaining({ seat: 0, amount: 400 })]);
     expect(shown.winners![0].description).toMatch(/Pair/);
     expect(table.netResults()).toEqual([200, -200]);
@@ -68,6 +70,21 @@ describe("fixed deals and hidden cards", () => {
     expect(after.seats.map((s) => s!.cards)).toEqual([null, null]);
     expect(after.winners).toEqual([{ seat: 1, amount: 2, bestHand: null, description: null }]);
     expect(folded.netResults()).toEqual([-1, 1]);
+  });
+
+  it("never shows a folded player's cards, even when others reach a showdown", () => {
+    const table = newTable([200, 200, 200]);
+    table.dealHand({ hands: [["As", "Ah"], ["Ks", "Kh"], ["Qs", "Qh"]], board: DRY_BOARD });
+    table.move(0, { type: "fold" });
+    table.move(1, { type: "call" });
+    table.move(2, { type: "check" });
+    for (let i = 0; i < 3; i++) {
+      table.move(1, { type: "check" });
+      table.move(2, { type: "check" });
+    }
+    const view = table.view(1);
+    expect(view.handOver).toBe(true);
+    expect(view.seats.map((s) => s!.cards)).toEqual([null, ["Ks", "Kh"], ["Qs", "Qh"]]);
   });
 
   it("reports results when posting the blinds already ends the hand", () => {

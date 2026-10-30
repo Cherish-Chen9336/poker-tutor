@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { useTakePendingFocus } from "../app/focus";
 import type { Progress } from "../app/progress";
 import { routeHref } from "../app/route";
@@ -50,7 +50,9 @@ export default function LessonPage({ lessonId, progress, onComplete }: Props) {
 
       {Content ? (
         <div className="prose">
-          <Content />
+          <Suspense fallback={<p className="loading">Loading the lesson…</p>}>
+            <Content />
+          </Suspense>
         </div>
       ) : (
         <>

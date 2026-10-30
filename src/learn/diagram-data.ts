@@ -63,3 +63,6 @@ export function formatOneIn(count: number, total: number): string {
   const n = total / count;
   return `1 in ${n >= 10 ? Math.round(n).toLocaleString("en-US") : n.toFixed(1)}`;
 }
+
+/** Lesson 9's example: a heart flush draw against a pair of kings, one card to come. */
+export const LESSON9_EXAMPLE = { you: ["7h", "6h"], opponent: ["Ks", "Jd"], board: ["Kh", "9h", "2c", "3s"] };

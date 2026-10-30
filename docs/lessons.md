@@ -560,7 +560,7 @@ Same cards, different prices, different answers. The price matters as much as yo
 [Diagram, live: two bars. One shows "premium hands after 3 losses in a row." The other shows "premium hands in all hands." Both have a margin-of-error line and the expected 2.56% marked.]
 
 - **The chance** of a premium hand is 34 out of 1,326 starting hands, about **2.56%** (1 in 39). This doesn't change after losses.
-- **The counts will wobble.** Over a few hundred cases, the bar might show 2% or 3.5%. That's normal randomness, not a pattern. The margin-of-error line shows how much wobble to expect, and the bars shrink toward 2.56% as you deal more.
+- **The counts will wobble.** Over a few hundred cases, the bar might show 2% or 3.5%. That's normal randomness, not a pattern. The margin-of-error line shows how much wobble to expect. As you deal more, the bars settle closer to 2.56% and the margin-of-error lines get shorter.
 - The demo deals hands in groups of 4. It looks for groups where the first 3 hands were losses (a tie breaks the streak), then checks the 4th. This keeps every case independent.
 
 **Within one hand, though, seen cards do matter.** If you see 4 hearts, fewer hearts are left in the deck. That's how outs work in Lesson 9. The fallacy is about *separate* shuffles, not cards in the same hand.

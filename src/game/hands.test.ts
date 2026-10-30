@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bestFive, compareHands, handName } from "./hands";
+import { bestFive, compareHands, handName, oneCardOdds } from "./hands";
 
 describe("hand helpers", () => {
   it("names every hand type", () => {
@@ -29,5 +29,14 @@ describe("hand helpers", () => {
     expect(compareHands(["As", "Kd"], ["Ac", "Qh"], ["Ad", "8c", "4s", "9h", "2c"])).toBe("a");
     expect(compareHands(["Ac", "2d"], ["6c", "2h"], ["3s", "4d", "5h", "Kc", "9s"])).toBe("b");
     expect(compareHands(["Ah", "Kh"], ["As", "Ks"], ["Qd", "Jc", "Th", "2s", "3c"])).toBe("tie");
+  });
+
+  it("counts winning river cards exactly", () => {
+    // Lesson 9: a heart flush draw against a pair of kings.
+    expect(oneCardOdds(["7h", "6h"], ["Ks", "Jd"], ["Kh", "9h", "2c", "3s"])).toEqual({ wins: 9, ties: 0, total: 44, equity: 9 / 44 });
+    // A tie counts as half a win.
+    const split = oneCardOdds(["Ah", "2c"], ["As", "2d"], ["Kc", "Qd", "Jh", "9s"]);
+    expect(split.equity).toBeCloseTo((split.wins + split.ties / 2) / split.total);
+    expect(split.ties).toBeGreaterThan(0);
   });
 });

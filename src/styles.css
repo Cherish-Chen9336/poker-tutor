@@ -223,6 +223,76 @@ table.moves th, table.moves td { text-align: left; padding: 9px 12px; border-bot
 table.moves thead th { font: 500 12px var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 table.moves tbody th { color: var(--brass); white-space: nowrap; }
 
+/* Guided hands (lesson 8) */
+.guided-wrap { display: flex; flex-direction: column; gap: 12px; }
+.hand-tabs { align-self: flex-start; flex-wrap: wrap; }
+.ghead { font-family: var(--f-display); font-size: 21px; margin: 4px 0 0; }
+.gsub { margin: -8px 0 0; color: var(--muted); font-size: 14.5px; }
+.guided { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.gtable {
+  display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 24px;
+  background: radial-gradient(ellipse at 50% 45%, var(--felt) 0%, var(--felt-deep) 90%);
+  box-shadow: 0 0 0 10px #3c2417, 0 0 0 11px var(--brass-dim), inset 0 6px 24px var(--shadow); margin: 11px;
+}
+.gseat { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: rgba(0, 0, 0, 0.28); border: 1px solid transparent; }
+.gseat.acting { border-color: var(--brass); }
+.gseat-info { display: flex; flex-direction: column; gap: 2px; }
+.gseat-info b { display: flex; align-items: center; gap: 6px; }
+.mono { font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.gbet { font: 500 12px var(--f-mono); color: var(--brass); }
+.dealer-chip { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--card); color: var(--suit-black); font: 700 11px var(--f-body); }
+.gboard { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 6px 0; }
+.gpot { background: rgba(0, 0, 0, 0.35); padding: 2px 12px; border-radius: 999px; color: var(--ink); }
+.slot.md { width: 40px; border-color: rgba(243, 237, 226, 0.18); }
+.pc.back { background: repeating-linear-gradient(45deg, #7e1b27 0 3px, #9c2c39 3px 6px); box-shadow: 0 2px 4px var(--shadow), inset 0 0 0 2px var(--card); }
+.gside { display: flex; flex-direction: column; gap: 12px; }
+.gcoach { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.coach-says { margin: 0; }
+.ask { margin: 0; color: var(--muted); font-size: 14.5px; }
+.ask b { color: var(--ink); }
+.gmoves { display: flex; gap: 8px; flex-wrap: wrap; }
+.gmoves .button { flex: 1 1 auto; }
+.gfeedback { margin: 0; color: var(--warn); font-size: 14.5px; }
+.glog summary { cursor: pointer; font: 500 12px var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.glog ol { margin: 8px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; font-size: 14px; color: var(--muted); }
+.glog li:last-child { color: var(--ink); }
+.next-hand { align-self: flex-start; }
+
+/* Pot odds (lesson 9) */
+.calc-body { display: grid; grid-template-columns: 140px minmax(0, 220px) minmax(0, 1fr); gap: 18px 24px; align-items: center; }
+.pie { width: 140px; height: 140px; }
+.pie-pot { fill: var(--felt); }
+.pie-call { fill: var(--brass); }
+.calc-fields { display: flex; flex-direction: column; gap: 4px; }
+.calc-fields label { font-size: 13.5px; color: var(--muted); }
+.calc-fields input { font: 500 16px var(--f-mono); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-height: 42px; margin-bottom: 6px; width: 100%; }
+.calc-fields input:focus-visible { border-color: var(--brass); }
+.calc-out { margin: 0; display: grid; grid-template-columns: auto; gap: 2px; }
+.calc-out dt { font-size: 13px; color: var(--muted); }
+.calc-out dd { margin: 0 0 8px; font: 500 16px var(--f-mono); }
+.key { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: -1px; margin: 0 2px 0 6px; }
+.key.call { background: var(--brass); }
+.key.pot { background: var(--felt); }
+
+/* Gambler's fallacy demo (lesson 10) */
+.streak { display: flex; flex-direction: column; gap: 14px; }
+.streak-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.streak-actions .button:disabled { opacity: 0.6; cursor: progress; }
+.streak-count { margin: 0; color: var(--muted); font-size: 14.5px; }
+.rate { display: flex; flex-direction: column; gap: 5px; }
+.rate-label { display: flex; justify-content: space-between; gap: 4px 12px; flex-wrap: wrap; }
+.rate-track { position: relative; height: 22px; background: var(--panel); border-radius: 4px; }
+.rate-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--brass); border-radius: 4px 0 0 4px; opacity: 0.85; }
+.rate-ci { position: absolute; top: 9px; height: 4px; background: var(--ink); border-radius: 2px; }
+.rate-ci::before, .rate-ci::after { content: ""; position: absolute; top: -5px; width: 2px; height: 14px; background: var(--ink); }
+.rate-ci::before { left: 0; }
+.rate-ci::after { right: 0; }
+.rate-expected { position: absolute; top: -4px; bottom: -4px; width: 0; border-left: 2px dashed var(--good); }
+.rate-note { font-size: 13px; color: var(--muted); }
+.rate-axis { display: flex; justify-content: space-between; font: 12px var(--f-mono); color: var(--muted); }
+.key.expected { width: 0; height: 12px; border-left: 2px dashed var(--good); border-radius: 0; }
+.key.ci { height: 4px; background: var(--ink); }
+
 /* Quick checks */
 .quiz { margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 16px; max-width: 68ch; }
 .quiz h2 { font-family: var(--f-display); font-size: 26px; margin: 0; }
@@ -275,6 +345,14 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   .kick-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .diagram { padding: 14px 12px; }
   .pager .button { width: 100%; }
+  .guided { grid-template-columns: minmax(0, 1fr); }
+  .hand-tabs { align-self: stretch; flex-wrap: nowrap; }
+  .hand-tabs button { flex: 1; padding-inline: 4px; white-space: nowrap; }
+  .gtable { padding: 12px; margin: 8px; box-shadow: 0 0 0 7px #3c2417, 0 0 0 8px var(--brass-dim), inset 0 6px 24px var(--shadow); }
+  .gboard .pc, .gboard .slot { --w: 34px; width: 34px; }
+  .calc-body { grid-template-columns: 110px minmax(0, 1fr); }
+  .pie { width: 110px; height: 110px; }
+  .calc-out { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }

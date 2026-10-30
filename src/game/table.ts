@@ -143,6 +143,16 @@ export class Table {
   view(viewerSeat: number | null): TableView {
     const viewerId = viewerSeat === null ? undefined : this.engine.state.players[viewerSeat]?.id;
     const state = this.engine.view(viewerId);
+    // App rule (lesson 7): every hand still in at a showdown is shown, so the
+    // learner can compare. The engine itself shows only the winners' cards.
+    const raw = this.engine.state;
+    const stillIn = raw.players.filter((p) => p && p.status !== PlayerStatus.FOLDED && p.hand).length;
+    const showdown = raw.winners !== null && stillIn >= 2;
+    const shownCards = (seat: number, visible: readonly (string | null)[] | null) => {
+      const player = raw.players[seat];
+      if (showdown && player?.hand && player.status !== PlayerStatus.FOLDED) return [...player.hand];
+      return visible ? [...visible] : null;
+    };
     return {
       viewerSeat,
       handNumber: state.handNumber,
@@ -164,7 +174,7 @@ export class Table {
               stack: p.stack,
               betThisStreet: state.currentBets.get(p.seat) ?? 0,
               status: seatStatus(p.status),
-              cards: p.hand ? [...p.hand] : null,
+              cards: shownCards(p.seat, p.hand),
             }
           : null,
       ),

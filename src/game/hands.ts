@@ -41,3 +41,33 @@ export function handName(cards: string[]): string {
   }
   return name;
 }
+
+export interface Odds {
+  wins: number;
+  ties: number;
+  total: number;
+  /** Wins plus half the ties, as a fraction. */
+  equity: number;
+}
+
+/**
+ * With one card to come and both hands known: how many of the unseen cards
+ * make `a` win or tie against `b`. Counts every card exactly.
+ */
+export function oneCardOdds(a: string[], b: string[], board: string[]): Odds {
+  const seen = new Set([...a, ...b, ...board]);
+  let wins = 0;
+  let ties = 0;
+  let total = 0;
+  for (const rank of "23456789TJQKA") {
+    for (const suit of "shdc") {
+      const card = rank + suit;
+      if (seen.has(card)) continue;
+      total++;
+      const result = compareHands(a, b, [...board, card]);
+      if (result === "a") wins++;
+      else if (result === "tie") ties++;
+    }
+  }
+  return { wins, ties, total, equity: (wins + ties / 2) / total };
+}
