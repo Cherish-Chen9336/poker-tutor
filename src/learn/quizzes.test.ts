@@ -6,6 +6,7 @@ import { bestFive, compareHands, handName, handScore } from "../game/hands";
 import { Table } from "../game/table";
 import type { Move } from "../game/types";
 import lessonsDoc from "../../docs/lessons.md?raw";
+import { formatPercent, RANK_LADDER, SEVEN_CARD_TOTAL } from "./diagram-data";
 import { QUIZZES, type Question } from "./quizzes";
 
 const ALL = Object.values(QUIZZES).flat();
@@ -135,6 +136,14 @@ const checks: Record<string, () => void> = {
   "L3-Q4": () => {
     expect(compareHands(["Ah", "Kh"], ["As", "Ks"], ["Qd", "Jc", "Th", "2s", "3c"])).toBe("tie");
     expectAnswer("L3-Q4", 2);
+  },
+
+  "L3-Q5": () => {
+    const count = (name: string) => RANK_LADDER.find((row) => row.name === name)!.sevenCardCount;
+    expect(count("Two Pair")).toBeGreaterThan(count("High Card"));
+    expect(formatPercent(count("Two Pair"), SEVEN_CARD_TOTAL)).toBe("23.5%");
+    expect(formatPercent(count("High Card"), SEVEN_CARD_TOTAL)).toBe("17.4%");
+    expectAnswer("L3-Q5", 0);
   },
 
   "L4-Q1": () => {

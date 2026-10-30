@@ -105,6 +105,14 @@ export const QUIZZES: Record<number, Question[]> = {
       why: "Both have the same straight, A-K-Q-J-10. Suits never break ties.",
       checkedBy: "evaluator",
     },
+    {
+      id: "L3-Q5",
+      prompt: "With 7 cards (your 2 plus the 5 on the board), which happens more often?",
+      choices: ["Two pair", "High card (no pair at all)", "They're equally common"],
+      answer: 0,
+      why: "Two pair comes up 23.5% of the time and high card 17.4%. With 7 cards, making at least a pair is more likely than making nothing.",
+      checkedBy: "math",
+    },
   ],
   4: [
     {

@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import { bestFive } from "../game/hands";
 import { Card, Cards } from "./cards";
-import { RANK_LADDER, SEAT_LAYOUTS } from "./diagram-data";
+import { formatOneIn, formatPercent, RANK_LADDER, SEAT_LAYOUTS, SEVEN_CARD_TOTAL } from "./diagram-data";
 
 /** Lesson 1: the four betting rounds and how the board grows. */
 export function StreetTimeline() {
@@ -73,10 +73,14 @@ export function BestFiveRows() {
   );
 }
 
-/** Lesson 3: the ten hands, strongest first. */
+/** Lesson 3: the ten hands, strongest first, with how often 7 cards make each. */
 export function RankLadder() {
+  const most = Math.max(...RANK_LADDER.map((row) => row.sevenCardCount));
   return (
     <figure className="diagram">
+      <div className="ladder-head" aria-hidden="true">
+        <span>How often (7 cards)</span>
+      </div>
       <ol className="ladder">
         {RANK_LADDER.map((row, i) => (
           <li key={row.name}>
@@ -86,10 +90,19 @@ export function RankLadder() {
               <span>{row.meaning}</span>
             </span>
             <Cards codes={row.cards} size="sm" />
+            <span className="ladder-odds">
+              <span className="pct">{formatPercent(row.sevenCardCount, SEVEN_CARD_TOTAL)}</span>
+              <span className="one-in">{formatOneIn(row.sevenCardCount, SEVEN_CARD_TOTAL)}</span>
+              <span className="odds-bar" aria-hidden="true">
+                <i style={{ width: `${(row.sevenCardCount / most) * 100}%` }} />
+              </span>
+            </span>
           </li>
         ))}
       </ol>
-      <figcaption>Strongest at the top. Each hand beats every hand below it.</figcaption>
+      <figcaption>
+        Strongest at the top. Each hand beats every hand below it. The bars compare how often 7 cards make each hand.
+      </figcaption>
     </figure>
   );
 }

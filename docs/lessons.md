@@ -107,22 +107,26 @@ You get **2 private cards** (your **hole cards**). Nobody else sees them. The **
 
 ## Lesson 3: Hand rankings
 
-From strongest to weakest, with how to remember each:
+From strongest to weakest, with how often each comes up:
 
 [Diagram: a 10-row ladder. Each row shows an example of 5 cards, the name, and a one-line description. The text below is the same content.]
 
-| # | Hand | Example | What it is |
-|---|---|---|---|
-| 1 | **Royal flush** | A♠ K♠ Q♠ J♠ 10♠ | The highest straight flush: 10 to ace, all one suit |
-| 2 | **Straight flush** | 9♥ 8♥ 7♥ 6♥ 5♥ | Five in a row, all one suit |
-| 3 | **Four of a kind** | Q♣ Q♦ Q♥ Q♠ 7♦ | Four cards of one rank |
-| 4 | **Full house** | 8♠ 8♦ 8♣ K♥ K♠ | Three of one rank plus two of another |
-| 5 | **Flush** | A♦ J♦ 8♦ 4♦ 2♦ | Five cards of one suit, in any order |
-| 6 | **Straight** | 10♣ 9♦ 8♠ 7♥ 6♣ | Five ranks in a row, any suits |
-| 7 | **Three of a kind** | 5♣ 5♦ 5♥ K♦ 9♣ | Three cards of one rank |
-| 8 | **Two pair** | J♥ J♣ 4♠ 4♦ A♣ | Two different pairs |
-| 9 | **One pair** | 10♠ 10♥ K♣ 7♦ 3♠ | Two cards of one rank |
-| 10 | **High card** | A♣ Q♦ 9♠ 6♥ 2♣ | None of the above; the highest card leads |
+| # | Hand | Example | What it is | How often (7 cards) |
+|---|---|---|---|---|
+| 1 | **Royal flush** | A♠ K♠ Q♠ J♠ 10♠ | The highest straight flush: 10 to ace, all one suit | 0.00323% (1 in 30,940) |
+| 2 | **Straight flush** | 9♥ 8♥ 7♥ 6♥ 5♥ | Five in a row, all one suit | 0.0279% (1 in 3,591) |
+| 3 | **Four of a kind** | Q♣ Q♦ Q♥ Q♠ 7♦ | Four cards of one rank | 0.168% (1 in 595) |
+| 4 | **Full house** | 8♠ 8♦ 8♣ K♥ K♠ | Three of one rank plus two of another | 2.60% (1 in 39) |
+| 5 | **Flush** | A♦ J♦ 8♦ 4♦ 2♦ | Five cards of one suit, in any order | 3.03% (1 in 33) |
+| 6 | **Straight** | 10♣ 9♦ 8♠ 7♥ 6♣ | Five ranks in a row, any suits | 4.62% (1 in 22) |
+| 7 | **Three of a kind** | 5♣ 5♦ 5♥ K♦ 9♣ | Three cards of one rank | 4.83% (1 in 21) |
+| 8 | **Two pair** | J♥ J♣ 4♠ 4♦ A♣ | Two different pairs | 23.5% (1 in 4.3) |
+| 9 | **One pair** | 10♠ 10♥ K♣ 7♦ 3♠ | Two cards of one rank | 43.8% (1 in 2.3) |
+| 10 | **High card** | A♣ Q♦ 9♠ 6♥ 2♣ | None of the above; the highest card leads | 17.4% (1 in 5.7) |
+
+**How often** is the chance that your 7 cards (your 2 plus all 5 on the board) make that hand as their best, if you see the river. These numbers were counted exactly over all 133,784,560 possible 7-card combinations. They're not your chance of *winning*: your opponents get 7 cards too.
+
+**Notice:** with 7 cards, one pair (43.8%) and two pair (23.5%) are more common than no pair at all (17.4%). That's why a single pair is often not enough to win. Hand rankings come from how rare each hand is in 5-card poker. With 7 cards the order stays the same, with one exception: no pair at all becomes rarer than one pair or two pair.
 
 **Three rules that surprise beginners:**
 1. **The ace can be low in a straight:** A-2-3-4-5 is a straight (the lowest one). But a straight can't wrap around, so Q-K-A-2-3 is not a straight.
@@ -160,6 +164,13 @@ When two hands are the same type, the higher cards win. Lesson 7 covers how ties
 - C. **Tie** ✓
 - *Why:* Both have the same straight, A-K-Q-J-10. Suits never break ties.
 - *Checked by:* evaluator
+
+**L3-Q5.** With 7 cards (your 2 plus the 5 on the board), which happens more often?
+- A. **Two pair** ✓
+- B. High card (no pair at all)
+- C. They're equally common
+- *Why:* Two pair comes up 23.5% of the time and high card 17.4%. With 7 cards, making at least a pair is more likely than making nothing.
+- *Checked by:* math (exact count of all 7-card combinations)
 
 ---
 

@@ -90,8 +90,18 @@ export function Lesson2() {
 export function Lesson3() {
   return (
     <>
-      <p>From strongest to weakest:</p>
+      <p>From strongest to weakest, with how often each comes up:</p>
       <RankLadder />
+      <p>
+        <b>How often</b> is the chance that your 7 cards (your 2 plus all 5 on the board) make that hand as their best, if
+        you see the river. These numbers were counted exactly over all 133,784,560 possible 7-card combinations. They're
+        not your chance of <i>winning</i>: your opponents get 7 cards too.
+      </p>
+      <p>
+        <b>Notice:</b> with 7 cards, one pair (43.8%) and two pair (23.5%) are more common than no pair at all (17.4%).
+        That's why a single pair is often not enough to win. Hand rankings come from how rare each hand is in 5-card poker.
+        With 7 cards the order stays the same, with one exception: no pair at all becomes rarer than one pair or two pair.
+      </p>
       <h2>Three rules that surprise beginners</h2>
       <ol>
         <li>
