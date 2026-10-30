@@ -2,7 +2,7 @@
 
 These are plain-English poker scenarios that define what "correct" means for the engine. Each one is an automated test. Rules follow the Poker TDA (Tournament Directors Association) standard for No-Limit Hold'em.
 
-Status: **all scenarios are tested** (`src/engine/scenarios.test.ts`, plus #13 in `src/engine/rules.test.ts`). Claude checked each expected result against the TDA rules on 2026-10-29, and Codex checked the numbers for 5–12. Ella reviews whether each explanation makes sense to a beginner.
+Status: **all scenarios are tested** (`src/engine/scenarios.test.ts`, plus #13 in `src/engine/rules.test.ts`). Claude checked each expected result against the TDA rules on 2026-10-29, and Codex checked the numbers for 5–12. The owner reviews whether each explanation makes sense to a beginner.
 
 Unless a scenario says otherwise:
 - The blinds are 1/2: the small blind is 1 chip and the big blind is 2 chips.

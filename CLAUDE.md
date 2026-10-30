@@ -2,12 +2,12 @@
 
 A single-player browser app for learning Texas Hold'em from zero: the learner plays against simple bots while the app teaches through hand-ranking references, live hints, win odds, and post-hand reviews.
 
-## Working with Ella
+## Working with the owner
 
-- Ella owns the project but does not write code. Claude writes the code; Ella makes decisions, writes plain-English test scenarios, and checks behavior.
+- The owner does not write code. Claude writes the code; the owner makes decisions, writes plain-English test scenarios, and checks behavior.
 - Explain choices in plain English and define poker and engineering terms the first time they come up.
-- She is learning poker as the app is built. When a test or bug reveals a poker rule, explain the rule.
-- Plan larger steps and get her approval before coding. Commit after each step once the tests pass.
+- The owner is learning poker as the app is built. When a test or bug reveals a poker rule, explain the rule.
+- Plan larger steps and get the owner's approval before coding. Commit after each step once the tests pass.
 - Get an independent Codex review at each milestone (`/cc-suite:review-plan`, `/cc-suite:audit`).
 
 ## Scope
@@ -55,9 +55,24 @@ Revised 2026-10-29 after a whole-plan review with Codex.
 
 1. ✅ Setup and library smoke tests (`src/engine/smoke.test.ts`)
 2. ✅ **Visual preview:** a clickable sketch of the table and one narrated example hand. Saved as the design reference in `docs/design/preview.html`: a dark "card room" look (Bodoni Moda, Instrument Sans, IBM Plex Mono), a coach that explains *why*, and hand odds for 7 cards (2 private + 5 shared), not 5.
-3. ✅ **Engine validation and adapter:** rules tests from `docs/rules-scenarios.md` (Claude verifies the expected results against the TDA rules; Ella reviews whether the explanations make sense to a beginner), plus the app-owned adapter (legal actions and amounts, player views without hidden cards, settlement, fixed deals for tests and lessons)
-4. **Learn:** about six short lessons with quick checks. Cover the goal and winning when everyone else folds, 2 private vs. 5 shared cards, hand rankings, the button and blinds, actions ("raise to" vs. "raise by"), and the showdown, ending with a guided practice hand. Early lessons use fixed examples plus the evaluator; the guided hand uses the real engine through the adapter. Never build a second betting engine.
-5. **Heads-up play** against one simple bot with a coach panel, plus a basic post-hand review
+3. ✅ **Engine validation and adapter:** rules tests from `docs/rules-scenarios.md` (Claude verifies the expected results against the TDA rules; the owner reviews whether the explanations make sense to a beginner), plus the app-owned adapter (legal actions and amounts, player views without hidden cards, settlement, fixed deals for tests and lessons)
+4. **Learn:** 10 short lessons with quick checks and diagrams, plus GitHub Pages and CI. Plan reviewed by Codex (thread `01a18bab-3775-78a1-8a8e-d081ee9cb261`, "approve with changes") and approved by the owner on 2026-10-30.
+   1. The goal and the flow of a hand: chips, the pot, preflop/flop/turn/river, winning at showdown or when everyone else folds
+   2. Your cards and the board: 2 private + 5 shared, best 5 of 7 using 2, 1, or 0 private cards, "the nuts" (the best possible hand on this board)
+   3. Hand rankings: a 10-row ladder (a royal flush is the top straight flush), ace-low straight, suits never break ties
+   4. Seats: button, blinds, turn order, the heads-up flip, why acting last is an advantage
+   5. Actions: fold/check/call/bet/raise, "raise to" vs. "raise by", minimum bet and raise. Checking needs nothing to call (the big blind can check after calls); the preview's definition was wrong.
+   6. All-in: short calls, refunds of uncalled chips, the board running out with no more betting, a short all-in not reopening the betting. Side pots wait until Step 6 (heads-up has none).
+   7. Showdown: kickers, split pots, showing and mucking. Needs an adapter action to show cards (the engine mucks losing hands by default; `rules/showdown.js`, SHOW action).
+   8. Guided practice hand: a tested script (setup, `FixedDeal`, expected actor and street, each `Move`, checkpoints) run through `Table`. Back/Restart rebuilds the table and replays moves. The coach uses only the learner's view.
+   9. Expected value and pot odds: graded questions use fully stated situations (heads-up, known opponent hand, calls that close the betting). `EV(call vs. fold) = equity × (P + C) − C`, where P includes bets in front of players and equity counts a tie as half. The rule of 2 and 4 is labeled an estimate; implied odds are only mentioned.
+   10. Gambler's fallacy: independent reshuffled heads-up showdowns in 4-hand blocks; after 3 losses (ties break a streak), how often the 4th hand is QQ+/AK (34/1326 ≈ 2.56%). Show the sample size and margin of error, never rerun until it looks good, and say the *chance* is unchanged (counts wobble).
+   - Lesson prose lives in `docs/lessons.md` (the owner reviews it before UI work). Quiz data (cards, choices, assumptions, answers, explanations) lives in typed fixtures shared by tests and UI. Winners are checked by the evaluator, legal moves by `Table`, and EV by exact enumeration. Conceptual answers need human review.
+   - Simulation shuffling lives in `src/game/` (Fisher-Yates over the approved random source, seeded in tests). It never uses the engine's default shuffle.
+   - App shell: hash URLs (e.g. `#/learn/6`), React state only, versioned progress in `localStorage` with an in-memory fallback, native quiz controls, announced feedback, spoken card names, SVG text equivalents, and reduced motion.
+   - Order: lesson texts → the owner's review → app shell and lessons 1–7 → practice hand and lessons 9–10 → Codex review → commit.
+   - Early lessons use fixed examples plus the evaluator; the guided hand uses the real engine through the adapter. Never build a second betting engine. Diagrams are drawn in code as SVG in the preview's style, with text labels.
+5. **Heads-up play** against one simple bot with a coach panel, plus a basic post-hand review. Right after it, a second set of thinking lessons that link to hands the learner has played: why bluffing works (game theory: mixed strategies), sunk cost, resulting (judging a decision by its outcome), and bankroll management with the Kelly criterion (betting math, not game theory; explain why players risk only a fraction of Kelly). Decided by the owner on 2026-10-30.
 6. **Six players, live hints, and win odds**
 
 Throughout the plan:
