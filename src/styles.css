@@ -123,6 +123,9 @@ h1:focus { outline: none; }
 .reset { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--muted); }
 
 /* Lesson page */
+/* The lesson card is as wide as a comfortable line of text (about 75 characters), centered, and its content fills it. */
+.panel.lesson { width: 100%; max-width: 780px; margin-inline: auto; }
+.lesson .prose, .lesson .quiz, .lesson .note, .lesson .lede { max-width: none; }
 .lesson .back { display: inline-block; margin-bottom: 18px; font-size: 15px; text-decoration: none; }
 .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
 
