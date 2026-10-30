@@ -17,7 +17,8 @@ describe("guided hands", () => {
       expect(run.table.netResults()[hand.youSeat]).toBe(hand.expectedNet);
     });
 
-    it(`hand ${hand.id}: the coach never names the bot's cards before the end`, () => {
+    // A narrow guard: it catches card tokens like {Qc}. Plain-word mentions ("queen-jack") need human review.
+    it(`hand ${hand.id}: coach lines before the end don't show the bot's cards as cards`, () => {
       const botCards = hand.hands[1 - hand.youSeat];
       for (const step of hand.script.filter((s) => s.who === YOU)) {
         for (const card of botCards) expect(step.coach ?? "").not.toContain(`{${card}}`);

@@ -190,7 +190,7 @@ export const QUIZZES: Record<number, Question[]> = {
       prompt: "3 players. On the flop, A bets 10, B calls, and C raises to 30. What happens next?",
       choices: [
         "A and B must each put in 20 more",
-        "A and B each choose: fold, call 30, or raise again",
+        "A and B each choose: fold, call 20 more, or raise again",
         "The round ends, because C raised last",
       ],
       answer: 1,

@@ -350,8 +350,13 @@ describe("quick checks", () => {
       expect(start, `${q.id} is in the doc`).toBeGreaterThan(-1);
       const block = plain(doc.slice(start, doc.indexOf("*Checked by:*", start)));
       expect(block, `${q.id} prompt`).toContain(plain(q.prompt));
-      const letter = String.fromCharCode(65 + q.answer);
-      expect(block, `${q.id} answer`).toContain(`- ${letter}. ${plain(q.choices[q.answer])} ✓`);
+      // Every choice, in order; only the correct one is bold and ticked.
+      const docChoices = block.split("\n").filter((line) => /^- [A-Z]\. /.test(line));
+      const expected = q.choices.map((choice, i) => {
+        const letter = String.fromCharCode(65 + i);
+        return i === q.answer ? `- ${letter}. ${plain(choice)} ✓` : `- ${letter}. ${plain(choice)}`;
+      });
+      expect(docChoices, `${q.id} choices`).toEqual(expected);
       expect(block, `${q.id} why`).toContain(plain(q.why));
     }
   });

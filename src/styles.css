@@ -161,7 +161,7 @@ h1:focus { outline: none; }
 /* Diagrams */
 .diagram { margin: 18px 0 22px; padding: 18px; background: var(--panel-hi); border-radius: 12px; max-width: 100%; }
 .diagram figcaption { margin-top: 12px; font-size: 14.5px; color: var(--muted); }
-.timeline { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
 .timeline li { display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); }
 .t-name { font: 500 12px var(--f-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--brass); }
 .t-board { display: flex; gap: 2px; }
@@ -313,6 +313,8 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 .question .button:disabled { opacity: 0.4; cursor: default; }
 .feedback p { margin: 12px 0 0; }
 .feedback:empty { display: none; }
+.feedback:focus, .gcoach:focus { outline: none; }
+.feedback:focus-visible, .gcoach:focus-visible { outline: 2px solid var(--brass-dim); outline-offset: 3px; }
 .done-note { border-left: 3px solid var(--good); }
 
 .loading { color: var(--muted); padding: 28px; }
@@ -333,7 +335,6 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   .lesson-card { grid-template-columns: 36px minmax(0, 1fr); padding: 12px 14px; gap: 2px 12px; }
   .lesson-card .num { width: 34px; height: 34px; font-size: 16px; grid-row: span 2; }
   .lesson-card .status { grid-column: 2; justify-self: start; margin-top: 4px; }
-  .timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .best5-row { grid-template-columns: minmax(0, 1fr); align-items: start; }
   .best5-result, .best5-label { padding-bottom: 0; }
   .best5-result { grid-column: 1; }

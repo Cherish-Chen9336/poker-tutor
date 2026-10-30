@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DECK, dealShowdown, EMPTY_TALLY, interval95, isPremium, PREMIUM_CHANCE, runBlocks, type Showdown } from "./simulate";
+import { addTally, DECK, dealShowdown, EMPTY_TALLY, interval95, isPremium, PREMIUM_CHANCE, runBlocks, type Showdown } from "./simulate";
 
 function seeded(seed: number): () => number {
   let a = seed >>> 0;
@@ -63,6 +63,14 @@ describe("gambler's fallacy simulation", () => {
     const [low, high] = interval95(tally.premiumAfterStreak, tally.afterStreak);
     expect(low).toBeLessThan(PREMIUM_CHANCE);
     expect(high).toBeGreaterThan(PREMIUM_CHANCE);
+  });
+
+  it("adds batches into the same totals as one long run", () => {
+    const random = seeded(5);
+    const first = runBlocks(EMPTY_TALLY, 300, random);
+    const second = runBlocks(EMPTY_TALLY, 200, random);
+    const again = seeded(5);
+    expect(addTally(first, second)).toEqual(runBlocks(runBlocks(EMPTY_TALLY, 300, again), 200, again));
   });
 
   it("computes 95% intervals", () => {

@@ -1,9 +1,9 @@
 // Interactive pieces for lessons 9 and 10: a pot-odds calculator and the
 // gambler's fallacy simulation.
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { oneCardOdds } from "../game/hands";
 import { LESSON9_EXAMPLE } from "./diagram-data";
-import { EMPTY_TALLY, interval95, PREMIUM_CHANCE, runBlocks, secureRandom, type StreakTally } from "../game/simulate";
+import { addTally, EMPTY_TALLY, interval95, PREMIUM_CHANCE, runBlocks, secureRandom, type StreakTally } from "../game/simulate";
 
 const pct = (x: number, digits = 1) => `${(x * 100).toFixed(digits)}%`;
 
@@ -108,7 +108,7 @@ function RateBar({ label, hits, trials }: { label: string; hits: number; trials:
       </div>
       {trials > 0 && (
         <span className="rate-note">
-          Likely range (95%): {pct(low, 1)} to {high > SCALE ? `${pct(high, 1)} (beyond this chart)` : pct(high, 1)}
+          95% margin of error: {pct(low, 1)} to {high > SCALE ? `${pct(high, 1)} (beyond this chart)` : pct(high, 1)}
         </span>
       )}
     </div>
@@ -129,14 +129,19 @@ export function StreakDemo() {
     setDealing(true);
     let left = BLOCKS_PER_CLICK;
     const step = () => {
-      if (run.current !== id) return; // "Start over" was pressed
-      setTally((t) => runBlocks(t, BLOCKS_PER_STEP, random));
+      if (run.current !== id) return; // "Start over" was pressed, or the page closed
+      // Deal outside the state update, so React may safely run the update twice.
+      const batch = runBlocks(EMPTY_TALLY, BLOCKS_PER_STEP, random);
+      setTally((t) => addTally(t, batch));
       left -= BLOCKS_PER_STEP;
       if (left > 0) setTimeout(step, 0);
       else setDealing(false);
     };
     step();
   }
+
+  // Stop dealing if the lesson page closes mid-run.
+  useEffect(() => () => void run.current++, []);
 
   function reset() {
     run.current++;
@@ -171,8 +176,10 @@ export function StreakDemo() {
       </div>
       <figcaption>
         <span className="key expected" /> the true chance, 2.56% (34 of 1,326 starting hands).{" "}
-        <span className="key ci" /> the margin of error: where the true rate most likely lies, given the hands dealt so
-        far. Each hand is a fresh shuffle from the browser's secure random source.
+        <span className="key ci" /> the 95% margin of error: the range of rates that fit the hands dealt so far. If the
+        dashed line falls inside it, the results agree with 2.56%, and a small gap from 2.56% is just chance. (Even with a
+        fair shuffle, about 1 run in 20 lands outside.) Each hand is a fresh shuffle from the browser's secure random
+        source.
       </figcaption>
     </figure>
   );

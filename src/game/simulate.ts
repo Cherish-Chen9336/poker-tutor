@@ -66,6 +66,17 @@ export function runBlocks(tally: StreakTally, count: number, random: () => numbe
   return next;
 }
 
+/** Adds two tallies (used to merge a freshly dealt batch into the running totals). */
+export function addTally(a: StreakTally, b: StreakTally): StreakTally {
+  return {
+    blocks: a.blocks + b.blocks,
+    hands: a.hands + b.hands,
+    premiumAll: a.premiumAll + b.premiumAll,
+    afterStreak: a.afterStreak + b.afterStreak,
+    premiumAfterStreak: a.premiumAfterStreak + b.premiumAfterStreak,
+  };
+}
+
 /** 95% Wilson score interval for a proportion, as [low, high]. */
 export function interval95(successes: number, trials: number): [number, number] {
   if (trials === 0) return [0, 1];

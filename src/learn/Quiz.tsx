@@ -1,7 +1,7 @@
 // The quick checks at the end of a lesson. Each question can be retried;
 // after a second wrong answer the right one is shown. The lesson counts as
 // done once every question has been answered correctly.
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { CardText } from "./cards";
 import type { Question } from "./quizzes";
 
@@ -13,6 +13,12 @@ function QuestionBlock({ q, number, onCorrect }: { q: Question; number: number; 
   const [misses, setMisses] = useState(0);
   const [result, setResult] = useState<Result | null>(null);
   const solved = result === "correct";
+  const feedbackRef = useRef<HTMLDivElement>(null);
+
+  // A correct answer removes the focused "Check answer" button, so move focus to the explanation.
+  useEffect(() => {
+    if (solved) feedbackRef.current?.focus();
+  }, [solved]);
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -57,7 +63,7 @@ function QuestionBlock({ q, number, onCorrect }: { q: Question; number: number; 
           </button>
         )}
       </fieldset>
-      <div className="feedback" role="status">
+      <div className="feedback" role="status" tabIndex={-1} ref={feedbackRef}>
         {result === "correct" && (
           <p>
             <b className="good">✓ Correct.</b> <CardText text={q.why} />

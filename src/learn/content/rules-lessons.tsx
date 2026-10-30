@@ -109,8 +109,10 @@ export function Lesson3() {
           around, so Q-K-A-2-3 is not a straight.
         </li>
         <li>
-          <b>Suits never break ties.</b> No suit beats another. <C c="Ah" /> <C c="Kh" /> and <C c="As" /> <C c="Ks" />{" "}
-          with the same board tie.
+          <b>Suits never break ties.</b> No suit beats another. On <C c="Qd" /> <C c="Jc" /> <C c="Th" /> <C c="2s" />{" "}
+          <C c="3c" />, <C c="Ah" /> <C c="Kh" /> and <C c="As" /> <C c="Ks" /> both make the same straight and tie. (A suit
+          only matters when five cards of it make a flush. On a board with three hearts, <C c="Ah" /> <C c="Kh" /> would
+          make a flush and win.)
         </li>
         <li>
           <b>A flush beats a straight.</b> Flushes are harder to make.
@@ -285,21 +287,32 @@ export function Lesson6() {
       </p>
       <AllInRefund />
       <p>
-        <b>When your opponent is all-in:</b> you can only call or fold. Raising makes no sense, because nobody is left to
-        match it.
+        <b>Heads-up, when your opponent is all-in:</b> you can only call or fold. Raising makes no sense, because nobody is
+        left to match it.
       </p>
       <p>
-        <b>After an all-in is called,</b> no more betting can happen. The remaining shared cards are simply dealt out ("run
-        out"), and then the showdown decides.
+        <b>Heads-up, after an all-in is called,</b> no more betting can happen. The remaining shared cards are simply dealt
+        out ("run out"), and then the showdown decides.
       </p>
       <p>
         <b>An all-in can be smaller than a minimum raise.</b> If the minimum raise is to 10 and you have only 8, you may
         still go all-in for 8.
       </p>
       <p>
-        <b>More than two players?</b> Then a short all-in creates <T>side pots</T>, extra pots that only some players can
-        win. You'll learn those when you play at a bigger table. Heads-up never needs them.
+        <b>More than two players?</b> Two things change, and you'll practice both at a bigger table later:
       </p>
+      <ul>
+        <li>
+          The players who still have chips can keep betting against each other. Their extra chips go into a{" "}
+          <T>side pot</T> that the all-in player can't win.
+        </li>
+        <li>
+          <b>A short all-in doesn't reopen the betting.</b> If an all-in raise is smaller than a full raise, players who
+          already acted can only call or fold. For example: A bets 10, B goes all-in for 16 (only 6 more), and C calls. A
+          may call the 6 or fold, but may not raise.
+        </li>
+      </ul>
+      <p>Heads-up never needs side pots.</p>
     </>
   );
 }

@@ -92,8 +92,9 @@ export function Lesson9() {
       <h2>A shortcut: the rule of 2 and 4</h2>
       <p>
         Count your outs. With one card to come, multiply by 2. With two cards to come and no more betting (for example,
-        someone is all-in on the flop), multiply by 4. It's only an estimate: 9 outs × 4 = 36%, while the exact chance is
-        35.0%. The more outs you have, the bigger the error.
+        someone is all-in on the flop), multiply by 4. It's only an estimate. For a flush draw on the flop (9 outs, 47
+        unseen cards, and every out a winner), 9 × 4 = 36%, while the exact chance is 35.0%. With many outs it
+        overestimates more: 15 × 4 = 60%, but the exact chance is 54.1%.
       </p>
       <p>
         <b>Careful with outs:</b> some "outs" can still lose. For example, they might also give your opponent a better

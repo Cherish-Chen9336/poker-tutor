@@ -130,7 +130,7 @@ From strongest to weakest, with how often each comes up:
 
 **Three rules that surprise beginners:**
 1. **The ace can be low in a straight:** A-2-3-4-5 is a straight (the lowest one). But a straight can't wrap around, so Q-K-A-2-3 is not a straight.
-2. **Suits never break ties.** No suit beats another. A♥ K♥ and A♠ K♠ with the same board tie.
+2. **Suits never break ties.** No suit beats another. On Q♦ J♣ 10♥ 2♠ 3♣, A♥ K♥ and A♠ K♠ both make the same straight and tie. (A suit only matters when five cards of it make a flush. On a board with three hearts, A♥ K♥ would make a flush and win.)
 3. **A flush beats a straight.** Flushes are harder to make.
 
 When two hands are the same type, the higher cards win. Lesson 7 covers how ties are broken.
@@ -293,7 +293,7 @@ With a medium hand, checking or calling is often better. A bet would mostly get 
 
 **L5-Q5.** 3 players. On the flop, A bets 10, B calls, and C raises to 30. What happens next?
 - A. A and B must each put in 20 more
-- B. **A and B each choose: fold, call 30, or raise again** ✓
+- B. **A and B each choose: fold, call 20 more, or raise again** ✓
 - C. The round ends, because C raised last
 - *Why:* A raise gives every other player still in the hand a new turn. Nobody is forced to match it; folding is always allowed.
 - *Checked by:* table
@@ -308,13 +308,17 @@ With a medium hand, checking or calling is often better. A bet would mostly get 
 
 [Diagram: the opponent's 100 split into 30 (matched, goes into the pot) and 70 (returned).]
 
-**When your opponent is all-in:** you can only call or fold. Raising makes no sense, because nobody is left to match it.
+**Heads-up, when your opponent is all-in:** you can only call or fold. Raising makes no sense, because nobody is left to match it.
 
-**After an all-in is called,** no more betting can happen. The remaining shared cards are simply dealt out ("run out"), and then the showdown decides.
+**Heads-up, after an all-in is called,** no more betting can happen. The remaining shared cards are simply dealt out ("run out"), and then the showdown decides.
 
 **An all-in can be smaller than a minimum raise.** If the minimum raise is to 10 and you have only 8, you may still go all-in for 8.
 
-**More than two players?** Then a short all-in creates **side pots**, extra pots that only some players can win. You'll learn those when you play at a bigger table (Step 6). Heads-up never needs them.
+**More than two players?** Two things change, and you'll practice both at a bigger table later:
+- The players who still have chips can keep betting against each other. Their extra chips go into a **side pot** that the all-in player can't win.
+- **A short all-in doesn't reopen the betting.** If an all-in raise is smaller than a full raise, players who already acted can only call or fold. For example: A bets 10, B goes all-in for 16 (only 6 more), and C calls. A may call the 6 or fold, but may not raise.
+
+Heads-up never needs side pots.
 
 ### Quick checks
 
@@ -513,7 +517,7 @@ Same cards, different prices, different answers. The price matters as much as yo
 
 **Ties count as half.** If a river card would split the pot, count it as half a win.
 
-**A shortcut: the rule of 2 and 4.** Count your outs. With one card to come, multiply by 2. With two cards to come and no more betting (for example, someone is all-in on the flop), multiply by 4. It's only an estimate: 9 outs × 4 = 36%, while the exact chance is 35.0%. The more outs you have, the bigger the error.
+**A shortcut: the rule of 2 and 4.** Count your outs. With one card to come, multiply by 2. With two cards to come and no more betting (for example, someone is all-in on the flop), multiply by 4. It's only an estimate. For a flush draw on the flop (9 outs, 47 unseen cards, and every out a winner), 9 × 4 = 36%, while the exact chance is 35.0%. With many outs it overestimates more: 15 × 4 = 60%, but the exact chance is 54.1%.
 
 **Careful with outs:** some "outs" can still lose. For example, they might also give your opponent a better hand. The app's checks count every card exactly.
 

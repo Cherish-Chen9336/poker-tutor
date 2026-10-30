@@ -34,9 +34,7 @@ describe("hand helpers", () => {
   it("counts winning river cards exactly", () => {
     // Lesson 9: a heart flush draw against a pair of kings.
     expect(oneCardOdds(["7h", "6h"], ["Ks", "Jd"], ["Kh", "9h", "2c", "3s"])).toEqual({ wins: 9, ties: 0, total: 44, equity: 9 / 44 });
-    // A tie counts as half a win.
-    const split = oneCardOdds(["Ah", "2c"], ["As", "2d"], ["Kc", "Qd", "Jh", "9s"]);
-    expect(split.equity).toBeCloseTo((split.wins + split.ties / 2) / split.total);
-    expect(split.ties).toBeGreaterThan(0);
+    // Identical ranks with no flush possible: every river card ties, and a tie counts as half a win.
+    expect(oneCardOdds(["Ah", "2c"], ["As", "2d"], ["Kc", "Qd", "Jh", "9s"])).toEqual({ wins: 0, ties: 44, total: 44, equity: 0.5 });
   });
 });
