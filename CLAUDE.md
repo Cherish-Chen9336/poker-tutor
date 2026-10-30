@@ -31,7 +31,9 @@ Decided 2026-10-28 together with Codex (thread `01a1823c-03a5-7e90-9101-798007d1
 
 ## Library rules
 
-- App code (screens, bots, lessons) uses only the adapter in `src/game/` (`Table` and the types in `src/game/types.ts`), never `@pokertools` directly. Only `src/game/` and the engine tests import the library.
+- App code (screens, bots, lessons) uses only the adapter in `src/game/` (`Table`, the hand helpers in `src/game/hands.ts`, and the types in `src/game/types.ts`), never `@pokertools` directly. Only `src/game/` and the engine tests import the library.
+- The evaluator is large (about 80 KB compressed), so screens that need it load lazily (`LessonPage` in `App.tsx`). Keep it out of the first page load.
+- Lesson quizzes live in `src/learn/quizzes.ts`; `quizzes.test.ts` verifies every non-"review" answer and checks the wording against `docs/lessons.md`. Change both together. Diagram facts live in `src/learn/diagram-data.ts` and are tested the same way.
 - The adapter builds its engine with `new PokerEngine` and a random source that uses queued shuffle numbers for a fixed deal and otherwise `getBrowserRNG()` (Web Crypto). Never rely on the engine's default shuffler: it uses Node's `crypto` module, which does not exist in browsers.
 - The evaluator's `HandRank` is a `const enum` and `getHandRank` is not exported. Use `rankBoard` and `rankDescription` instead.
 - `@pokertools` is young (7 GitHub stars), which is why it sits behind the adapter and could be replaced. The rules tests (`src/engine/scenarios.test.ts`) must pass before UI is built on top of it.

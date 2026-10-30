@@ -1,0 +1,249 @@
+// Quick checks for each lesson. The wording matches docs/lessons.md (by ID).
+// Cards are written as tokens like {Ah}, shown as cards with spoken names.
+// quizzes.test.ts verifies every answer not marked "review" with the
+// evaluator, the real engine (through Table), or exact math.
+
+export type CheckedBy = "evaluator" | "table" | "math" | "review";
+
+export interface Question {
+  id: string;
+  prompt: string;
+  choices: string[];
+  /** Index of the correct choice. */
+  answer: number;
+  why: string;
+  checkedBy: CheckedBy;
+}
+
+export const QUIZZES: Record<number, Question[]> = {
+  1: [
+    {
+      id: "L1-Q1",
+      prompt: "On the flop, you bet and both other players fold. What happens?",
+      choices: [
+        "The remaining cards are dealt, and then everyone shows their cards",
+        "You win the pot right away, without showing your cards",
+        "The hand starts over",
+      ],
+      answer: 1,
+      why: "When everyone else folds, the last player left wins. No showdown is needed.",
+      checkedBy: "table",
+    },
+    {
+      id: "L1-Q2",
+      prompt: "How many shared cards are on the table after the turn?",
+      choices: ["3", "4", "5"],
+      answer: 1,
+      why: "The flop brings 3, and the turn adds a 4th. The river makes 5.",
+      checkedBy: "table",
+    },
+    {
+      id: "L1-Q3",
+      prompt: "In what order do the betting rounds come?",
+      choices: ["Preflop, flop, turn, river", "Flop, preflop, river, turn", "Preflop, turn, flop, river"],
+      answer: 0,
+      why: "Preflop has no shared cards. Then come the flop (3 cards), the turn (1 card), and the river (1 card).",
+      checkedBy: "table",
+    },
+  ],
+  2: [
+    {
+      id: "L2-Q1",
+      prompt: "You hold {Ah} {3c}. The board is {Kh} {9h} {6h} {2h} {Ts}. What's your best hand?",
+      choices: ["Ace-high", "A flush", "A pair of threes"],
+      answer: 1,
+      why: "{Ah} plus the four hearts on the board make five hearts. Only one of your cards is needed.",
+      checkedBy: "evaluator",
+    },
+    {
+      id: "L2-Q2",
+      prompt: "The board is {As} {Ad} {Kc} {Kh} {Qs}. You hold {Js} {Jd}, and your opponent holds {3c} {2d}. Who wins?",
+      choices: ["You, with the pair of jacks", "Your opponent", "It's a tie: both best hands are A-A-K-K-Q"],
+      answer: 2,
+      why: "A hand has 5 cards. A-A-K-K-Q from the board beats anything your jacks could add, so both of you play the board.",
+      checkedBy: "evaluator",
+    },
+    {
+      id: "L2-Q3",
+      prompt: "The board is {Ks} {9h} {4c} {2d} {7s}. What's the nuts (the best possible hand)?",
+      choices: ["A flush", "Three kings", "A straight"],
+      answer: 1,
+      why: "Only two spades are on the board, so no flush is possible. No straight fits these ranks, and an unpaired board rules out a full house. Two kings in hand make three kings, the best possible hand.",
+      checkedBy: "evaluator",
+    },
+  ],
+  3: [
+    {
+      id: "L3-Q1",
+      prompt: "Board: {9h} {8s} {7h} {2h} {Qc}. Player A holds {Ah} {3h}. Player B holds {Jd} {Tc}. Who wins?",
+      choices: ["A, with a flush", "B, with a straight", "Tie"],
+      answer: 0,
+      why: "A has five hearts ({Ah} {3h} {9h} {7h} {2h}). B has a straight (Q-J-10-9-8). A flush beats a straight.",
+      checkedBy: "evaluator",
+    },
+    {
+      id: "L3-Q2",
+      prompt: "Board: {5h} {Kd} {9c} {2s} {3d}. Player A holds {5c} {5d}. Player B holds {Ks} {9d}. Who wins?",
+      choices: ["A, with three of a kind", "B, with two pair", "Tie"],
+      answer: 0,
+      why: "Three of a kind (three fives) beats two pair (kings and nines).",
+      checkedBy: "evaluator",
+    },
+    {
+      id: "L3-Q3",
+      prompt: "Board: {3s} {4d} {5h} {Kc} {9s}. Player A holds {Ac} {2d}. Player B holds {6c} {2h}. Who wins?",
+      choices: ["A, because an ace is the highest card", "B, with a 6-high straight", "Tie, because both have a straight"],
+      answer: 1,
+      why: "Both have straights. A's is A-2-3-4-5, where the ace counts as 1, so it's the lowest straight. B's is 2-3-4-5-6, which is higher.",
+      checkedBy: "evaluator",
+    },
+    {
+      id: "L3-Q4",
+      prompt: "Board: {Qd} {Jc} {Th} {2s} {3c}. Player A holds {Ah} {Kh}. Player B holds {As} {Ks}. Who wins?",
+      choices: ["A, because hearts beat spades", "B, because spades beat hearts", "Tie"],
+      answer: 2,
+      why: "Both have the same straight, A-K-Q-J-10. Suits never break ties.",
+      checkedBy: "evaluator",
+    },
+  ],
+  4: [
+    {
+      id: "L4-Q1",
+      prompt: "Heads-up, you have the button. Who acts first before the flop?",
+      choices: ["You", "Your opponent"],
+      answer: 0,
+      why: "Heads-up, the button posts the small blind and acts first preflop. After the flop, the order flips back.",
+      checkedBy: "table",
+    },
+    {
+      id: "L4-Q2",
+      prompt: "Heads-up, you have the button. Who acts first on the flop?",
+      choices: ["You", "Your opponent (the big blind)"],
+      answer: 1,
+      why: "From the flop on, the button acts last.",
+      checkedBy: "table",
+    },
+    {
+      id: "L4-Q3",
+      prompt: "4 players. Everyone calls 2 before the flop, and it's the big blind's turn. What may the big blind do?",
+      choices: ["Only fold or call", "Check or raise", "Nothing; the round is over"],
+      answer: 1,
+      why: "The big blind already has 2 in, so there's nothing to call. It may check to end the round or raise. This is the big blind's option.",
+      checkedBy: "table",
+    },
+    {
+      id: "L4-Q4",
+      prompt: "Why is acting last an advantage?",
+      choices: [
+        "The last player gets better cards",
+        "The last player sees what the others did before deciding",
+        "The last player pays less in blinds",
+      ],
+      answer: 1,
+      why: "Cards are random, and position doesn't change them. Acting last gives you more information.",
+      checkedBy: "review",
+    },
+  ],
+  5: [
+    {
+      id: "L5-Q1",
+      prompt: "Before the flop, 3 players just call 2 each, and you're the big blind. Can you check?",
+      choices: ["Yes", "No, because someone already bet"],
+      answer: 0,
+      why: "Your 2 already matches everyone else's 2, so there's nothing to call. You may check, or raise.",
+      checkedBy: "table",
+    },
+    {
+      id: "L5-Q2",
+      prompt: "The big blind is 2. A raises to 6. What's the smallest raise you can make?",
+      choices: ["To 8", "To 10", "To 12"],
+      answer: 1,
+      why: "A raised by 4 (from 2 to 6). Your raise must also be at least 4 more, so you must raise to at least 10.",
+      checkedBy: "table",
+    },
+    {
+      id: "L5-Q3",
+      prompt: "On the flop, your opponent bets 20. Which moves can you make?",
+      choices: ["Check or bet", "Fold, call 20, or raise to at least 40", "Only call"],
+      answer: 1,
+      why: "Facing a bet, you can't check. A raise must add at least the size of the bet (20), so the smallest raise is to 40.",
+      checkedBy: "table",
+    },
+    {
+      id: "L5-Q4",
+      prompt: "You “raise to 30” after a bet of 10. How much did you raise by?",
+      choices: ["30", "20", "10"],
+      answer: 1,
+      why: "“To 30” is your total. 30 − 10 = 20 more than the bet.",
+      checkedBy: "math",
+    },
+    {
+      id: "L5-Q5",
+      prompt: "3 players. On the flop, A bets 10, B calls, and C raises to 30. What happens next?",
+      choices: [
+        "A and B must each put in 20 more",
+        "A and B each choose: fold, call 30, or raise again",
+        "The round ends, because C raised last",
+      ],
+      answer: 1,
+      why: "A raise gives every other player still in the hand a new turn. Nobody is forced to match it; folding is always allowed.",
+      checkedBy: "table",
+    },
+  ],
+  6: [
+    {
+      id: "L6-Q1",
+      prompt: "You have 30 chips. Your opponent bets 100. What can you do?",
+      choices: ["Only fold, because you can't afford it", "Fold, or call all-in for 30", "Call 100 by borrowing chips"],
+      answer: 1,
+      why: "You can always call all-in for what you have. Your opponent's extra 70 goes back to them.",
+      checkedBy: "table",
+    },
+    {
+      id: "L6-Q2",
+      prompt: "In the example above you call all-in for 30. How much of your opponent's bet goes into the pot?",
+      choices: ["100", "30", "70"],
+      answer: 1,
+      why: "You can only win as much from your opponent as you put in yourself. The other 70 is returned.",
+      checkedBy: "table",
+    },
+    {
+      id: "L6-Q3",
+      prompt: "Both players are all-in on the flop. What happens next?",
+      choices: [
+        "Betting continues on the turn",
+        "The turn and river are dealt with no betting, then the showdown",
+        "The hand ends, and the pot is split",
+      ],
+      answer: 1,
+      why: "Nobody has chips left to bet, so the remaining cards are dealt out.",
+      checkedBy: "table",
+    },
+  ],
+  7: [
+    {
+      id: "L7-Q1",
+      prompt: "Board: {Ad} {8c} {4s} {9h} {2c}. You hold {As} {Kd}; your opponent holds {Ac} {Qh}. Who wins?",
+      choices: ["You, with the king kicker", "Your opponent", "Tie"],
+      answer: 0,
+      why: "Both have a pair of aces. The next card decides: K beats Q.",
+      checkedBy: "evaluator",
+    },
+    {
+      id: "L7-Q2",
+      prompt: "Board: {As} {Kc} {Ks} {Qd} {Jh}. You hold {Ac} {3d}; your opponent holds {Ad} {4h}. Who wins?",
+      choices: ["Your opponent, because 4 beats 3", "Tie", "You"],
+      answer: 1,
+      why: "Both best hands are A-A-K-K-Q. The fifth card comes from the board, so the 3 and the 4 don't play.",
+      checkedBy: "evaluator",
+    },
+    {
+      id: "L7-Q3",
+      prompt: "Does a heart beat a spade when two hands are otherwise equal?",
+      choices: ["Yes", "No, suits never break ties"],
+      answer: 1,
+      why: "All suits are equal. Equal hands split the pot.",
+      checkedBy: "evaluator",
+    },
+  ],
+};

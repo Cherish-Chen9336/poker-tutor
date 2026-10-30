@@ -1,10 +1,13 @@
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { parseRoute, routeHref, useHash, type Route } from "./app/route";
+import { focusPageHeading } from "./app/focus";
 import { useProgress } from "./app/progress";
 import { ComingSoon } from "./app/ComingSoon";
 import { LearnHome } from "./learn/LearnHome";
-import { LessonPage } from "./learn/LessonPage";
 import { findLesson } from "./learn/lessons";
+
+// Lesson pages include the hand evaluator, which is large, so they load on first visit.
+const LessonPage = lazy(() => import("./learn/LessonPage"));
 
 const AREAS: { area: Route["area"]; label: string }[] = [
   { area: "learn", label: "Learn" },
@@ -23,7 +26,7 @@ function pageTitle(route: Route): string {
 export default function App() {
   const hash = useHash();
   const route = parseRoute(hash);
-  const { progress, saved, reset } = useProgress();
+  const { progress, saved, complete, reset } = useProgress();
   const main = useRef<HTMLElement>(null);
   const firstRender = useRef(true);
 
@@ -36,7 +39,7 @@ export default function App() {
       return;
     }
     window.scrollTo(0, 0);
-    main.current?.querySelector<HTMLElement>("h1")?.focus();
+    focusPageHeading(main.current);
   }, [hash]);
 
   return (
@@ -63,7 +66,9 @@ export default function App() {
           <LearnHome progress={progress} saved={saved} onReset={reset} />
         )}
         {route.area === "learn" && route.lesson !== null && (
-          <LessonPage lessonId={route.lesson} progress={progress} />
+          <Suspense fallback={<p className="loading">Loading the lesson…</p>}>
+            <LessonPage key={route.lesson} lessonId={route.lesson} progress={progress} onComplete={complete} />
+          </Suspense>
         )}
         {route.area === "play" && (
           <ComingSoon title="Play">
