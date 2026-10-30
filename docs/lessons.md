@@ -302,7 +302,7 @@ With a medium hand, checking or calling is often better. A bet would mostly get 
 
 ## Lesson 6: All-in
 
-**All-in** means putting in all your chips. You can always go all-in for whatever you have, even if it's less than a full call or less than a minimum raise.
+**All-in** means putting in all your chips. You can always call all-in, even with fewer chips than the bet. And whenever you're allowed to raise, you may go all-in even if that's less than a minimum raise.
 
 **When you can't afford a call:** your opponent bets 100, and you have only 30. You may still call for 30, all-in. You can only win as much from your opponent as you put in yourself, so **the 70 nobody matched goes back to your opponent**.
 
@@ -316,7 +316,7 @@ With a medium hand, checking or calling is often better. A bet would mostly get 
 
 **More than two players?** Two things change, and you'll practice both at a bigger table later:
 - The players who still have chips can keep betting against each other. Their extra chips go into a **side pot** that the all-in player can't win.
-- **A short all-in doesn't reopen the betting.** If an all-in raise is smaller than a full raise, players who already acted can only call or fold. For example: A bets 10, B goes all-in for 16 (only 6 more), and C calls. A may call the 6 or fold, but may not raise.
+- **A short all-in may not reopen the betting.** A player who already bet or raised can raise again only if the amount has gone up by at least a full raise since then. For example: A bets 10, B goes all-in for 16 (only 6 more), and C calls. A may call the 6 or fold, but may not raise. If A had only checked, A could raise. And if several short all-ins add up to a full raise, A may raise again.
 
 Heads-up never needs side pots.
 

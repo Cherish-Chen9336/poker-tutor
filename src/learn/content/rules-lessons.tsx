@@ -277,8 +277,8 @@ export function Lesson6() {
   return (
     <>
       <p>
-        <T>All-in</T> means putting in all your chips. You can always go all-in for whatever you have, even if it's less
-        than a full call or less than a minimum raise.
+        <T>All-in</T> means putting in all your chips. You can always call all-in, even with fewer chips than the bet.
+        And whenever you're allowed to raise, you may go all-in even if that's less than a minimum raise.
       </p>
       <h2>When you can't afford a call</h2>
       <p>
@@ -307,9 +307,10 @@ export function Lesson6() {
           <T>side pot</T> that the all-in player can't win.
         </li>
         <li>
-          <b>A short all-in doesn't reopen the betting.</b> If an all-in raise is smaller than a full raise, players who
-          already acted can only call or fold. For example: A bets 10, B goes all-in for 16 (only 6 more), and C calls. A
-          may call the 6 or fold, but may not raise.
+          <b>A short all-in may not reopen the betting.</b> A player who already bet or raised can raise again only if the
+          amount has gone up by at least a full raise since then. For example: A bets 10, B goes all-in for 16 (only 6
+          more), and C calls. A may call the 6 or fold, but may not raise. If A had only checked, A could raise. And if
+          several short all-ins add up to a full raise, A may raise again.
         </li>
       </ul>
       <p>Heads-up never needs side pots.</p>
