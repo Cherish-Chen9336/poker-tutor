@@ -7,6 +7,7 @@ import { handLog } from "../game/hand-log";
 import { Match, YOU_SEAT, type HandRecord } from "../game/match";
 import { potTotal, sizedTo } from "../game/pot-math";
 import type { LegalMoves, Move, TableView } from "../game/types";
+import { useHands } from "../app/hand-store";
 import { spokenText } from "../learn/card-names";
 import { CardText } from "../learn/cards";
 import { TableFelt } from "../ui/TableFelt";
@@ -116,6 +117,7 @@ export default function PlayPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [finished, setFinished] = useState<HandRecord[]>([]);
+  const { addHand, saved } = useHands();
   const [focusTick, setFocusTick] = useState(0);
   const nextRef = useRef<HTMLButtonElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
@@ -135,7 +137,10 @@ export default function PlayPage() {
   function afterChange(linesBefore: number) {
     const lines = match.current ? handLog(match.current) : [];
     setAnnouncement(spokenText(lines.slice(linesBefore).join(" ")));
-    if (match.handOver && match.current && !finished.includes(match.current)) setFinished((list) => [...list, match.current!]);
+    if (match.handOver && match.current && !finished.includes(match.current)) {
+      setFinished((list) => [...list, match.current!]);
+      addHand(match.current); // saved for the Review screen
+    }
     setFocusTick((n) => n + 1);
     rerender();
   }
@@ -168,7 +173,7 @@ export default function PlayPage() {
         <ul>
           <li>The bot plays a simple, fixed style. It only sees its own cards, never yours.</li>
           <li>The coach describes your situation before each move. It doesn't tell you what to do.</li>
-          <li>Play chips only. Nothing is saved yet; the Review area comes next.</li>
+          <li>Play chips only. Your hands are saved in this browser, so you can replay them in Review.</li>
         </ul>
         <button type="button" className="button primary" onClick={deal}>
           Deal the first hand
@@ -204,6 +209,8 @@ export default function PlayPage() {
                 <p>
                   <CardText text={log.at(-1) ?? ""} />
                 </p>
+                <a href="#/review">Review this hand</a>
+                {!saved && <p className="mono">This browser isn't saving hands, so they'll be kept only until you close the page.</p>}
                 {match.matchOver ? (
                   <>
                     <p>{stack === 0 ? "You're out of chips." : "The bot is out of chips."} A new match starts with 200 each.</p>

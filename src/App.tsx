@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect, useRef } from "react";
 import { parseRoute, routeHref, useHash, type Route } from "./app/route";
 import { focusPageHeading } from "./app/focus";
 import { useProgress } from "./app/progress";
-import { ComingSoon } from "./app/ComingSoon";
 import { LearnHome } from "./learn/LearnHome";
 import { findLesson } from "./learn/lessons";
 
@@ -10,6 +9,7 @@ import { findLesson } from "./learn/lessons";
 const LessonPage = lazy(() => import("./learn/LessonPage"));
 // Play needs the full game engine, so it loads on first visit too.
 const PlayPage = lazy(() => import("./play/PlayPage"));
+const ReviewPage = lazy(() => import("./review/ReviewPage"));
 
 const AREAS: { area: Route["area"]; label: string }[] = [
   { area: "learn", label: "Learn" },
@@ -78,9 +78,9 @@ export default function App() {
           </Suspense>
         )}
         {route.area === "review" && (
-          <ComingSoon title="Review">
-            Replay your hands step by step, with explanations of each decision. This comes together with Play.
-          </ComingSoon>
+          <Suspense fallback={<p className="loading">Loading your hands…</p>}>
+            <ReviewPage />
+          </Suspense>
         )}
       </main>
 

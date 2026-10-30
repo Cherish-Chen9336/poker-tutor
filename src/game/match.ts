@@ -25,6 +25,10 @@ export interface RecordedMove {
 /** One finished or ongoing hand, as the Review screen replays it. */
 export interface HandRecord {
   version: 1;
+  /** A stable id for links from lessons and the Review screen (set when the hand is saved). */
+  id?: string;
+  /** When the hand ended, as an ISO date (set when the hand is saved). */
+  playedAt?: string;
   /** Which bot policy played this hand (e.g. "bot-1"). */
   botVersion: string;
   matchNumber: number;
