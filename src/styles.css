@@ -123,9 +123,9 @@ h1:focus { outline: none; }
 .reset { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--muted); }
 
 /* Lesson page */
-/* The lesson card is as wide as a comfortable line of text (about 75 characters), centered, and its content fills it. */
-.panel.lesson { width: 100%; max-width: 780px; margin-inline: auto; }
+/* The lesson card is full width (the owner's choice), and its content fills it. A slightly larger font keeps the long lines readable. */
 .lesson .prose, .lesson .quiz, .lesson .note, .lesson .lede { max-width: none; }
+.lesson .prose { font-size: 17px; }
 .lesson .back { display: inline-block; margin-bottom: 18px; font-size: 15px; text-decoration: none; }
 .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
 
@@ -170,12 +170,14 @@ h1:focus { outline: none; }
 .t-bet { font-size: 12.5px; color: var(--muted); }
 .t-end { justify-content: center; border-style: dashed !important; }
 .best5 { display: flex; flex-direction: column; gap: 14px; }
-.best5-row { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 6px 14px; align-items: center; }
+.best5-row { display: grid; grid-template-columns: 100px auto minmax(0, 1fr); gap: 6px 24px; align-items: end; }
 .best5-label { font: 500 12px var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--brass); }
 .best5-cards { display: flex; gap: 14px; flex-wrap: wrap; }
 .group { display: flex; flex-direction: column; gap: 4px; }
 .group-label { font-size: 12px; color: var(--muted); }
-.best5-result { grid-column: 2; font-size: 14px; }
+.best5-result { font-size: 15px; padding-bottom: 12px; }
+.best5-label { padding-bottom: 14px; }
+.best5-result::before { content: "= "; color: var(--muted); }
 .ladder { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .ladder li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto 150px; gap: 6px 16px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
 .ladder li:last-child { border-bottom: 0; }
@@ -256,12 +258,14 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   .panel { padding: 20px 18px; }
   .panel h1 { font-size: 28px; }
   .lede { font-size: 16px; }
+  .lesson .prose { font-size: 15.5px; }
   .progress-row .button { width: 100%; }
   .lesson-card { grid-template-columns: 36px minmax(0, 1fr); padding: 12px 14px; gap: 2px 12px; }
   .lesson-card .num { width: 34px; height: 34px; font-size: 16px; grid-row: span 2; }
   .lesson-card .status { grid-column: 2; justify-self: start; margin-top: 4px; }
   .timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .best5-row { grid-template-columns: minmax(0, 1fr); }
+  .best5-row { grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .best5-result, .best5-label { padding-bottom: 0; }
   .best5-result { grid-column: 1; }
   .ladder li { grid-template-columns: 24px minmax(0, 1fr); }
   .ladder li .pc-row, .ladder-odds { grid-column: 2; }
