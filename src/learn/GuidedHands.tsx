@@ -2,7 +2,8 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import type { Move } from "../game/types";
 import { spokenText } from "./card-names";
-import { Card, CardText } from "./cards";
+import { TableFelt } from "../ui/TableFelt";
+import { CardText } from "./cards";
 import { GUIDED_HANDS } from "./guided-hands";
 import { describeMove, GuidedRun } from "./guided-run";
 
@@ -10,50 +11,8 @@ function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-function CardBack() {
-  return <span className="pc md back" role="img" aria-label="Face-down card" />;
-}
-
 function HandTable({ run }: { run: GuidedRun }) {
-  const view = run.view();
-  const you = view.seats[run.youSeat]!;
-  const bot = view.seats[1 - run.youSeat]!;
-  const pot = view.pots.reduce((sum, p) => sum + p.amount, 0) + you.betThisStreet + bot.betThisStreet;
-  // Once the hand is over the chips are already paid out, so say who won them.
-  const winners = view.winners ?? [];
-  const potLabel = !view.handOver
-    ? `Pot ${pot}`
-    : winners.length > 1
-      ? `Split pot: ${winners.map((w) => w.amount).join(" + ")}`
-      : `${winners[0]?.seat === run.youSeat ? "You won" : "The bot won"} ${winners[0]?.amount ?? 0}`;
-  const seatRow = (seat: typeof you, label: string) => (
-    <div className={`gseat ${view.actionTo === seat.seat ? "acting" : ""}`}>
-      <div className="gseat-info">
-        <b>
-          {label}
-          {view.buttonSeat === seat.seat && <span className="dealer-chip" title="Button">D</span>}
-        </b>
-        <span className="mono">{seat.stack} chips</span>
-        {seat.betThisStreet > 0 && <span className="gbet">bet {seat.betThisStreet}</span>}
-        {seat.status === "folded" && <span className="gbet">folded</span>}
-      </div>
-      <span className="pc-row">
-        {seat.cards ? seat.cards.map((c, i) => (c ? <Card key={c} code={c} /> : <CardBack key={i} />)) : seat.status === "folded" ? null : [<CardBack key="a" />, <CardBack key="b" />]}
-      </span>
-    </div>
-  );
-  return (
-    <div className="gtable" aria-label="Table">
-      {seatRow(bot, "Bot")}
-      <div className="gboard">
-        <span className="pc-row" aria-label={view.board.length ? "Board" : "No board cards yet"}>
-          {Array.from({ length: 5 }, (_, i) => (view.board[i] ? <Card key={view.board[i]} code={view.board[i]} /> : <span key={i} className="slot md" />))}
-        </span>
-        <span className="gpot mono">{potLabel}</span>
-      </div>
-      {seatRow(you, "You")}
-    </div>
-  );
+  return <TableFelt view={run.view()} youSeat={run.youSeat} />;
 }
 
 function Coach({ run, onMove, feedback, boxRef }: { run: GuidedRun; onMove: (move: Move) => void; feedback: string | null; boxRef: React.RefObject<HTMLDivElement | null> }) {

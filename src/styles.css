@@ -293,6 +293,31 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 .key.expected { width: 0; height: 12px; border-left: 2px dashed var(--good); border-radius: 0; }
 .key.ci { height: 4px; background: var(--ink); }
 
+/* Play */
+.play-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.play-head h1 { margin: 0; }
+.play-main { display: flex; flex-direction: column; gap: 12px; }
+.play-controls:focus { outline: none; }
+.actions-bar { display: flex; flex-direction: column; gap: 10px; }
+.action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.action-buttons .button { flex: 1 1 0; }
+.sizer { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: var(--panel-hi); border-radius: 10px; }
+.sizer-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.sizer input[type="range"] { flex: 1 1 160px; accent-color: var(--brass); min-height: 32px; }
+.size-number { width: 84px; font: 500 15px var(--f-mono); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px; min-height: 40px; }
+.chip-btn { padding-inline: 12px; min-height: 40px; }
+.chip-btn[aria-pressed="true"] { border-color: var(--brass); color: var(--brass); }
+.sizer .button.primary { margin-left: auto; }
+.sizer-note { margin: 0; font-size: 13px; color: var(--muted); }
+.hand-done { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; padding: 12px; background: var(--panel-hi); border-radius: 10px; }
+.hand-done p { margin: 0; }
+.coach-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.switch { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); cursor: pointer; min-height: 32px; }
+.switch input { accent-color: var(--brass); width: 18px; height: 18px; }
+.coach-list { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; }
+.coach-list li::marker { color: var(--brass); }
+.play-intro ul { margin: 16px 0 20px; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+
 /* Quick checks */
 .quiz { margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 16px; max-width: 68ch; }
 .quiz h2 { font-family: var(--f-display); font-size: 26px; margin: 0; }

@@ -8,6 +8,8 @@ import { findLesson } from "./learn/lessons";
 
 // Lesson pages include the hand evaluator, which is large, so they load on first visit.
 const LessonPage = lazy(() => import("./learn/LessonPage"));
+// Play needs the full game engine, so it loads on first visit too.
+const PlayPage = lazy(() => import("./play/PlayPage"));
 
 const AREAS: { area: Route["area"]; label: string }[] = [
   { area: "learn", label: "Learn" },
@@ -71,9 +73,9 @@ export default function App() {
           </Suspense>
         )}
         {route.area === "play" && (
-          <ComingSoon title="Play">
-            Play heads-up against a bot, with a coach that explains each decision. This comes after the lessons.
-          </ComingSoon>
+          <Suspense fallback={<p className="loading">Loading the table…</p>}>
+            <PlayPage />
+          </Suspense>
         )}
         {route.area === "review" && (
           <ComingSoon title="Review">
