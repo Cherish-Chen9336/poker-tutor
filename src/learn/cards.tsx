@@ -18,8 +18,13 @@ export function Card({ code, size = "md", lit, dim }: CardProps) {
   const classes = ["pc", size, suit.red ? "red" : "", lit ? "lit" : "", dim ? "dim" : ""].filter(Boolean).join(" ");
   return (
     <span className={classes} role="img" aria-label={cardName(code)}>
-      <span className="r" aria-hidden="true">{rankLabel(code)}</span>
-      <span className="s" aria-hidden="true">{suit.symbol}</span>
+      <span className="ix" aria-hidden="true">
+        <span className="r">{rankLabel(code)}</span>
+        <span className="s">{suit.symbol}</span>
+      </span>
+      <span className="pip" aria-hidden="true">
+        {suit.symbol}
+      </span>
     </span>
   );
 }
