@@ -58,7 +58,7 @@ Revised 2026-10-29 after a whole-plan review with Codex.
 1. ✅ Setup and library smoke tests (`src/engine/smoke.test.ts`)
 2. ✅ **Visual preview:** a clickable sketch of the table and one narrated example hand. Saved as the design reference in `docs/design/preview.html`: a dark "card room" look (Bodoni Moda, Instrument Sans, IBM Plex Mono), a coach that explains *why*, and hand odds for 7 cards (2 private + 5 shared), not 5.
 3. ✅ **Engine validation and adapter:** rules tests from `docs/rules-scenarios.md` (Claude verifies the expected results against the TDA rules; the owner reviews whether the explanations make sense to a beginner), plus the app-owned adapter (legal actions and amounts, player views without hidden cards, settlement, fixed deals for tests and lessons)
-4. **Learn:** 10 short lessons with quick checks and diagrams, plus GitHub Pages and CI. Plan reviewed by Codex (thread `01a18bab-3775-78a1-8a8e-d081ee9cb261`, "approve with changes") and approved by the owner on 2026-10-30.
+4. ✅ **Learn:** 10 short lessons with quick checks and diagrams, plus GitHub Pages and CI. Done 2026-10-30; Codex audit (thread `01a18cbc-02b3-70b2-937a-7210b4bf7969`) found 9 issues, all fixed and verified. Plan reviewed by Codex (thread `01a18bab-3775-78a1-8a8e-d081ee9cb261`, "approve with changes") and approved by the owner on 2026-10-30.
    1. The goal and the flow of a hand: chips, the pot, preflop/flop/turn/river, winning at showdown or when everyone else folds
    2. Your cards and the board: 2 private + 5 shared, best 5 of 7 using 2, 1, or 0 private cards, "the nuts" (the best possible hand on this board)
    3. Hand rankings: a 10-row ladder (a royal flush is the top straight flush), ace-low straight, suits never break ties
