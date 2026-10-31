@@ -1,17 +1,17 @@
 # Step 1b, batch 1: simpler text and new visuals (lessons 5, 12, 13, 14, 16) — for the owner's review
 
-Each lesson below is the complete proposed text; it replaces the lesson's current text (quizzes unchanged). **[Visual: …]** describes a new or changed picture; its labels carry what the removed text or table said. Pinned facts (the sentences the tests check) are kept word for word.
+Each lesson below is the complete proposed text; it replaces the lesson's current text (quizzes unchanged). **[Visual: …]** describes a new or changed picture; its labels carry what the removed text or table said. Pinned facts (the sentences the tests check) are kept word for word. Reviewed by Codex ("approve with changes"; changes applied).
 
 ---
 
 ## Lesson 5: Your moves
 
-When it's your turn, what you can do depends on one question: **do you owe chips?**
+On your turn, first ask: **do you owe chips?**
 
 [Visual: three situation cards, side by side (stacked on phones):
-1. "Nobody has bet this round" → **Check** (pass for free) or **Bet** (put in chips the others must match or fold to).
+1. "Nobody has bet this round" → **Check** (pass for free) or **Bet** (put in chips; others may call, raise, or fold).
 2. "You're the big blind, and everyone just matched your 2" → **Check** or **Raise**. Nothing to call isn't the same as nobody bet.
-3. "Someone bet 20, and you both have chips left" → **Fold**, **Call 20** (match it), or **Raise to at least 40**.]
+3. "On the flop, both players have 100 chips. Your opponent bets 20." → **Fold**, **Call 20** (match it), or **Raise to at least 40**.]
 
 **If you owe chips, you can't check.** You can fold, call, or raise if allowed. You can always **fold**: you give up the hand, and chips you already put in stay in the pot. Folding when you could check for free just throws the hand away.
 
@@ -21,7 +21,7 @@ When it's your turn, what you can do depends on one question: **do you owe chips
 - **For value:** your hand is probably best, and you want worse hands to put in more.
 - **As a bluff:** your hand is probably worse, and you want better hands to fold.
 
-With a medium hand, checking or calling is often better.
+With a medium hand, checking or calling is often better: betting may make weaker hands fold while stronger hands call.
 
 **"Raise to" vs. "raise by."** This app always says **"raise to"**: your total for this round. The big blind is 2. You **raise to 6**: that's 4 more, so you **raised by 4**.
 
@@ -29,10 +29,10 @@ With a medium hand, checking or calling is often better.
 
 **Smallest and largest bets:**
 - The smallest **bet** is the big blind (2).
-- A full **raise** must add at least as much as the last full bet or raise this round. After a raise to 6 (by 4), the next raise is to at least 10.
+- A full **raise** must add at least as much as the last full bet or raise this round. After a raise to 6 (by 4), the next full raise is to at least 10.
 - In No-Limit Hold'em, the only maximum is your stack. Betting everything is going **all-in** (Lesson 6).
 
-*Removed:* the five-row move table (now the three cards) and the longer "why bet" paragraph.
+*Removed:* the five-row move table (now the three cards) and repeated wording.
 
 ---
 
@@ -40,16 +40,16 @@ With a medium hand, checking or calling is often better.
 
 **A sunk cost** is something you've already paid and can't get back. The trap: "I've already put 60 in, so I can't fold now."
 
-**Chips in the pot aren't yours anymore.** Folding costs no new chips. Judge the next call only by what it costs and what it can win.
+**Chips in the pot aren't yours anymore.** Folding costs no new chips. Judge the next call by what it costs and whether it pays on average.
 
 **What still matters from earlier:**
 - **The size of the pot.** The bigger the pot, the smaller the chance you need for the same call to pay off (Lesson 9), no matter who put the chips in.
 - **What the betting told you** about your opponent's hand.
 
-[Visual: two pots side by side, each with the same call of 20 and the call closing the betting.
-- "Pot 40 → you need 20 ÷ (40 + 20) = 33%"
+[Visual: two heads-up situations side by side. Each pot includes the opponent's bet; calling 20 ends the betting.
+- "Pot 40 → you need 20 ÷ (40 + 20) ≈ 33.3%"
 - "Pot 180 → you need 20 ÷ (180 + 20) = 10%"
-In each pot, some chips have a dashed outline labeled "yours earlier, now the pot's". Caption: "Who put the chips in doesn't change the math. Only the pot and the price do."]
+In each pot, some chips have a dashed outline labeled "yours earlier, now the pot's". Caption: "Pot size and call price set the chance you need. Who put the chips in doesn't."]
 
 **A test:** keep everything the same (cards, pot, stacks, betting), but imagine someone else put in your earlier chips. Would you call? That's your answer.
 
@@ -61,11 +61,11 @@ In each pot, some chips have a dashed outline labeled "yours earlier, now the po
 
 **Resulting** means judging a decision by how it turned out. But one hand's result depends on both your decision and luck.
 
-[Visual: a 2×2 grid built on Lesson 9's example, shown once above it: you hold 7♥ 6♥, your opponent K♠ J♦, the board is K♥ 9♥ 2♣ 3♠, one card to come, and your call ends the betting. You win only if a heart comes (9 of the 44 unseen cards, 20.5%).
+[Visual: a 2×2 grid built on Lesson 9's example, shown once above it: you hold 7♥ 6♥, your opponent K♠ J♦, the board is K♥ 9♥ 2♣ 3♠, one card to come, and your call ends the betting. For this example, both hands are known before the call. You win only if a heart comes (9 of the 44 unseen cards, 20.5%).
 - Rows: **Good call**: pot 200, call 25, you need 11.1%. **Bad call**: pot 100, call 50, you need 33.3%.
 - Columns: **A heart comes (you win)** and **No heart (you lose)**.
-- Cells: Good call + win: "+200. Right decision, good result." Good call + lose: "−25. Right decision, bad luck. This happens about 4 times in 5." Bad call + win: "+100. Wrong decision, lucky result." Bad call + lose: "−50. Wrong decision, and it lost."
-- Caption: "The boxes are the same size, but the chances aren't: without a heart you lose, about 4 times in 5."]
+- Cells: "+200. Good call, winning result." "−25. Good call, losing result." "+100. Bad call, winning result." "−50. Bad call, losing result."
+- Caption: "Amounts are chips won or lost by calling. Either call wins 20.5% of the time and loses 79.5%; the boxes' size doesn't show the chances."]
 
 **Even the best spots lose often.** Before the flop, A♥ A♠ all-in against K♣ K♦ wins 81.1% of the time, loses 18.6%, and ties 0.4% (counted over all 1,712,304 possible boards). If you play that spot 10 times, you'll likely lose it at least once.
 
@@ -83,7 +83,7 @@ In each pot, some chips have a dashed outline labeled "yours earlier, now the po
 
 **Your bankroll** is the money you set aside for a game. This app uses play chips only, but the question matters for any risky choice: how much of what you have should you risk at once?
 
-**The Kelly criterion** (John Kelly, 1956) answers it for a simple bet you repeat many times, when you know your exact chance of winning p, the bet pays b for each 1 you risk, and there are no ties:
+**The Kelly criterion** (John Kelly, 1956) gives the fraction of your current bankroll to risk on each of many independent, repeated bets. Assume you know your chance of winning p, you profit b for each 1 you risk, and there are no ties:
 
 **Kelly fraction = (b × p − (1 − p)) ÷ b**, or nothing if that's zero or less.
 
@@ -93,9 +93,9 @@ In each pot, some chips have a dashed outline labeled "yours earlier, now the po
 
 **Betting too much is worse than betting too little.** Take 100 bets with the typical result, 55 wins and 45 losses, starting with 100. Each win multiplies your bankroll by (1 + the fraction you bet), and each loss by (1 − that fraction). The order doesn't change the final balance: multiplying gives the same answer in any order.
 
-[Visual: three bars starting from 0, with a line marking the starting 100: **Half Kelly (5%) → 146**, **Kelly (10%) → 165**, **Twice Kelly (20%) → 99**. Beside them, a small chain: "100 → lose 20% → 80 → win 20% → 96". Caption: "After 55 wins and 45 losses. Real runs are luckier or unluckier; this is the typical one."]
+[Visual: three bars starting from 0, with a line marking the starting 100: **Half Kelly (5%) → 146**, **Kelly (10%) → 165**, **Twice Kelly (20%) → 99**. Beside them, a small chain: "100 → lose 20% → 80 → win 20% → 96". Caption: "Rounded balances after 55 wins and 45 losses, starting from 100. Real results vary."]
 
-- **Half Kelly** grows at about three-quarters of Kelly's speed, with much smaller swings.
+- **Half Kelly's** long-run growth rate is about three-quarters of full Kelly's, with much smaller swings.
 - **Twice Kelly** ends up about where it started, even though you won 55% of the time. Losing 20% takes you to 80, and winning 20% from there only gets you back to 96. Its growth per bet is slightly below zero, so over thousands of bets it slowly shrinks (100 becomes about 25 after 10,000 bets).
 
 **Kelly is a guide, not a rule.** Many players risk half or a quarter of Kelly: it grows more slowly but swings less, and it hurts less if you've overestimated your edge. In poker you never know your exact edge, and overestimating it makes Kelly bet too much, which is the costly direction.
@@ -127,7 +127,7 @@ So the shortest stack can win at most the main pot.
 **Things to keep straight:**
 - **A side pot isn't a split pot.** A split pot is one pot shared by tied hands.
 - **Folded chips stay in** the pots they went into, but the player who folded can't win them.
-- **Ties are settled pot by pot.** Any leftover chips go one at a time to the tied players, starting left of the button.
-- **One all-in doesn't stop the others.** Players with chips can keep betting; those bets go into the side pot.
+- **Ties are settled pot by pot.** Each pot is split equally among its tied winners; any leftover chips go one at a time, starting left of the button.
+- **One all-in doesn't stop the others.** Two or more players with chips can keep betting against each other, into a side pot.
 
 *Removed:* the four-column pot table (now the bar labels) and a repeated sentence.
