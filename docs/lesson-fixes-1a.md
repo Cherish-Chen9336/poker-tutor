@@ -1,6 +1,6 @@
 # Lesson accuracy fixes (step 1a) — for the owner's review
 
-Places where the current lesson text is slightly wrong or too loose, found with Codex (thread `01a19200-e08d-7f61-a533-e99bcd483ab0`), checked by Claude, then reviewed again by Codex. Each **replaces** the current text. Rewrites are kept about as long as the original or shorter. Revised after Codex's review ("approve with changes"). Overall the patch adds about 40 words, mostly short assumptions in quiz questions. No quiz answer changes. Simplification and new visuals come in step 1b.
+Places where the current lesson text is slightly wrong or too loose, found with Codex (thread `01a19200-e08d-7f61-a533-e99bcd483ab0`), checked by Claude, then reviewed again by Codex. Each **replaces** the current text. Rewrites are kept about as long as the original or shorter. Revised after Codex's review ("approve with changes"). The replaced lesson passages get slightly shorter (343 → 325 words); quiz questions gain about 35 words of stated assumptions, so overall the lessons grow by roughly 20 words. No quiz answer changes. Simplification and new visuals come in step 1b.
 
 ## Lesson 1: when a betting round ends
 
