@@ -109,21 +109,30 @@ export interface EquityRequest {
  * estimate (against random hands, only the count matters).
  */
 export function equityRequests(
-  view: { seats: ({ seat: number; status: string; betThisStreet: number } | null)[]; pots: { eligibleSeats: number[] }[] },
+  view: { seats: ({ seat: number; status: string; betThisStreet: number; stack?: number } | null)[]; pots: { eligibleSeats: number[] }[] },
   learner: number,
 ): EquityRequest[] {
   const live = view.seats.filter((s): s is NonNullable<typeof s> => !!s && s.status !== "folded" && s.status !== "out");
+  const me = view.seats[learner]!;
   const highest = Math.max(0, ...view.seats.map((s) => s?.betThisStreet ?? 0));
-  // Bets on this round (including the learner's call) go to a pot that only players who can
-  // match them can win: an all-in player who put in less this round can't win that part.
-  const current = live.filter((s) => s.status !== "all-in" || s.betThisStreet >= highest || highest === 0).length - 1;
-  const mine = view.pots.filter((pot) => pot.eligibleSeats.includes(learner));
   const requests: EquityRequest[] = [];
   const add = (label: string, opponents: number) => {
     if (opponents > 0 && !requests.some((r) => r.opponents === opponents)) requests.push({ label, opponents });
   };
+  // Pots from earlier rounds.
+  const mine = view.pots.filter((pot) => pot.eligibleSeats.includes(learner));
   mine.forEach((pot, i) => add(i === 0 ? "the main pot" : `side pot ${i}`, pot.eligibleSeats.length - 1));
-  if (highest > 0 || mine.length === 0) add(mine.length === 0 ? "the pot" : "this round's bets", current);
+  // This round's bets form one layer per all-in amount, up to what the learner puts in by calling.
+  // Each layer can be won by the players who put in at least that much (all-in players only up to their bet).
+  const myTotal = Math.min(highest, me.betThisStreet + (me.stack ?? Infinity));
+  const levels = [...new Set([...live.filter((s) => s.status === "all-in" && s.betThisStreet > 0 && s.betThisStreet < myTotal).map((s) => s.betThisStreet), myTotal])]
+    .filter((level) => level > 0)
+    .sort((a, b) => a - b);
+  for (const level of levels) {
+    const eligible = live.filter((s) => s.status !== "all-in" || s.betThisStreet >= level).length;
+    add(requests.length === 0 ? "the main pot" : "a side pot", eligible - 1);
+  }
+  if (requests.length === 0) add("the pot", live.length - 1);
   if (requests.length === 1) requests[0] = { ...requests[0], label: "the pot" };
   return requests;
 }

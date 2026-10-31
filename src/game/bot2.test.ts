@@ -60,6 +60,19 @@ const styles: Record<string, Learner> = {
       }) as Learner,
     ]),
   ),
+  // Raise small, then bet half the pot whenever checked to after the flop; otherwise check or fold
+  // (Codex's Step 6 verification found this won about +42 per 100 hands).
+  ...Object.fromEntries(
+    [5, 7].map((to) => [
+      `raise to ${to}, then bet half the pot when checked to`,
+      ((legal, view) => {
+        const unopened = view.street === "preflop" && Math.max(...view.seats.map((s) => s!.betThisStreet)) <= view.bigBlind;
+        if (unopened && legal.raise) return { type: "raise", to: Math.min(legal.raise.max, Math.max(legal.raise.min, to)) };
+        if (view.street !== "preflop" && legal.bet) return { type: "bet", to: sizedTo(view, 0, legal, 0.5)! };
+        return legal.check ? { type: "check" } : { type: "fold" };
+      }) as Learner,
+    ]),
+  ),
 };
 
 /** The learner's results against five copies of bot-2, in big blinds per 100 hands, with a 95% margin. */
@@ -87,10 +100,11 @@ describe("bot-2 at the six-player table", () => {
     for (const [name, learner] of Object.entries(styles)) {
       const { per100, margin } = benchmark(learner, 8, 400);
       // Not even the low end of the 95% range is a profit.
+      console.info(`${name}: ${per100.toFixed(0)} ± ${margin.toFixed(0)}`);
       expect(per100 - margin, `${name}: ${per100.toFixed(0)} ± ${margin.toFixed(0)}`).toBeLessThan(0);
       // Stealing used to win (about +29 per 100 hands raising to 6, then +32 raising to 7 until the defense
       // stopped narrowing suddenly above 3 big blinds); the other styles lose clearly.
-      if (!name.startsWith("steal")) expect(per100 + margin, name).toBeLessThan(0);
+      if (!name.startsWith("steal") && !name.startsWith("raise to")) expect(per100 + margin, name).toBeLessThan(0);
     }
   }, 60_000); // 16,000 hands take a few seconds
 

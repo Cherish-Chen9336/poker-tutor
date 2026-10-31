@@ -102,15 +102,15 @@ describe("coach", () => {
       };
     }
 
-    it("names the seat and how many act after you before the flop", () => {
+    it("names the seat and states the order without miscounting who acts later", () => {
       // Button in seat 3: seat 0 is 3 seats left of the button, under the gun.
       expect(text(six({ button: 3, bets: [0, 0, 0, 0, 1, 2] }))[0]).toBe(
-        "You're under the gun (UTG). In the first round of betting, 5 players act after you; you act third on later rounds if everyone stays in.",
+        "You're under the gun (UTG). Before the flop, betting goes around from under the gun to the big blind, and a raise gives everyone else another turn. After the flop, you act third on later rounds if everyone stays in.",
       );
       expect(text(six({ button: 0, bets: [0, 1, 2, 0, 0, 0], folded: [3, 4] }))[0]).toBe(
-        "You're on the button (BTN). In the first round of betting, 2 players act after you; you act last on every later round.",
+        "You're on the button (BTN). Before the flop, betting goes around from under the gun to the big blind, and a raise gives everyone else another turn. After the flop, you act last on every later round.",
       );
-      expect(text(six({ button: 4, bets: [2, 0, 0, 0, 0, 1] }))[0]).toBe("You're the big blind (BB). In the first round of betting, you act last; you act second on later rounds if everyone stays in.");
+      expect(text(six({ button: 4, bets: [2, 0, 0, 0, 0, 1] }))[0]).toBe("You're the big blind (BB). Before the flop, betting goes around from under the gun to the big blind, and a raise gives everyone else another turn. After the flop, you act second on later rounds if everyone stays in.");
     });
 
     it("says where you act among the players still in after the flop", () => {

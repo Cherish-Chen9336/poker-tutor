@@ -163,8 +163,12 @@ function multiwayPostflop(view: TableView, legal: LegalMoves, seat: number, hole
   const aggressions = history.filter((a) => a.street === view.street && (a.move.type === "bet" || a.move.type === "raise")).length;
   if (strong) return aggressions <= 1 && random() < 0.2 ? aggress(legal, size(), { type: "call" }) : { type: "call" };
   if (aggressions > 1) return { type: "fold" }; // facing a raise, only strong hands go on
-  if (read.strength === "topPair" && price.breakEven <= 0.2) return { type: "call" };
-  if (bigDraw && price.breakEven <= 0.15) return { type: "call" };
+  // Facing a single bet of up to about three-quarters of the pot, defend with pairs and good draws,
+  // so betting every time it's checked around can't win the pot too often.
+  if (price.breakEven <= 0.3) {
+    if (read.strength === "topPair" || read.strength === "lowerPair") return { type: "call" };
+    if (bigDraw || (view.board.length < 5 && read.straightDraw === "gutshot" && price.breakEven <= 0.2)) return { type: "call" };
+  }
   return checkOrFold(legal);
 }
 
@@ -178,9 +182,34 @@ export const tableBot: BotPolicy = (view, legal, random, history) => {
     // One opponent left, and they checked to the bot: bet sometimes with any hand (a "stab"),
     // so a player who checks and gives up can't reach the showdown for free.
     const checkedToMe = history.some((a) => a.street === view.street && a.seat !== seat && a.move.type === "check");
-    if (legal.check && checkedToMe && random() < 0.3) {
+    const firstToAct = !history.some((a) => a.street === view.street);
+    // Sometimes bet first with any hand ("leading"), and bet when checked to (a "stab").
+    if (legal.check && ((checkedToMe && random() < 0.3) || (firstToAct && random() < 0.2))) {
       const to = sizedTo(view, seat, legal, random() < 0.5 ? 1 / 2 : 2 / 3);
       return aggress(legal, to, { type: "check" });
+    }
+    // Against one opponent's small bet, defend more than bot-1 would: otherwise a player who
+    // bets every flop after raising before it wins too often (Codex's Step 6 verification).
+    if (!legal.check) {
+      const read = readHand(hole, view.board);
+      const strongNow = read.strength === "strong" || isUnbeatable(hole, view.board);
+      const price = callPrice(view, seat)!;
+      if (!strongNow) {
+        const boardMax = Math.max(...view.board.map((c) => "23456789TJQKA".indexOf(c[0])));
+        const overcards = hole.every((c) => "23456789TJQKA".indexOf(c[0]) > boardMax);
+        const draw = read.flushDraw || read.straightDraw !== null;
+        const madeOrAce = read.strength !== "nothing";
+        if (view.board.length < 5 && price.breakEven <= 0.3) {
+          // Sometimes fight back with a raise (a bluff), so betting every round doesn't win automatically.
+          const bluffRaise = draw || overcards ? 0.15 : 0.08;
+          if (random() < bluffRaise) {
+            const to = sizedTo(view, seat, legal, 2 / 3);
+            if (to !== null) return aggress(legal, to, { type: "call" });
+          }
+          if (madeOrAce || draw || overcards || random() < 0.3) return { type: "call" };
+        }
+        if (view.board.length === 5 && price.breakEven <= 0.25 && madeOrAce) return { type: "call" };
+      }
     }
     return headsUpPostflop(view, legal, seat, hole, random);
   }

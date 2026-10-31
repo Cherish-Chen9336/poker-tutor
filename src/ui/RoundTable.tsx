@@ -65,37 +65,45 @@ function Seat({ seat, view, youSeat, names }: { seat: SeatView; view: TableView;
 export function RoundTable({ view, youSeat, names }: { view: TableView; youSeat: number; names: string[] }) {
   const n = view.seats.length;
   const place = (seat: number) => (seat - youSeat + n) % n;
+  const potList = pots(view, youSeat, names);
   return (
-    <div className="rt-wrap">
-      <div className="rt-felt" aria-label="Table">
-        <div className="rt-center">
-          <span className="pc-row" aria-label={view.board.length ? "Board" : "No board cards yet"}>
-            {Array.from({ length: 5 }, (_, i) =>
-              view.board[i] ? <Card key={view.board[i]} code={view.board[i]} /> : <span key={i} className="slot md" />,
-            )}
-          </span>
-          <span className="gpot mono">{potLabel(view, youSeat, names)}</span>
-          {pots(view, youSeat, names).map((p) => (
-            <span key={p} className="rt-sidepot mono">
-              {p}
+    <div className="rt">
+      <div className="rt-wrap">
+        <div className="rt-felt" aria-label="Table">
+          <div className="rt-center">
+            <span className="pc-row" aria-label={view.board.length ? "Board" : "No board cards yet"}>
+              {Array.from({ length: 5 }, (_, i) =>
+                view.board[i] ? <Card key={view.board[i]} code={view.board[i]} /> : <span key={i} className="slot md" />,
+              )}
             </span>
-          ))}
+            <span className="gpot mono">{potLabel(view, youSeat, names)}</span>
+          </div>
+          {view.seats.map((s) =>
+            s && s.betThisStreet > 0 ? (
+              <span key={`bet${s.seat}`} className={`rt-bet p${place(s.seat)}`} aria-hidden="true">
+                <span className="chip" />
+                {s.betThisStreet}
+              </span>
+            ) : null,
+          )}
+          {view.buttonSeat !== null && (
+            <span className={`rt-dealer p${place(view.buttonSeat)}`} title="Button" aria-hidden="true">
+              D
+            </span>
+          )}
+          {view.seats.map((s) => (s ? <Seat key={s.seat} seat={s} view={view} youSeat={youSeat} names={names} /> : null))}
         </div>
-        {view.seats.map((s) =>
-          s && s.betThisStreet > 0 ? (
-            <span key={`bet${s.seat}`} className={`rt-bet p${place(s.seat)}`} aria-hidden="true">
-              <span className="chip" />
-              {s.betThisStreet}
-            </span>
-          ) : null,
-        )}
-        {view.buttonSeat !== null && (
-          <span className={`rt-dealer p${place(view.buttonSeat)}`} title="Button" aria-hidden="true">
-            D
-          </span>
-        )}
-        {view.seats.map((s) => (s ? <Seat key={s.seat} seat={s} view={view} youSeat={youSeat} names={names} /> : null))}
       </div>
+      {/* Pot details go below the table, so long lists never push the board into the seats. */}
+      {potList.length > 0 && (
+        <ul className="rt-pots" aria-label="Pots">
+          {potList.map((p) => (
+            <li key={p} className="mono">
+              {p}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

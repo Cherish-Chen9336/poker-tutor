@@ -58,7 +58,8 @@ describe("equity against random hands", () => {
 });
 
 describe("which estimates the coach asks for", () => {
-  const seats = (statuses: string[], bets: number[] = []) => statuses.map((status, seat) => ({ seat, status, betThisStreet: bets[seat] ?? 0 }));
+  const seats = (statuses: string[], bets: number[] = [], stacks: number[] = []) =>
+    statuses.map((status, seat) => ({ seat, status, betThisStreet: bets[seat] ?? 0, stack: stacks[seat] ?? (status === "all-in" ? 0 : 200) }));
 
   it("asks once when there's one pot", () => {
     expect(equityRequests({ seats: seats(["active", "active", "folded", "active"]), pots: [{ eligibleSeats: [0, 1, 3] }] }, 0)).toEqual([
@@ -83,7 +84,7 @@ describe("which estimates the coach asks for", () => {
     const view = { seats: seats(["active", "all-in", "active", "active"], [0, 0, 10, 0]), pots: [{ eligibleSeats: [0, 1, 2, 3] }] };
     expect(equityRequests(view, 0)).toEqual([
       { label: "the main pot", opponents: 3 },
-      { label: "this round's bets", opponents: 2 },
+      { label: "a side pot", opponents: 2 },
     ]);
     // No bets yet this round: only the collected pot.
     const quiet = { seats: seats(["active", "all-in", "active", "active"]), pots: [{ eligibleSeats: [0, 1, 2, 3] }] };
@@ -91,5 +92,15 @@ describe("which estimates the coach asks for", () => {
     // Before the flop, nothing collected yet: everyone still in.
     const preflop = { seats: seats(["active", "active", "folded", "active"], [0, 1, 0, 2]), pots: [] };
     expect(equityRequests(preflop, 0)).toEqual([{ label: "the pot", opponents: 2 }]);
+  });
+
+  it("builds a layer for each all-in amount on this round (Codex's verification)", () => {
+    // Bets [10, 20, 50, 50]: seat 1 all-in for 20, seat 2 all-in for 50, seat 3 bet 50; you call to 50.
+    // That makes a pot everyone can win (up to 20) and one that seat 1 can't (20 to 50).
+    const view = { seats: seats(["active", "all-in", "all-in", "active", "folded", "folded"], [10, 20, 50, 50, 0, 0]), pots: [] };
+    expect(equityRequests(view, 0)).toEqual([
+      { label: "the main pot", opponents: 3 },
+      { label: "a side pot", opponents: 2 },
+    ]);
   });
 });

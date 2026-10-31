@@ -96,17 +96,13 @@ export function coachLines(view: TableView): CoachLine[] {
       });
     }
   } else if (preflop) {
-    // Describes the order of the first round of betting only: after a raise,
-    // players who already acted get another turn.
+    // States the order plainly rather than counting who's left: after a raise, everyone
+    // who already acted gets another turn, so a count of "players after you" can mislead.
     const position = positionOf(view, seat);
-    const preflopOrder = (s: number) => (s - (view.buttonSeat ?? 0) - 3 + 2 * n) % n;
-    const behind = view.seats.filter((s) => s && s.status !== "folded" && preflopOrder(s.seat) > preflopOrder(seat)).length;
     const later = postflopRank(view, seat) === n ? "you act last on every later round" : `you act ${ordinal(postflopRank(view, seat))} on later rounds if everyone stays in`;
     lines.push({
       topic: "position",
-      text: `You're ${SEAT_PHRASE[position]} (${position}). In the first round of betting, ${
-        behind === 0 ? "you act last" : `${behind} ${behind === 1 ? "player acts" : "players act"} after you`
-      }; ${later}.`,
+      text: `You're ${SEAT_PHRASE[position]} (${position}). Before the flop, betting goes around from under the gun to the big blind, and a raise gives everyone else another turn. After the flop, ${later}.`,
     });
   } else {
     // Only players with chips left take turns; all-in players are still in the hand but don't act.
