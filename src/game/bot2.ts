@@ -64,11 +64,8 @@ const REBUY_LATE = range("TT+ AJs+ KQs AQo+"); // re-raise against a late-seat o
 const FLAT = range("22-TT A9s-AQs KTs-KQs QTs-QJs JTs T9s 98s 87s AQo KQo"); // call an open in position
 const BB_DEFEND = range("55-66 ATs KJs QJs JTs AQo KQo"); // the big blind's extra calls
 const FLAT_BIG = range("99-TT AQs"); // call a bigger open
-// The big blind against a big open (above 6 big blinds): fewer hands as the price grows.
+// The big blind against a 6–10 big blind open.
 const BB_DEFEND_BIG = range("22-TT ATs+ KJs+ QJs JTs AQo+ KQo");
-const BB_DEFEND_HUGE = range("77+ AJs+ KQs AQo+");
-// After limping, against a raise from behind (otherwise every limp would fold to a small raise).
-const LIMP_DEFEND_BIG = range("22+ A2s+ K9s+ Q9s+ J9s+ T8s+ 97s+ 86s+ 75s+ 65s 54s A9o+ KTo+ QTo+ JTo");
 // Against an open from a late seat (often a steal), defend wider and sometimes re-raise as a bluff.
 const FLAT_VS_LATE = range("22-TT A2s-AQs K9s-KQs Q9s-QJs J9s-JTs T9s 98s 87s 76s 65s ATo-AQo KJo-KQo");
 // Joining a cheap raise that someone already called: hands that do well in pots with several players.
@@ -83,6 +80,35 @@ const SHOVE_EARLY = range("88+ AJs+ AQo+");
 const SHOVE_LATE = range("55+ A5s+ ATo+ KQs");
 const CALL_SHOVE_ONE = range("TT+ AQs+ AQo+");
 const CALL_SHOVE_MANY = range("QQ+ AKs AKo");
+
+/** Every starting hand, as keys ("AA", "AKs", "AKo", …). */
+const ALL = new Set([...RANKS].flatMap((a, i) => [...RANKS].slice(0, i + 1).flatMap((b) => (a === b ? [a + b] : [a + b + "s", a + b + "o"]))));
+const combosOf = (key: string) => (key.length === 2 ? 6 : key.endsWith("s") ? 4 : 12);
+
+/** The Chen formula: a simple, well-known preflop hand score (higher is better). Used only to order hands. */
+function chen(key: string): number {
+  const points = (r: string) => ({ A: 10, K: 8, Q: 7, J: 6 })[r] ?? (RANKS.indexOf(r) + 2) / 2;
+  if (key.length === 2) return Math.max(5, points(key[0]) * 2);
+  const gap = RANKS.indexOf(key[0]) - RANKS.indexOf(key[1]) - 1;
+  let score = points(key[0]) + (key[2] === "s" ? 2 : 0) - (gap < 4 ? [0, 1, 2, 4][gap] : 5);
+  if (gap <= 1 && RANKS.indexOf(key[0]) < RANKS.indexOf("Q")) score += 1;
+  return Math.ceil(score);
+}
+const BY_STRENGTH = [...ALL].sort((a, b) => chen(b) - chen(a) || combosOf(a) - combosOf(b) || RANKS.indexOf(b[0]) - RANKS.indexOf(a[0]) || RANKS.indexOf(b[1]) - RANKS.indexOf(a[1]));
+
+/** The strongest hands of `from` that make up at least `share` of its combinations. */
+function strongest(from: Set<string>, share: number): Set<string> {
+  const total = [...from].reduce((sum, k) => sum + combosOf(k), 0);
+  const kept = new Set<string>();
+  let count = 0;
+  for (const key of BY_STRENGTH) {
+    if (count >= share * total) break;
+    if (!from.has(key)) continue;
+    kept.add(key);
+    count += combosOf(key);
+  }
+  return kept;
+}
 
 /** Order of acting after the flop: the small blind first, the button last. */
 function postflopOrder(view: TableView, seat: number): number {
@@ -101,6 +127,25 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
   const callersOfLast = lastRaise ? actions.slice(actions.indexOf(lastRaise) + 1).filter((a) => a.move.type === "call").length : 0;
   const callOrCheck: Move = legal.call !== null ? { type: "call" } : { type: "check" };
 
+  // When the bot is the only player left who can stop a lone raise, it continues with at least enough of
+  // the hands it could hold here that a raise with any two cards can't profit just from folds: the raiser
+  // risks `added` to win `before`, so the bot keeps the strongest before / (before + added) of them.
+  const minimumDefense = (couldHold: Set<string>): Set<string> => {
+    if (!lastRaise || callersOfLast > 0) return new Set();
+    const raiserSeat = view.seats[lastRaise.seat]!;
+    const inFront = raiserSeat.betThisStreet; // the raise itself, at most the raiser's chips
+    const raiserBefore = actions.some((a) => a.seat === lastRaise.seat && a.move.type === "call" && actions.indexOf(a) < actions.indexOf(lastRaise))
+      ? bb
+      : positionOf(view, lastRaise.seat) === "SB" ? view.smallBlind : positionOf(view, lastRaise.seat) === "BB" ? bb : 0;
+    const total = view.pots.reduce((sum, pot) => sum + pot.amount, 0) + view.seats.reduce((sum, x) => sum + (x?.betThisStreet ?? 0), 0);
+    const added = Math.min(inFront, me.stack + me.betThisStreet) - raiserBefore;
+    const before = total - (inFront - raiserBefore);
+    const stillToAct = view.seats.filter((x) => x && x.seat !== seat && x.seat !== lastRaise.seat && x.status === "active" && x.betThisStreet < inFront && !actions.some((a) => a.seat === x.seat && a.move.type === "fold"));
+    // Someone else still to act shares the job; then the bot keeps its usual ranges.
+    if (stillToAct.length > 0 || added <= 0) return new Set();
+    return strongest(couldHold, before / (before + added));
+  };
+
   // Stacks against the biggest opponent still in the hand.
   const others = view.seats.filter((s) => s && s.seat !== seat && (s.status === "active" || s.status === "all-in"));
   const myTotal = me.stack + me.betThisStreet;
@@ -113,7 +158,8 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
       return shoves.has(key) ? allIn(legal) : { type: "fold" };
     }
     const committed = new Set(raises.map((a) => a.seat)).size + callersOfLast;
-    return (committed > 1 ? CALL_SHOVE_MANY : CALL_SHOVE_ONE).has(key) ? callOrCheck : { type: "fold" };
+    if ((committed > 1 ? CALL_SHOVE_MANY : CALL_SHOVE_ONE).has(key)) return callOrCheck;
+    return position === "BB" && raises.length === 1 && minimumDefense(ALL).has(key) ? callOrCheck : { type: "fold" };
   }
 
   if (raises.length === 0) {
@@ -139,25 +185,26 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
     const raiserPosition = positionOf(view, raises[0].seat);
     const late = raiserPosition === "CO" || raiserPosition === "BTN" || raiserPosition === "SB";
     const reRaise = late ? REBUY_LATE : REBUY_EARLY;
-    if (reRaise.has(key)) return aggress(legal, reRaiseTo, callOrCheck);
+    // A re-raise that would put in half the stack or more is an all-in, kept for hands that can call one.
+    const shoveSized = Math.min(reRaiseTo, me.stack + me.betThisStreet) >= 0.5 * (me.stack + me.betThisStreet);
+    if (reRaise.has(key) && (!shoveSized || CALL_SHOVE_ONE.has(key))) return shoveSized ? allIn(legal) : aggress(legal, reRaiseTo, callOrCheck);
     // Defense shrinks gradually as the raise grows (no sudden cliff a raiser could aim just past).
     const size = lastRaiseTo / bb;
     // Against a late open with nobody else in yet, sometimes re-raise as a bluff (at random, so it can't be read).
-    if (late && size <= 6 && callersOfLast === 0 && LIGHT_REBUY.has(key) && random() < 0.5) return aggress(legal, reRaiseTo, { type: "fold" });
-    // Facing a raise for much of the stack (or all of it), only hands that can call an all-in go on.
-    const committing = lastRaiseTo >= 0.4 * effective * bb;
-    if (committing) return (callersOfLast > 0 ? CALL_SHOVE_MANY : CALL_SHOVE_ONE).has(key) ? callOrCheck : { type: "fold" };
-    // Having limped, the bot defends against a raise from behind: the price is good after its limp.
+    if (late && size <= 6 && callersOfLast === 0 && LIGHT_REBUY.has(key) && random() < 0.5 && !shoveSized) return aggress(legal, reRaiseTo, { type: "fold" });
+    // Having limped, the bot defends against a raise from behind with at least the price-based share of the
+    // hands it limps with (all of them against a small raise).
     const limped = actions.some((a, i) => a.seat === seat && a.move.type === "call" && i < actions.indexOf(raises[0]));
     if (limped && callersOfLast === 0) {
-      const defend = size <= 3.5 ? OPENING.BTN : size <= 6 ? LIMP_DEFEND_BIG : BB_DEFEND_HUGE;
+      const limpRange = new Set([...(position === "SB" ? OPENING.BTN : FLAT_MULTIWAY)].filter((k) => !OPENING[position]?.has(k)));
+      const defend = size <= 3.5 ? limpRange : union(minimumDefense(limpRange), CALL_SHOVE_ONE);
       return defend.has(key) ? callOrCheck : { type: "fold" };
     }
     if (position === "BB") {
       // The big blind already has chips in, so it defends widest, by the price rather than the raiser's seat
-      // (callers in front make the price even better).
-      const defend = size <= 3 ? OPENING.BTN : size <= 6 ? OPENING.CO : size <= 10 ? union(BB_DEFEND_BIG, BB_DEFEND) : BB_DEFEND_HUGE;
-      return defend.has(key) ? callOrCheck : { type: "fold" };
+      // (callers in front make the price even better). Above 10 big blinds it keeps only the price-based share.
+      const usual = size <= 3 ? OPENING.BTN : size <= 6 ? OPENING.CO : size <= 10 ? union(BB_DEFEND_BIG, BB_DEFEND) : CALL_SHOVE_ONE;
+      return union(usual, minimumDefense(ALL)).has(key) ? callOrCheck : { type: "fold" };
     }
     if (size > 6) return FLAT_BIG.has(key) && callersOfLast === 0 && inPosition ? callOrCheck : { type: "fold" };
     if (position === "SB") {
