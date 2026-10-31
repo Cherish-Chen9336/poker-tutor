@@ -3,6 +3,7 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import { useTakePendingFocus } from "../app/focus";
 import { BOT_POLICY_VERSION, practiceBot } from "../game/bot";
+import { BOT2_POLICY_VERSION, tableBot } from "../game/bot2";
 import { coachLines } from "../game/coach";
 import { handLog } from "../game/hand-log";
 import { Match, YOU_SEAT, type HandRecord } from "../game/match";
@@ -11,7 +12,7 @@ import type { LegalMoves, Move, TableView } from "../game/types";
 import { useHands } from "../app/hand-store";
 import { spokenText } from "../learn/card-names";
 import { CardText } from "../learn/cards";
-import { TableFelt } from "../ui/TableFelt";
+import { PokerTable } from "../ui/PokerTable";
 
 const COACH_KEY = "poker-tutor:coach";
 
@@ -110,25 +111,62 @@ function Actions({ view, legal, onMove }: { view: TableView; legal: LegalMoves; 
   );
 }
 
-// The match lives outside the page, so visiting Review (or a lesson) and coming
-// back continues the same match instead of starting over.
-const session = {
-  match: null as Match | null,
-  started: false,
-  /** Finished hands and the learner's total per match (kept small: no records). */
-  results: new Map<number, { hands: number; net: number }>(),
-  saved: new WeakSet<HandRecord>(),
-};
+type Size = 2 | 6;
 
-function sessionMatch(): Match {
-  session.match ??= new Match({ bot: practiceBot, botVersion: BOT_POLICY_VERSION });
-  return session.match;
+// Each table size keeps its own session, outside the page, so visiting Review
+// (or a lesson, or the other table) and coming back continues where you were.
+interface Session {
+  match: Match | null;
+  started: boolean;
+  /** Finished hands and the learner's total per session (kept small: no records). */
+  results: Map<number, { hands: number; net: number }>;
+  saved: WeakSet<HandRecord>;
+}
+const sessions: Record<Size, Session> = {
+  2: { match: null, started: false, results: new Map(), saved: new WeakSet() },
+  6: { match: null, started: false, results: new Map(), saved: new WeakSet() },
+};
+let lastSize: Size = 2;
+
+function rememberSize(size: Size) {
+  lastSize = size;
+}
+
+function markStarted(size: Size) {
+  sessions[size].started = true;
+}
+
+/** Counts a finished hand once; returns false if it was already counted. */
+function countFinished(size: Size, record: HandRecord): boolean {
+  const session = sessions[size];
+  if (session.saved.has(record)) return false;
+  session.saved.add(record);
+  const totals = session.results.get(record.matchNumber) ?? { hands: 0, net: 0 };
+  session.results.set(record.matchNumber, { hands: totals.hands + 1, net: totals.net + (record.net ?? 0) });
+  return true;
+}
+
+function sessionMatch(size: Size): Match {
+  sessions[size].match ??=
+    size === 2
+      ? new Match({ bot: practiceBot, botVersion: BOT_POLICY_VERSION })
+      : new Match({ bot: tableBot, botVersion: BOT2_POLICY_VERSION, players: 6 });
+  return sessions[size].match!;
 }
 
 export default function PlayPage() {
-  const match = sessionMatch();
+  const [size, setSize] = useState<Size>(lastSize);
+  const session = sessions[size];
+  const match = sessionMatch(size);
+  const names = match.seats.map((s) => s.name);
   const [, rerender] = useReducer((n: number) => n + 1, 0);
   const [started, setStarted] = useState(session.started);
+  const choose = (next: Size) => {
+    rememberSize(next);
+    setSize(next);
+    setStarted(sessions[next].started);
+    setNotice(null);
+  };
   const heading = useRef<HTMLHeadingElement>(null);
   useTakePendingFocus(heading);
   const [coachOn, setCoachOn] = useState(loadCoachSetting);
@@ -155,19 +193,14 @@ export default function PlayPage() {
     const lines = match.current ? handLog(match.current) : [];
     setAnnouncement(spokenText(lines.slice(linesBefore).join(" ")));
     const record = match.current;
-    if (match.handOver && record && !session.saved.has(record)) {
-      session.saved.add(record);
-      const totals = session.results.get(record.matchNumber) ?? { hands: 0, net: 0 };
-      session.results.set(record.matchNumber, { hands: totals.hands + 1, net: totals.net + (record.net ?? 0) });
-      addHand(record); // saved for the Review screen
-    }
+    if (match.handOver && record && countFinished(size, record)) addHand(record); // saved for the Review screen
     setFocusTick((n) => n + 1);
     rerender();
   }
 
   function deal() {
     match.dealNext();
-    session.started = true;
+    markStarted(size);
     setStarted(true);
     setNotice(null);
     afterChange(0);
@@ -190,11 +223,17 @@ export default function PlayPage() {
         <h1 tabIndex={-1} ref={heading}>
           Play
         </h1>
-        <p className="lede">
-          Heads-up against a practice bot. Blinds are 1/2 and you both start with 200 chips. The button switches every hand.
-        </p>
+        <p className="lede">Choose a table. Blinds are 1/2, and everyone starts with 200 chips. The button moves every hand.</p>
+        <div className="seg size-choice" role="group" aria-label="Table size">
+          {([2, 6] as const).map((n) => (
+            <button key={n} type="button" aria-pressed={size === n} onClick={() => choose(n)}>
+              {n === 2 ? "Heads-up: you and 1 bot" : "6 players: you and 5 bots"}
+            </button>
+          ))}
+        </div>
         <ul>
-          <li>The bot plays a simple, fixed style. It only sees its own cards, never yours.</li>
+          <li>The bots play a simple, fixed style. Each sees only its own cards, never yours.</li>
+          {size === 6 && <li>A bot that runs out of chips is topped back up to 200. If you run out, a new session starts.</li>}
           <li>The coach describes your situation before each move. It doesn't tell you what to do.</li>
           <li>Play chips only. Your hands are saved in this browser, so you can replay them in Review.</li>
         </ul>
@@ -218,14 +257,21 @@ export default function PlayPage() {
         <h1 tabIndex={-1} ref={heading}>
           Play
         </h1>
+        <div className="seg" role="group" aria-label="Table size">
+          {([2, 6] as const).map((n) => (
+            <button key={n} type="button" aria-pressed={size === n} onClick={() => choose(n)}>
+              {n === 2 ? "Heads-up" : "6 players"}
+            </button>
+          ))}
+        </div>
         <p className="mono">
-          Match {match.matchNumber} · {totals.hands} {totals.hands === 1 ? "hand" : "hands"} played ·{" "}
+          {size === 2 ? "Match" : "Session"} {match.matchNumber} · {totals.hands} {totals.hands === 1 ? "hand" : "hands"} played ·{" "}
           {matchNet > 0 ? `you're ${matchNet} up` : matchNet < 0 ? `you're ${-matchNet} down` : "you're even"}
         </p>
       </div>
-      <div className="guided">
+      <div className={size === 6 ? "guided six" : "guided"}>
         <div className="play-main">
-          <TableFelt view={view} youSeat={YOU_SEAT} />
+          <PokerTable view={view} youSeat={YOU_SEAT} names={names} />
           <div ref={actionsRef} tabIndex={-1} className="play-controls">
             {yourTurn ? (
               <Actions view={view} legal={legal} onMove={move} />
@@ -238,7 +284,9 @@ export default function PlayPage() {
                 {!saved && <p className="mono">This browser isn't saving hands, so they'll be kept only until you close the page.</p>}
                 {match.matchOver ? (
                   <>
-                    <p>{stack === 0 ? "You're out of chips." : "The bot is out of chips."} A new match starts with 200 each.</p>
+                    <p>
+                      {stack === 0 ? "You're out of chips." : "The bot is out of chips."} A new {size === 2 ? "match" : "session"} starts with 200 each.
+                    </p>
                     <button ref={nextRef} type="button" className="button primary" onClick={deal}>
                       Start a new match
                     </button>
@@ -250,7 +298,7 @@ export default function PlayPage() {
                 )}
               </div>
             ) : (
-              <p className="mono">The bot is thinking…</p>
+              <p className="mono">{size === 2 ? "The bot is" : "The bots are"} thinking…</p>
             )}
             {notice && (
               <p className="gfeedback" role="alert">

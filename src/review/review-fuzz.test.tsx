@@ -6,11 +6,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { isHandRecord } from "../app/hand-store";
 import { practiceBot } from "../game/bot";
+import { tableBot } from "../game/bot2";
 import { handLog, resultLine } from "../game/hand-log";
 import { Match, type HandRecord } from "../game/match";
 import { reviewHand } from "../game/review";
 import { CardText } from "../learn/cards";
-import { TableFelt } from "../ui/TableFelt";
+import { PokerTable } from "../ui/PokerTable";
 
 function seeded(seed: number): () => number {
   let a = seed >>> 0;
@@ -47,7 +48,7 @@ function showInReview(record: HandRecord) {
   const lines = handLog(record);
   renderToStaticMarkup(<>{lines.map((l, i) => <CardText key={i} text={l} />)}</>);
   renderToStaticMarkup(<CardText text={resultLine(record.final!, record.net!)} />);
-  for (const view of [...record.moves.map((m) => m.view), record.final!]) renderToStaticMarkup(<TableFelt view={view} youSeat={0} />);
+  for (const view of [...record.moves.map((m) => m.view), record.final!]) renderToStaticMarkup(<PokerTable view={view} youSeat={record.learnerSeat} names={record.seats.map((s) => s.name)} />);
 }
 
 describe("damaged saved hands", () => {
@@ -62,6 +63,16 @@ describe("damaged saved hands", () => {
         match.act(legal.check ? { type: "check" } : random() < 0.3 ? { type: "fold" } : { type: "call" });
       }
       records.push(JSON.parse(JSON.stringify({ ...match.current!, id: `r${n}`, playedAt: "2026-10-31T00:00:00Z" })));
+    }
+    // Six-player hands too, drawn on the round table.
+    const table = new Match({ bot: tableBot, players: 6, random: seeded(3), botRandom: seeded(4) });
+    for (let n = 0; n < 8; n++) {
+      table.dealNext();
+      while (!table.handOver) {
+        const legal = table.legalMoves()!;
+        table.act(legal.check ? { type: "check" } : { type: "call" });
+      }
+      records.push(JSON.parse(JSON.stringify({ ...table.current!, id: `t${n}`, playedAt: "2026-10-31T00:00:00Z" })));
     }
     for (const record of records) {
       expect(isHandRecord(record)).toBe(true);
@@ -81,7 +92,7 @@ describe("damaged saved hands", () => {
         expect(() => showInReview(damaged), `${path.join(".")} = ${JSON.stringify(odd)}`).not.toThrow();
       }
     }
-    expect(tried).toBe(1440);
+    expect(tried).toBe(2400);
     console.info(`damaged records accepted (and shown safely): ${accepted} of ${tried}`);
   });
 });

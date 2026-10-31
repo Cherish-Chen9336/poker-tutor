@@ -85,4 +85,55 @@ describe("coach", () => {
     expect(linesFor(["Kc", "Kd"], ["Jh", "Ts"])).toEqual(a);
     expect(linesFor(["2d", "3d"], ["5c", "6c"])).toEqual(a);
   });
+
+  describe("at the six-player table", () => {
+    /** Seat 0 is the learner; `button` sets who has the button; `folded` and `bets` adjust others. */
+    function six(opts: { button: number; board?: string[]; bets?: number[]; folded?: number[]; pot?: number; street?: TableView["street"] }): TableView {
+      const board = opts.board ?? [];
+      const bets = opts.bets ?? [0, 0, 0, 0, 0, 0];
+      return {
+        viewerSeat: 0, handNumber: 1, street: opts.street ?? (board.length ? (board.length === 5 ? "river" : board.length === 4 ? "turn" : "flop") : "preflop"),
+        board, pots: opts.pot ? [{ amount: opts.pot, eligibleSeats: [0, 1, 2, 3, 4, 5] }] : [],
+        seats: Array.from({ length: 6 }, (_, seat) => ({
+          seat, id: `p${seat}`, name: `P${seat}`, stack: 190, betThisStreet: bets[seat],
+          status: (opts.folded ?? []).includes(seat) ? "folded" as const : "active" as const, cards: seat === 0 ? ["Ah", "Kd"] : null,
+        })),
+        buttonSeat: opts.button, bigBlindSeat: (opts.button + 2) % 6, smallBlind: 1, bigBlind: 2, actionTo: 0, handOver: false, winners: null,
+      };
+    }
+
+    it("names the seat and how many act after you before the flop", () => {
+      // Button in seat 3: seat 0 is 3 seats left of the button, under the gun.
+      expect(text(six({ button: 3, bets: [0, 0, 0, 0, 1, 2] }))[0]).toBe(
+        "You're under the gun (UTG): 5 players act after you before the flop, and third on later rounds if everyone stays in.",
+      );
+      expect(text(six({ button: 0, bets: [0, 1, 2, 0, 0, 0], folded: [3, 4] }))[0]).toBe(
+        "You're on the button (BTN): 2 players act after you before the flop, and last on every later round.",
+      );
+      expect(text(six({ button: 4, bets: [2, 0, 0, 0, 0, 1] }))[0]).toBe("You're the big blind (BB): you act last before the flop, and second on later rounds if everyone stays in.");
+    });
+
+    it("says where you act among the players still in after the flop", () => {
+      const flop = ["9c", "5d", "2s"];
+      expect(text(six({ button: 0, board: flop, pot: 12, folded: [3, 4, 5] }))[0]).toBe("You act last this round (in position). 2 opponents are still in.");
+      expect(text(six({ button: 5, board: flop, pot: 12, folded: [2, 3] }))[0]).toBe("You act first this round. 3 opponents are still in.");
+      expect(text(six({ button: 4, board: flop, pot: 12, folded: [1, 2] }))[0]).toBe("You act second of 4 this round. 3 opponents are still in.");
+    });
+
+    it("knows a river call doesn't end the betting while someone else can still act", () => {
+      const river = ["9c", "5d", "2s", "Jh", "4c"];
+      // Seat 1 bet 20; seat 2 hasn't acted yet, so a call might not close the betting.
+      const waiting = text(six({ button: 5, board: river, pot: 40, bets: [0, 20, 0, 0, 0, 0], folded: [3, 4, 5] })).at(-1)!;
+      expect(waiting).toMatch(/More betting may follow/);
+      // Seat 2 already called: a call now ends the betting.
+      const closing = text(six({ button: 5, board: river, pot: 40, bets: [0, 20, 20, 0, 0, 0], folded: [3, 4, 5] })).at(-1)!;
+      expect(closing).not.toMatch(/More betting may follow/);
+    });
+
+    it("says a board hand is shared by everyone still in", () => {
+      const v = six({ button: 0, board: ["Ks", "Kd", "2h", "2c", "9d"], pot: 12, folded: [3, 4, 5] });
+      v.seats[0]!.cards = ["7c", "4d"];
+      expect(text(v).find((l) => l.startsWith("Your best five"))).toMatch(/so everyone still in shares it\.$/);
+    });
+  });
 });

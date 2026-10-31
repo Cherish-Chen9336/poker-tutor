@@ -8,7 +8,7 @@ import { handLog, moveSentence, resultLine } from "../game/hand-log";
 import type { HandRecord } from "../game/match";
 import { reviewHand, type Verdict } from "../game/review";
 import { CardText } from "../learn/cards";
-import { TableFelt } from "../ui/TableFelt";
+import { PokerTable } from "../ui/PokerTable";
 
 const VERDICT_LABEL: Record<Verdict, string> = { mistake: "✗ Mistake", good: "✓ Good", note: "Note" };
 
@@ -33,9 +33,9 @@ function HandReplay({ record }: { record: HandRecord }) {
   }, [steps]);
 
   return (
-    <div className="guided">
+    <div className={record.seats.length > 2 ? "guided stacked" : "guided"}>
       <div className="play-main">
-        <TableFelt view={view} youSeat={record.learnerSeat} />
+        <PokerTable view={view} youSeat={record.learnerSeat} names={record.seats.map((seat) => seat.name)} />
         <div className="replay-nav">
           <button type="button" className="button" disabled={step === 0} onClick={() => setStep(step - 1)}>
             ← Back
@@ -98,7 +98,8 @@ function HandReplay({ record }: { record: HandRecord }) {
 function handTitle(record: HandRecord): string {
   const first = record.moves[0]?.view ?? record.final!;
   const cards = (first.seats[0]?.cards ?? []).filter(Boolean).map((c) => `{${c}}`).join(" ");
-  return `Match ${record.matchNumber}, hand ${record.handNumber}${cards ? ` · ${cards}` : ""}`;
+  const table = record.seats.length > 2 ? `${record.seats.length} players, session` : "Match";
+  return `${table} ${record.matchNumber}, hand ${record.handNumber}${cards ? ` · ${cards}` : ""}`;
 }
 
 export default function ReviewPage() {

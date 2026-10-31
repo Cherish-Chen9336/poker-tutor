@@ -6,6 +6,7 @@
 import { aggress, allIn, checkOrFold, postflop as headsUpPostflop } from "./bot";
 import { isUnbeatable, readHand } from "./hand-read";
 import type { BotPolicy, PublicAction } from "./match";
+import { positionOf, postflopRank } from "./positions";
 import { callPrice, sizedTo } from "./pot-math";
 import type { LegalMoves, Move, TableView } from "./types";
 
@@ -70,18 +71,9 @@ const SHOVE_LATE = range("55+ A5s+ ATo+ KQs");
 const CALL_SHOVE_ONE = range("TT+ AQs+ AQo+");
 const CALL_SHOVE_MANY = range("QQ+ AKs AKo");
 
-/** Seat names by distance from the button, for six players. */
-const POSITIONS = ["BTN", "SB", "BB", "UTG", "HJ", "CO"];
-
-export function positionOf(view: TableView, seat: number): string {
-  const n = view.seats.length;
-  return POSITIONS[(seat - (view.buttonSeat ?? 0) + n) % n];
-}
-
 /** Order of acting after the flop: the small blind first, the button last. */
 function postflopOrder(view: TableView, seat: number): number {
-  const n = view.seats.length;
-  return (seat - (view.buttonSeat ?? 0) - 1 + n) % n;
+  return postflopRank(view, seat);
 }
 
 function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, history: PublicAction[], random: () => number): Move {

@@ -5,6 +5,7 @@
 // Lines may contain card tokens like {Ah}.
 import { bestFive, handName } from "./hands";
 import { readHand } from "./hand-read";
+import { positionOf, postflopRank } from "./positions";
 import { callPrice } from "./pot-math";
 import type { TableView } from "./types";
 
@@ -20,6 +21,16 @@ export function displayOrder(cards: string[]): string[] {
   const count = (card: string) => cards.filter((c) => c[0] === card[0]).length;
   return [...cards].sort((a, b) => count(b) - count(a) || RANKS.indexOf(b[0]) - RANKS.indexOf(a[0]));
 }
+
+/** "You're under the gun", "You're on the button"… */
+const SEAT_PHRASE: Record<string, string> = {
+  UTG: "under the gun",
+  HJ: "in the hijack",
+  CO: "in the cutoff",
+  BTN: "on the button",
+  SB: "the small blind",
+  BB: "the big blind",
+};
 
 export interface CoachLine {
   topic: "position" | "hand" | "draw" | "board" | "price";
@@ -65,19 +76,43 @@ export function coachLines(view: TableView): CoachLine[] {
   const button = view.buttonSeat === seat;
   const preflop = view.street === "preflop";
 
-  // Position (lesson 4).
-  if (preflop) {
+  const n = view.seats.length;
+  const live = view.seats.filter((s) => s && (s.status === "active" || s.status === "all-in"));
+  const ordinal = (k: number) => ["first", "second", "third", "fourth", "fifth", "sixth"][k - 1];
+
+  // Position (lessons 4 and 15).
+  if (n === 2) {
+    if (preflop) {
+      lines.push({
+        topic: "position",
+        text: button
+          ? "You have the button: you act first before the flop, and last on every later round."
+          : "You're the big blind: you act last before the flop, and first on every later round.",
+      });
+    } else {
+      lines.push({
+        topic: "position",
+        text: button ? "You act last this round, so you'll see the bot's choice first (in position)." : "You act first this round; the bot will see your choice before deciding.",
+      });
+    }
+  } else if (preflop) {
+    const position = positionOf(view, seat);
+    // Before the flop the order is under the gun first … the big blind last.
+    const preflopOrder = (s: number) => (s - (view.buttonSeat ?? 0) - 3 + 2 * n) % n;
+    const behind = view.seats.filter((s) => s && s.status !== "folded" && preflopOrder(s.seat) > preflopOrder(seat)).length;
+    const later = postflopRank(view, seat) === n ? "and last on every later round" : `and ${ordinal(postflopRank(view, seat))} on later rounds if everyone stays in`;
     lines.push({
       topic: "position",
-      text: button
-        ? "You have the button: you act first before the flop, and last on every later round."
-        : "You're the big blind: you act last before the flop, and first on every later round.",
+      text: `You're ${SEAT_PHRASE[position]} (${position}): ${
+        behind === 0 ? "you act last before the flop" : `${behind} ${behind === 1 ? "player acts" : "players act"} after you before the flop`
+      }, ${later}.`,
     });
   } else {
-    lines.push({
-      topic: "position",
-      text: button ? "You act last this round, so you'll see the bot's choice first (in position)." : "You act first this round; the bot will see your choice before deciding.",
-    });
+    const order = live.map((s) => s!.seat).sort((a, b) => postflopRank(view, a) - postflopRank(view, b));
+    const mine = order.indexOf(seat) + 1;
+    const others = live.length - 1;
+    const where = mine === live.length ? "You act last this round (in position)" : mine === 1 ? "You act first this round" : `You act ${ordinal(mine)} of ${live.length} this round`;
+    lines.push({ topic: "position", text: `${where}. ${others} ${others === 1 ? "opponent is" : "opponents are"} still in.` });
   }
 
   // The hand.
@@ -90,7 +125,7 @@ export function coachLines(view: TableView): CoachLine[] {
     const read = readHand(hole, view.board);
     const shared = (read.strength === "nothing" || read.strength === "aceHigh") && name !== "high card";
     let text = `Your best five: ${best.map((c) => `{${c}}`).join(" ")}, ${name}.`;
-    if (shared) text += ` The ${name} is on the board, so the bot shares it.`;
+    if (shared) text += ` The ${name} is on the board, so ${n === 2 ? "the bot shares it" : "everyone still in shares it"}.`;
     lines.push({ topic: "hand", text });
 
     if (read.drawCards.length) {
@@ -111,8 +146,14 @@ export function coachLines(view: TableView): CoachLine[] {
   } else {
     const pct = (price.breakEven * 100).toFixed(1);
     const allIn = price.toCall >= me.stack ? " Calling puts you all-in." : "";
-    const opponent = view.seats[1 - seat];
-    const ends = view.street === "river" || opponent?.status === "all-in" || price.toCall >= me.stack;
+    // The call ends the betting only if nobody else can still bet after it: everyone
+    // else still in is all-in, or (on the river) has already matched the bet.
+    const highest = Math.max(...view.seats.map((s) => s?.betThisStreet ?? 0));
+    const othersWithChips = live.filter((s) => s!.seat !== seat && s!.status === "active" && s!.stack > 0);
+    const ends =
+      price.toCall >= me.stack ||
+      othersWithChips.length === 0 ||
+      (view.street === "river" && othersWithChips.every((s) => s!.betThisStreet === highest));
     const caveat = ends
       ? "We haven't estimated your chance of winning."
       : "More betting may follow, which changes this math. We haven't estimated your chance of winning.";
