@@ -10,7 +10,7 @@ import { positionOf, postflopRank } from "./positions";
 import { callPrice, sizedTo } from "./pot-math";
 import type { LegalMoves, Move, TableView } from "./types";
 
-export const BOT2_POLICY_VERSION = "bot-2";
+export const BOT2_POLICY_VERSION = "bot-2.1";
 
 const RANKS = "23456789TJQKA";
 
@@ -48,21 +48,29 @@ export function range(notation: string): Set<string> {
 
 const union = (...sets: Set<string>[]) => new Set(sets.flatMap((set) => [...set]));
 
-// Opening ranges by position (six players), each adding to the one before.
-const UTG = range("66+ A2s+ KTs+ QTs+ JTs T9s AJo+ KQo");
-const HJ = union(UTG, range("55 K9s Q9s J9s 98s ATo KJo"));
-const CO = union(HJ, range("22-44 K7s-K8s Q8s J8s T8s 87s 76s A9o QJo"));
-const BTN = union(CO, range("K2s-K6s Q6s-Q7s J7s 97s 86s 65s 54s A2o-A8o KTo QTo JTo"));
+// Opening ranges by position (six players), each adding to the one before. Widened one step per seat
+// on 2026-10-31 (each seat now opens what the seat after it used to) so the table plays less tightly.
+const UTG = range("55+ A2s+ K9s+ Q9s+ J9s+ T9s 98s ATo+ KJo+");
+const HJ = union(UTG, range("22-44 K7s-K8s Q8s J8s T8s 87s 76s A9o QJo"));
+const CO = union(HJ, range("K5s-K6s Q7s J7s 97s 86s 65s 54s A7o-A8o KTo QTo JTo"));
+const BTN = union(CO, range("K2s-K4s Q2s-Q6s J5s-J6s T6s-T7s 96s 75s 64s 53s 43s A2o-A6o K8o-K9o Q8o-Q9o J8o-J9o T8o-T9o 98o 87o"));
 export const OPENING: Record<string, Set<string>> = { UTG, HJ, CO, BTN, SB: CO };
 
-const ISOLATE = range("88+ ATs+ KQs AQo+"); // the big blind raising limpers
+const ISOLATE = range("77+ ATs+ KJs+ AJo+ KQo"); // the big blind raising limpers
 const REBUY_EARLY = range("QQ+ AKs AKo"); // re-raise against an early-seat open
-const REBUY_LATE = range("JJ+ AQs+ AQo+"); // re-raise against a late-seat open
-const FLAT = range("77-TT AJs-AQs KQs"); // call an open in position
+const REBUY_LATE = range("TT+ AJs+ KQs AQo+"); // re-raise against a late-seat open
+// Calls are wide enough that pots with three or more players happen regularly (tuned 2026-10-31
+// against table-shape targets; see bot2.test.ts).
+const FLAT = range("22-TT A9s-AQs KTs-KQs QTs-QJs JTs T9s 98s 87s AQo KQo"); // call an open in position
 const BB_DEFEND = range("55-66 ATs KJs QJs JTs AQo KQo"); // the big blind's extra calls
 const FLAT_BIG = range("99-TT AQs"); // call a bigger open
 // Against an open from a late seat (often a steal), defend wider and sometimes re-raise as a bluff.
-const FLAT_VS_LATE = range("22-TT ATs-AQs KJs-KQs QJs JTs T9s 98s");
+const FLAT_VS_LATE = range("22-TT A2s-AQs K9s-KQs Q9s-QJs J9s-JTs T9s 98s 87s 76s 65s ATo-AQo KJo-KQo");
+// Joining a cheap raise that someone already called: hands that do well in pots with several players.
+const FLAT_MULTIWAY = range("22-TT A2s-AQs K9s-KQs Q9s-QJs J9s-JTs T9s 98s 87s 76s 65s 54s");
+// The small blind acts first after the flop, so it calls a cheap raise with fewer hands.
+const SB_FLAT = range("66-TT ATs-AQs KJs-KQs QJs JTs");
+const SB_FLAT_VS_LATE = range("22-TT A8s-AQs KTs-KQs QTs-QJs JTs T9s 98s 87s AJo-AQo KQo");
 const LIGHT_REBUY = range("A2s-A5s KTs QTs J9s 87s 76s");
 const FOUR_BET = range("QQ+ AKs AKo");
 const FLAT_THREE_BET = range("JJ AQs");
@@ -106,9 +114,16 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
   if (raises.length === 0) {
     if (legal.check) {
       // The big blind after limpers (or everyone folding to it).
-      return limpers > 0 && ISOLATE.has(key) ? aggress(legal, 3 * bb + limpers * bb, { type: "check" }) : { type: "check" };
+      // Against a lone small-blind limp, raise a wider range (the small blind often limps weak hands).
+      const sbOnly = limpers === 1 && actions.some((a) => a.move.type === "call" && positionOf(view, a.seat) === "SB");
+      const raiseWith = sbOnly ? OPENING.CO : ISOLATE;
+      return limpers > 0 && raiseWith.has(key) ? aggress(legal, 3 * bb + limpers * bb, { type: "check" }) : { type: "check" };
     }
     if (OPENING[position]?.has(key)) return aggress(legal, limpers > 0 ? 3 * bb + limpers * bb : Math.round(2.5 * bb), callOrCheck);
+    // Just calling ("limping"), as casual tables often do: the small blind completes with more hands
+    // when everyone folded to it, and others join a pot that someone already limped into.
+    if (position === "SB" && limpers === 0 && OPENING.BTN.has(key)) return callOrCheck;
+    if (limpers > 0 && FLAT_MULTIWAY.has(key)) return callOrCheck;
     return { type: "fold" };
   }
 
@@ -125,13 +140,18 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
     // Against a late open with nobody else in yet, sometimes re-raise as a bluff (at random, so it can't be read).
     if (late && size <= 6 && callersOfLast === 0 && LIGHT_REBUY.has(key) && random() < 0.5) return aggress(legal, reRaiseTo, { type: "fold" });
     if (position === "BB") {
-      // The big blind already has chips in, so it defends widest, by the price rather than the raiser's seat.
-      const defend = size <= 3 && callersOfLast === 0 ? OPENING.BTN : size <= 6 ? OPENING.CO : union(FLAT, BB_DEFEND);
+      // The big blind already has chips in, so it defends widest, by the price rather than the raiser's seat
+      // (callers in front make the price even better).
+      const defend = size <= 3 ? OPENING.BTN : size <= 6 ? OPENING.CO : union(FLAT, BB_DEFEND);
       return defend.has(key) ? callOrCheck : { type: "fold" };
     }
     if (size > 6) return FLAT_BIG.has(key) && callersOfLast === 0 && inPosition ? callOrCheck : { type: "fold" };
-    // With callers already in, drop the smallest pairs.
-    const flat = callersOfLast > 0 ? range("99-TT AJs-AQs KQs") : late || size > 3 ? FLAT_VS_LATE : FLAT;
+    if (position === "SB") {
+      // With a caller already in, the price is better and the pot will have several players.
+      const sbFlat = callersOfLast > 0 ? FLAT_MULTIWAY : late ? SB_FLAT_VS_LATE : SB_FLAT;
+      return size <= 3 && sbFlat.has(key) ? callOrCheck : { type: "fold" };
+    }
+    const flat = callersOfLast > 0 ? (size <= 3 ? FLAT_MULTIWAY : range("99-TT AJs-AQs KQs")) : late || size > 3 ? FLAT_VS_LATE : FLAT;
     return inPosition && flat.has(key) ? callOrCheck : { type: "fold" };
   }
 
@@ -163,10 +183,11 @@ function multiwayPostflop(view: TableView, legal: LegalMoves, seat: number, hole
   const aggressions = history.filter((a) => a.street === view.street && (a.move.type === "bet" || a.move.type === "raise")).length;
   if (strong) return aggressions <= 1 && random() < 0.2 ? aggress(legal, size(), { type: "call" }) : { type: "call" };
   if (aggressions > 1) return { type: "fold" }; // facing a raise, only strong hands go on
-  // Facing a single bet of up to about three-quarters of the pot, defend with pairs and good draws,
-  // so betting every time it's checked around can't win the pot too often.
+  // Facing a single bet, defend with pairs and good draws, so betting every time it's checked around
+  // can't win the pot too often: top pair against bets up to about three-quarters of the pot, a lower
+  // pair only against a third of the pot or less (with several players in, someone often has it beaten).
   if (price.breakEven <= 0.3) {
-    if (read.strength === "topPair" || read.strength === "lowerPair") return { type: "call" };
+    if (read.strength === "topPair" || (read.strength === "lowerPair" && price.breakEven <= 0.2)) return { type: "call" };
     if (bigDraw || (view.board.length < 5 && read.straightDraw === "gutshot" && price.breakEven <= 0.2)) return { type: "call" };
   }
   return checkOrFold(legal);
