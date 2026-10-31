@@ -28,7 +28,7 @@ describe("equity against random hands", () => {
       expect(e.margin).toBeLessThan(0.01);
       expect(Math.abs(e.share - published), `${hole.join("")} vs ${opponents}`).toBeLessThan(e.margin + 0.004);
     }
-  });
+  }, 60_000); // 160,000 sampled deals
 
   it("counts a k-way tie as 1/k", () => {
     // A royal flush on the board: everyone ties, every time.

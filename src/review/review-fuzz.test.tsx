@@ -94,5 +94,5 @@ describe("damaged saved hands", () => {
     }
     expect(tried).toBe(2400);
     console.info(`damaged records accepted (and shown safely): ${accepted} of ${tried}`);
-  });
+  }, 60_000); // thousands of renders: slower machines (like CI) need more than the default 5 seconds
 });
