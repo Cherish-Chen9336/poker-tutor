@@ -10,8 +10,18 @@ export const YOU_SEAT = 0;
 /** The bot's seat in heads-up play. */
 export const BOT_SEAT = 1;
 
-/** A bot decides from its own view and legal moves only. */
-export type BotPolicy = (view: TableView, legal: LegalMoves, random: () => number) => Move;
+/** A move everyone at the table saw: who, on which round, and what. */
+export interface PublicAction {
+  seat: number;
+  street: TableView["street"];
+  move: Move;
+}
+
+/**
+ * A bot decides from its own view, its legal moves, and the public moves of
+ * this hand so far (which every player saw), plus its own random source.
+ */
+export type BotPolicy = (view: TableView, legal: LegalMoves, random: () => number, history: PublicAction[]) => Move;
 
 export interface SeatInfo {
   seat: number;
@@ -195,7 +205,8 @@ export class Match {
       const seat = this.table.view(null).actionTo;
       if (this.handOver || seat === null || seat === YOU_SEAT) return;
       const legal = this.table.legalMoves(seat)!;
-      const move = this.bot(this.table.view(seat), legal, this.botRandom);
+      const history = this.current!.moves.map((m) => ({ seat: m.actorSeat, street: m.view.street, move: m.move }));
+      const move = this.bot(this.table.view(seat), legal, this.botRandom, history);
       const view = this.view();
       const result = this.table.move(seat, move);
       if (!result.ok) throw new Error(`A bot chose an illegal move (${JSON.stringify(move)}): ${result.reason}`);

@@ -69,18 +69,18 @@ function inMidCallSet(h: Start): boolean {
   return (h.pair && h.high >= 6) || (h.high === A && h.low >= T) || (h.high === K && h.low >= J) || (h.high === Q && h.low === J && h.suited);
 }
 
-function checkOrFold(legal: LegalMoves): Move {
+export function checkOrFold(legal: LegalMoves): Move {
   return legal.check ? { type: "check" } : { type: "fold" };
 }
 
-function allIn(legal: LegalMoves): Move {
+export function allIn(legal: LegalMoves): Move {
   if (legal.raise) return { type: "raise", to: legal.raise.max };
   if (legal.bet) return { type: "bet", to: legal.bet.max };
   return legal.call !== null ? { type: "call" } : { type: "check" };
 }
 
 /** Bet or raise to a total, or fall back when aggression isn't allowed. */
-function aggress(legal: LegalMoves, to: number | null, fallback: Move): Move {
+export function aggress(legal: LegalMoves, to: number | null, fallback: Move): Move {
   if (to === null) return fallback;
   if (legal.bet) return { type: "bet", to: Math.min(legal.bet.max, Math.max(legal.bet.min, to)) };
   if (legal.raise) return { type: "raise", to: Math.min(legal.raise.max, Math.max(legal.raise.min, to)) };
@@ -130,7 +130,8 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, h: Start): Mo
   return inMidCallSet(h) ? callOrFold : { type: "fold" };
 }
 
-function postflop(view: TableView, legal: LegalMoves, seat: number, hole: string[], random: () => number): Move {
+/** bot-1's postflop play; bot-2 reuses it when only one opponent is left. */
+export function postflop(view: TableView, legal: LegalMoves, seat: number, hole: string[], random: () => number): Move {
   const read = readHand(hole, view.board);
   const river = view.board.length === 5;
   // Never fold a hand nothing can beat right now (on the river, nothing ever can).

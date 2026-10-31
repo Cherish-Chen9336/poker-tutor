@@ -101,7 +101,7 @@ describe("practice bot", () => {
       const moves: string[] = [];
       while (!table.view(null).handOver && table.view(null).board.length <= 3) {
         const seat = table.view(null).actionTo!;
-        const move = seat === 1 ? practiceBot(table.view(1), table.legalMoves(1)!, random) : checkCall(table.legalMoves(0)!, table.view(0), random);
+        const move = seat === 1 ? practiceBot(table.view(1), table.legalMoves(1)!, random, []) : checkCall(table.legalMoves(0)!, table.view(0), random);
         if (seat === 1) moves.push(JSON.stringify(move));
         expect(table.move(seat, move).ok).toBe(true);
       }
@@ -142,7 +142,7 @@ describe("practice bot never folds an unbeatable hand (Codex's Step 5 audit)", (
   ]) {
     it(`${hole.join(" ")} on ${board.join(" ")}`, () => {
       for (let seed = 1; seed <= 20; seed++) {
-        expect(practiceBot(botView(hole, board), facing60, seeded(seed)).type).not.toBe("fold");
+        expect(practiceBot(botView(hole, board), facing60, seeded(seed), []).type).not.toBe("fold");
       }
     });
   }
