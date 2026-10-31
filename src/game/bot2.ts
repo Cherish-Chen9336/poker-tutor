@@ -101,18 +101,20 @@ const BY_STRENGTH = [...ALL].sort((a, b) => chen(b) - chen(a) || combosOf(a) - c
  * The strongest hands of `from` making up about `wanted` combinations. A hand class is added only if that
  * lands nearer the target than stopping, so a small range isn't rounded up to a whole extra class.
  */
-function strongest(from: Set<string>, wanted: number): Set<string> {
+function strongest(from: Set<string>, wanted: number, weight: (key: string) => number): Set<string> {
   const kept = new Set<string>();
   let count = 0;
   for (const key of BY_STRENGTH) {
     if (!from.has(key)) continue;
-    if (count + combosOf(key) / 2 > wanted) break;
+    const combos = combosOf(key) * weight(key);
+    if (count + combos / 2 > wanted) break;
     kept.add(key);
-    count += combosOf(key);
+    count += combos;
   }
   return kept;
 }
-const combosIn = (keys: Set<string>) => [...keys].reduce((sum, k) => sum + combosOf(k), 0);
+/** Combinations in `keys`, each hand counted by how often the bot reaches this spot with it. */
+const combosIn = (keys: Set<string>, weight: (key: string) => number) => [...keys].reduce((sum, k) => sum + combosOf(k) * weight(k), 0);
 
 /** Order of acting after the flop: the small blind first, the button last. */
 function postflopOrder(view: TableView, seat: number): number {
@@ -134,7 +136,10 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
   // When the bot is the only player left who can stop a lone raise, it continues with at least enough of
   // the hands it could hold here that a raise with any two cards can't profit just from folds: the raiser
   // risks `added` to win `before`, so the bot keeps the strongest before / (before + at risk) of them.
-  const minimumDefense = (couldHold: Set<string>, bluffEquity = 0): Set<string> => {
+  // `weight`: how often the bot reaches this spot with each hand (the small blind limps its best hands half the time).
+  // From a narrow range (limps, opens) its strongest hands can still be weak, so a deep call keeps only hands fit
+  // for all-in; from every hand (the big blind) the strongest share already is.
+  const minimumDefense = (couldHold: Set<string>, bluffEquity = 0, weight: (key: string) => number = () => 1): Set<string> => {
     if (!lastRaise || callersOfLast > 0) return new Set();
     const raiserSeat = view.seats[lastRaise.seat]!;
     const inFront = raiserSeat.betThisStreet; // the raise itself, at most the raiser's chips
@@ -148,19 +153,26 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
     // Someone else still to act shares the job; then the bot keeps its usual ranges.
     if (stillToAct.length > 0 || added <= 0) return new Set();
     // `bluffEquity`: how often a called bluff still wins, so it really risks only `added` minus that share
-    // of the final pot (at least a tenth of `added`).
-    const atRisk = Math.max(0.1 * added, added - bluffEquity * (before + 2 * added));
-    const wanted = (combosIn(couldHold) * before) / (before + atRisk);
-    // A call for much of a deep stack is made only with hands fit to go all in, even if that defends less:
-    // calling off a deep stack with weak hands would cost more than the folds it prevents.
-    const deepAndCommitting = added >= 0.4 * (me.stack + me.betThisStreet) && effective > 20;
-    return strongest(deepAndCommitting ? new Set([...couldHold].filter((k) => ALL_IN_FIT.has(k))) : couldHold, wanted);
+    // of the final pot (`before`, the raise, and the bot's call; at least a tenth of `added`).
+    const finalPot = before + added + Math.min(inFront, myTotal) - me.betThisStreet;
+    const atRisk = Math.max(0.1 * added, added - bluffEquity * finalPot);
+    const wanted = (combosIn(couldHold, weight) * before) / (before + atRisk);
+    return strongest(couldHold === ALL ? ALL : fit(couldHold), wanted, weight);
   };
 
   // Stacks against the biggest opponent still in the hand.
   const others = view.seats.filter((s) => s && s.seat !== seat && (s.status === "active" || s.status === "all-in"));
   const myTotal = me.stack + me.betThisStreet;
   const effective = Math.min(myTotal, Math.max(0, ...others.map((s) => s!.stack + s!.betThisStreet))) / bb;
+  // A call for much of a deep stack is made only with hands fit to go all in, even if that defends less:
+  // calling off a deep stack with weak hands would cost more than the folds it prevents.
+  const myCall = legal.call !== null ? callPrice(view, seat)!.toCall : 0;
+  const deepCall = myCall >= 0.4 * myTotal && effective > 20;
+  // The bigger the call is for the bot's stack, the more a called bluff's equity matters (random cards keep
+  // about 40% against a calling range): it grows smoothly, so no raise size sits just past a jump.
+  const stackBluffEquity = 0.4 * Math.min(1, myCall / (0.4 * myTotal));
+  const fit = (keys: Set<string>) => (deepCall ? new Set([...keys].filter((k) => ALL_IN_FIT.has(k))) : keys);
+  const callIfIn = (keys: Set<string>, alsoCall = new Set<string>()): Move => (fit(keys).has(key) || alsoCall.has(key) ? callOrCheck : { type: "fold" });
 
   if (effective <= 12) {
     if (raises.length === 0) {
@@ -170,7 +182,7 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
     }
     const committed = new Set(raises.map((a) => a.seat)).size + callersOfLast;
     if ((committed > 1 ? CALL_SHOVE_MANY : CALL_SHOVE_ONE).has(key)) return callOrCheck;
-    return position === "BB" && raises.length === 1 && minimumDefense(ALL).has(key) ? callOrCheck : { type: "fold" };
+    return position === "BB" && raises.length === 1 && minimumDefense(ALL, stackBluffEquity).has(key) ? callOrCheck : { type: "fold" };
   }
 
   if (raises.length === 0) {
@@ -210,14 +222,17 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
     const limped = actions.some((a, i) => a.seat === seat && a.move.type === "call" && i < actions.indexOf(raises[0]));
     if (limped && callersOfLast === 0) {
       const limpRange = position === "SB" ? union(new Set([...OPENING.BTN].filter((k) => !OPENING.SB.has(k))), CALL_SHOVE_ONE) : new Set([...FLAT_MULTIWAY].filter((k) => !OPENING[position]?.has(k)));
-      const defend = size <= 3.5 ? limpRange : union(minimumDefense(limpRange), CALL_SHOVE_ONE);
-      return defend.has(key) ? callOrCheck : { type: "fold" };
+      const limpWeight = (k: string) => (position === "SB" && CALL_SHOVE_ONE.has(k) ? 0.5 : 1);
+      return callIfIn(size <= 3.5 ? limpRange : union(minimumDefense(limpRange, 0, limpWeight), CALL_SHOVE_ONE));
     }
     if (position === "BB") {
       // The big blind already has chips in, so it defends widest, by the price rather than the raiser's seat
       // (callers in front make the price even better). Above 10 big blinds it keeps only the price-based share.
       const usual = size <= 3 ? OPENING.BTN : size <= 6 ? OPENING.CO : size <= 10 ? union(BB_DEFEND_BIG, BB_DEFEND) : CALL_SHOVE_ONE;
-      return union(usual, minimumDefense(ALL)).has(key) ? callOrCheck : { type: "fold" };
+      // Counting a called bluff's equity matters for raises that are big for its stack: without it, moving all
+      // in with any cards beat folding at 15–30 big blinds. From every hand, the price share decides even for a
+      // deep call (its strongest hands by the Chen score); only the usual ranges are trimmed to all-in hands.
+      return callIfIn(usual, minimumDefense(ALL, stackBluffEquity));
     }
     if (size > 6) return FLAT_BIG.has(key) && callersOfLast === 0 && inPosition ? callOrCheck : { type: "fold" };
     if (position === "SB") {
@@ -243,7 +258,7 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
     const openRange = OPENING[position] ?? OPENING.BTN;
     // A called bluff still wins sometimes (random cards keep about 30% equity against an opening range, less
     // after the opener bets); count 20%.
-    return (cheap ? openRange : minimumDefense(openRange, 0.2)).has(key) ? callOrCheck : { type: "fold" };
+    return callIfIn(cheap ? openRange : minimumDefense(openRange, 0.2));
   }
 
   // Facing a third raise or more: only the best hands go on, all-in.
