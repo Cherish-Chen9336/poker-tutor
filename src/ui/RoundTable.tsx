@@ -51,6 +51,11 @@ function Seat({ seat, view, youSeat, names }: { seat: SeatView; view: TableView;
             : [<Back key="a" />, <Back key="b" />]}
       </div>
       <div className="rt-plate">
+        {view.buttonSeat === seat.seat && (
+          <span className="rt-dealer" title="Button" aria-hidden="true">
+            D
+          </span>
+        )}
         <span className="rt-name">{you ? "You" : names[seat.seat]}</span>
         <span className="rt-pos" title={POSITION_NAMES[position]}>
           {position}
@@ -85,11 +90,6 @@ export function RoundTable({ view, youSeat, names }: { view: TableView; youSeat:
                 {s.betThisStreet}
               </span>
             ) : null,
-          )}
-          {view.buttonSeat !== null && (
-            <span className={`rt-dealer p${place(view.buttonSeat)}`} title="Button" aria-hidden="true">
-              D
-            </span>
           )}
           {view.seats.map((s) => (s ? <Seat key={s.seat} seat={s} view={view} youSeat={youSeat} names={names} /> : null))}
         </div>

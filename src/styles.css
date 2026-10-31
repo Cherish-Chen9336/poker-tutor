@@ -407,12 +407,15 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   display: flex; align-items: center; gap: 5px; font: 500 12.5px var(--f-mono); background: rgba(0, 0, 0, 0.35); padding: 2px 9px 2px 3px; border-radius: 999px;
 }
 .chip { width: 16px; height: 16px; border-radius: 50%; background: var(--brass); border: 3px dashed var(--card); flex: none; }
+/* The dealer button sits just outside the button player's plate, on the side facing the table, so it never
+   reaches the board whatever the width. */
+.rt-plate { position: relative; }
 .rt-dealer {
-  position: absolute; left: calc(50% + (var(--sx) - 50) * 0.8% + 40px); top: calc(50% + (var(--sy) - 50) * 0.8%); transform: translate(-50%, -50%);
+  position: absolute; left: calc(100% + 5px); top: 50%; transform: translateY(-50%);
   width: 24px; height: 24px; border-radius: 50%; background: var(--card); color: var(--suit-black); font: 700 12px var(--f-body);
   display: grid; place-items: center; box-shadow: 0 2px 4px var(--shadow), inset 0 0 0 2px var(--card-edge);
 }
-.rt-dealer.p0 { left: calc(50% + 96px); top: 86%; }
+.rt-seat.p4 .rt-dealer, .rt-seat.p5 .rt-dealer { left: auto; right: calc(100% + 5px); }
 
 .odds-box { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .odds-title { font: 500 12px var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--brass); }
@@ -474,19 +477,6 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   .diagram { padding: 14px 12px; }
   .pager .button { width: 100%; }
   .guided { grid-template-columns: minmax(0, 1fr); }
-  .rt-wrap { padding: 58px 28px 96px; }
-  .rt-felt { aspect-ratio: 4 / 5; border-width: 10px; }
-  .p1 { --sx: 4; --sy: 84; } .p2 { --sx: 4; --sy: 16; } .p4 { --sx: 96; --sy: 16; } .p5 { --sx: 96; --sy: 84; }
-  .rt-seat { width: 84px; }
-  .rt-plate { padding: 3px 6px; }
-  .rt-name { font-size: 12px; }
-  .rt-pos { font-size: 10px; }
-  .rt-hand { min-height: 36px; }
-  .rt-hand .pc.sm { --w: 24px; }
-  .rt-center .pc-row .pc, .rt-center .slot.md { --w: 38px; width: 38px; }
-  .rt-bet { left: calc(50% + (var(--sx) - 50) * 0.5%); top: calc(50% + (var(--sy) - 50) * 0.6%); }
-  .rt-dealer { left: calc(50% + (var(--sx) - 50) * 0.78% + 30px); }
-  .rt-dealer.p0 { left: calc(50% - 72px); top: 92%; }
   .guided.six { grid-template-columns: minmax(0, 1fr); }
   .review-layout { grid-template-columns: minmax(0, 1fr); }
   .hand-list ol { max-height: 200px; }
@@ -498,8 +488,39 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   .pie { width: 110px; height: 110px; }
   .calc-out { grid-column: 1 / -1; }
 }
-/* Very narrow phones: smaller board cards and seat plates, and the top seats moved clear of the board. */
-@media (max-width: 380px) {
+/* The six-seat table follows its own width, not the screen's: beside the coach on a tablet or small laptop it
+   can be as narrow as on a phone. */
+.rt { container-type: inline-size; }
+/* At this width the full layout gets a taller oval, a lower board, and smaller board cards, so the top seat's
+   cards and the bets stay clear of the board. */
+@container (min-width: 601px) and (max-width: 720px) {
+  .rt-felt { aspect-ratio: 16 / 10; }
+  .rt-center { top: 48%; }
+  .rt-center .pc-row .pc, .rt-center .slot.md { --w: 40px; width: 40px; }
+}
+/* Compact: a taller oval with the side seats at the edges. */
+@container (max-width: 600px) {
+  .rt-wrap { padding: 58px 28px 96px; }
+  .rt-felt { aspect-ratio: 4 / 5; border-width: 10px; }
+  .p1 { --sx: 4; --sy: 84; } .p2 { --sx: 4; --sy: 16; } .p4 { --sx: 96; --sy: 16; } .p5 { --sx: 96; --sy: 84; }
+  .rt-seat { width: 84px; }
+  .rt-plate { padding: 3px 6px; }
+  .rt-name { font-size: 12px; }
+  .rt-pos { font-size: 10px; }
+  .rt-hand { min-height: 36px; }
+  .rt-hand .pc.sm { --w: 24px; }
+  .rt-center .pc-row .pc, .rt-center .slot.md { --w: 38px; width: 38px; }
+  .rt-bet { left: calc(50% + (var(--sx) - 50) * 0.5%); top: calc(50% + (var(--sy) - 50) * 0.6%); }
+  .rt-dealer { width: 20px; height: 20px; font-size: 11px; }
+}
+/* Tablet-sized: the compact seats on a rounder oval (the phone oval is taller than this width needs). */
+@container (min-width: 460px) and (max-width: 600px) {
+  .rt-felt { aspect-ratio: 1 / 1; }
+  .rt-center { top: 52%; }
+  .p1 { --sy: 80; } .p2 { --sy: 20; } .p4 { --sy: 20; } .p5 { --sy: 80; }
+}
+/* Very narrow: smaller board cards and seat plates, and the top seats moved clear of the board. */
+@container (max-width: 320px) {
   .rt-wrap { padding: 66px 22px 100px; }
   .rt-seat { width: 74px; }
   .rt-name { font-size: 11.5px; }
@@ -509,6 +530,8 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   .p2 { --sy: 8; } .p4 { --sy: 8; } .p3 { --sy: -6; }
   .p1 { --sy: 88; } .p5 { --sy: 88; }
   .rt-hand .pc.sm { --w: 20px; }
+  /* The bottom side seats sit beside your cards here, so their dealer button goes higher. */
+  .rt-seat.p1 .rt-dealer, .rt-seat.p5 .rt-dealer { top: -6px; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
