@@ -32,7 +32,8 @@ function view(note = ""): TableView {
 }
 
 function record(n: number, padding = 0): HandRecord {
-  const move: RecordedMove = { who: "you", move: { type: "check" }, view: view(), after: view(), legal: null };
+  const legal = { fold: true, check: true, call: null, bet: { min: 2, max: 198 }, raise: null };
+  const move: RecordedMove = { who: "you", move: { type: "check" }, view: view(), after: view(), legal };
   return {
     version: 1, id: `h${n}`, botVersion: "bot-1", matchNumber: 1, handNumber: n, startStacks: [200, 200],
     moves: [move], final: { ...view("x".repeat(padding)), handOver: true, winners: [{ seat: 0, amount: 4, bestHand: null, description: null }] }, net: 0,
@@ -85,6 +86,12 @@ describe("saved hands", () => {
     expect(isHandRecord(withView({ pots: [null as never] }))).toBe(false);
     expect(isHandRecord({ ...good, moves: [{ ...good.moves[0], move: { type: "dance" } as never }] })).toBe(false);
     expect(isHandRecord({ ...good, final: { ...good.final!, handOver: false } })).toBe(false);
+    // Codex's second round.
+    expect(isHandRecord(withView({ viewerSeat: 99 }))).toBe(false);
+    expect(isHandRecord(withView({ viewerSeat: 0.5 }))).toBe(false);
+    expect(isHandRecord({ ...good, final: { ...good.final!, winners: [{ seat: 0, amount: 4, bestHand: null, description: 123 as never }] } })).toBe(false);
+    expect(isHandRecord({ ...good, moves: [{ ...good.moves[0], legal: { ...good.moves[0].legal!, check: "false" as never } }] })).toBe(false);
+    expect(isHandRecord({ ...good, moves: [{ ...good.moves[0], legal: null }] })).toBe(false); // the learner's moves always have legal moves
   });
 
   it("drops a single record too big to fit, and trims when loading", () => {

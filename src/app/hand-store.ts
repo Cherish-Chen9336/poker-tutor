@@ -37,16 +37,39 @@ function isSeat(value: unknown): boolean {
   );
 }
 
-/** Every part of a table view that the Review screen reads. */
+function isWinner(value: unknown): boolean {
+  const w = value as { seat?: unknown; amount?: unknown; bestHand?: unknown; description?: unknown };
+  return (
+    typeof w === "object" && w !== null && (w.seat === 0 || w.seat === 1) && isNumber(w.amount) &&
+    (w.description === null || typeof w.description === "string") &&
+    (w.bestHand === null || (Array.isArray(w.bestHand) && w.bestHand.every((c) => typeof c === "string" && CARD.test(c))))
+  );
+}
+
+function isRange(value: unknown): boolean {
+  const r = value as { min?: unknown; max?: unknown };
+  return value === null || (typeof r === "object" && isNumber(r.min) && isNumber(r.max));
+}
+
+/** The learner's legal moves: exactly the shape the Review screen's judgments read. */
+function isLegal(value: unknown): boolean {
+  const l = value as { fold?: unknown; check?: unknown; call?: unknown; bet?: unknown; raise?: unknown };
+  return (
+    typeof l === "object" && l !== null && typeof l.fold === "boolean" && typeof l.check === "boolean" &&
+    (l.call === null || isNumber(l.call)) && isRange(l.bet) && isRange(l.raise)
+  );
+}
+
+/** Every part of a table view that the Review screen reads. The view is always the learner's (seat 0). */
 function isView(value: unknown): boolean {
   const v = value as Record<string, unknown>;
   return (
-    typeof v === "object" && v !== null && isNumber(v.viewerSeat) && STREETS.includes(v.street as string) &&
+    typeof v === "object" && v !== null && v.viewerSeat === 0 && STREETS.includes(v.street as string) &&
     Array.isArray(v.seats) && v.seats.length === 2 && v.seats.every(isSeat) &&
     Array.isArray(v.board) && v.board.length <= 5 && v.board.every((c) => typeof c === "string" && CARD.test(c)) &&
     Array.isArray(v.pots) && v.pots.every((p) => typeof p === "object" && p !== null && isNumber((p as { amount?: unknown }).amount) && Array.isArray((p as { eligibleSeats?: unknown }).eligibleSeats)) &&
     (v.buttonSeat === null || isNumber(v.buttonSeat)) && isNumber(v.smallBlind) && isNumber(v.bigBlind) && typeof v.handOver === "boolean" &&
-    (v.winners === null || (Array.isArray(v.winners) && v.winners.every((w) => typeof w === "object" && w !== null && isNumber((w as { seat?: unknown }).seat) && isNumber((w as { amount?: unknown }).amount))))
+    (v.winners === null || (Array.isArray(v.winners) && v.winners.every(isWinner)))
   );
 }
 
@@ -57,7 +80,7 @@ function isMove(value: unknown): boolean {
     typeof m === "object" && m !== null && (m.who === "you" || m.who === "bot") &&
     typeof move === "object" && move !== null && MOVES.includes(move.type as string) &&
     (move.type !== "bet" && move.type !== "raise" ? true : isNumber(move.to)) &&
-    isView(m.view) && isView(m.after) && (m.legal === null || (typeof m.legal === "object" && m.legal !== null))
+    isView(m.view) && isView(m.after) && (m.who === "you" ? isLegal(m.legal) : m.legal === null)
   );
 }
 
