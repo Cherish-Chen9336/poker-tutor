@@ -64,6 +64,11 @@ const REBUY_LATE = range("TT+ AJs+ KQs AQo+"); // re-raise against a late-seat o
 const FLAT = range("22-TT A9s-AQs KTs-KQs QTs-QJs JTs T9s 98s 87s AQo KQo"); // call an open in position
 const BB_DEFEND = range("55-66 ATs KJs QJs JTs AQo KQo"); // the big blind's extra calls
 const FLAT_BIG = range("99-TT AQs"); // call a bigger open
+// The big blind against a big open (above 6 big blinds): fewer hands as the price grows.
+const BB_DEFEND_BIG = range("22-TT ATs+ KJs+ QJs JTs AQo+ KQo");
+const BB_DEFEND_HUGE = range("77+ AJs+ KQs AQo+");
+// After limping, against a raise from behind (otherwise every limp would fold to a small raise).
+const LIMP_DEFEND_BIG = range("22+ A2s+ K9s+ Q9s+ J9s+ T8s+ 97s+ 86s+ 75s+ 65s 54s A9o+ KTo+ QTo+ JTo");
 // Against an open from a late seat (often a steal), defend wider and sometimes re-raise as a bluff.
 const FLAT_VS_LATE = range("22-TT A2s-AQs K9s-KQs Q9s-QJs J9s-JTs T9s 98s 87s 76s 65s ATo-AQo KJo-KQo");
 // Joining a cheap raise that someone already called: hands that do well in pots with several players.
@@ -139,10 +144,19 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
     const size = lastRaiseTo / bb;
     // Against a late open with nobody else in yet, sometimes re-raise as a bluff (at random, so it can't be read).
     if (late && size <= 6 && callersOfLast === 0 && LIGHT_REBUY.has(key) && random() < 0.5) return aggress(legal, reRaiseTo, { type: "fold" });
+    // Facing a raise for much of the stack (or all of it), only hands that can call an all-in go on.
+    const committing = lastRaiseTo >= 0.4 * effective * bb;
+    if (committing) return (callersOfLast > 0 ? CALL_SHOVE_MANY : CALL_SHOVE_ONE).has(key) ? callOrCheck : { type: "fold" };
+    // Having limped, the bot defends against a raise from behind: the price is good after its limp.
+    const limped = actions.some((a, i) => a.seat === seat && a.move.type === "call" && i < actions.indexOf(raises[0]));
+    if (limped && callersOfLast === 0) {
+      const defend = size <= 3.5 ? OPENING.BTN : size <= 6 ? LIMP_DEFEND_BIG : BB_DEFEND_HUGE;
+      return defend.has(key) ? callOrCheck : { type: "fold" };
+    }
     if (position === "BB") {
       // The big blind already has chips in, so it defends widest, by the price rather than the raiser's seat
       // (callers in front make the price even better).
-      const defend = size <= 3 ? OPENING.BTN : size <= 6 ? OPENING.CO : union(FLAT, BB_DEFEND);
+      const defend = size <= 3 ? OPENING.BTN : size <= 6 ? OPENING.CO : size <= 10 ? union(BB_DEFEND_BIG, BB_DEFEND) : BB_DEFEND_HUGE;
       return defend.has(key) ? callOrCheck : { type: "fold" };
     }
     if (size > 6) return FLAT_BIG.has(key) && callersOfLast === 0 && inPosition ? callOrCheck : { type: "fold" };

@@ -6,6 +6,7 @@ import { Match, type BotPolicy } from "./match";
 import { sizedTo } from "./pot-math";
 import { Table } from "./table";
 import type { LegalMoves, Move, TableView } from "./types";
+import type { PublicAction } from "./match";
 
 function seeded(seed: number): () => number {
   let a = seed >>> 0;
@@ -107,8 +108,14 @@ export const diagnostics: Record<string, Learner> = {
       const unopened = Math.max(...view.seats.map((s) => s!.betThisStreet)) <= view.bigBlind;
       return unopened ? valueRaise(legal, 5) : checkCall(legal, view, null!);
     }
-    if (madeHand(view) === "nothing") return legal.check ? { type: "check" } : { type: "fold" };
+    const strength = madeHand(view);
+    if (strength === "nothing" || strength === "aceHigh") return legal.check ? { type: "check" } : { type: "fold" };
     return legal.bet ? valueRaise(legal, sizedTo(view, 0, legal, 0.5)!) : checkCall(legal, view, null!);
+  },
+  // All-in before the flop with good hands, otherwise fold (Codex's bot-2.1 review; inconclusive on fresh seeds).
+  "all-in with good hands": (legal, view) => {
+    if (view.street === "preflop" && range("77+ AJs+ KQs AQo+").has(handKey(view.seats[0]!.cards as string[])) && legal.raise) return { type: "raise", to: legal.raise.max };
+    return legal.check ? { type: "check" } : view.street === "preflop" ? { type: "fold" } : { type: "call" };
   },
 };
 
@@ -132,6 +139,7 @@ export function benchmark(learner: Learner, seeds: number[], hands: number) {
   }
   const mean = sessions.reduce((a, b) => a + b, 0) / sessions.length;
   const sd = Math.sqrt(sessions.reduce((a, b) => a + (b - mean) ** 2, 0) / (sessions.length - 1));
+  if (sessions.length < 2 || sessions.length > T95.length) throw new Error(`benchmark supports 2–${T95.length} sessions`);
   const margin = (T95[sessions.length - 1] * sd) / Math.sqrt(sessions.length);
   return { per100: mean, margin };
 }
@@ -142,7 +150,7 @@ const T95 = [NaN, 12.71, 4.3, 3.18, 2.78, 2.57, 2.45, 2.36, 2.31, 2.26, 2.23, 2.
 describe("bot-2 at the six-player table", () => {
   // A regression benchmark, not proof the bot can't be beaten: fixed seeds, 10 sessions of 300 hands per
   // style. Tuning (bot-2.1, 2026-10-31) used other seeds; on 12 fresh sessions of 400 hands every style
-  // below lost clearly (the closest, stealing with a raise to 13, lost 20 ± 9 per 100 hands).
+  // below lost clearly (after Codex's review fixes, the closest, stealing with a raise to 13, lost 16 ± 8 per 100 hands).
   const seeds = Array.from({ length: 10 }, (_, i) => i + 1);
   it("never chooses an illegal move, and no one-trick style beats it", () => {
     for (const [name, learner] of Object.entries(styles)) {
@@ -189,11 +197,12 @@ describe("bot-2 at the six-player table", () => {
     expect(decisions[1]).toEqual(decisions[0]);
   });
 
-  // Practice targets from Codex (2026-10-31), at 100 big blind stacks: enough pots with three or more
-  // players to practice them. PFR (raising before the flop) measures about 15.5%, a little under Codex's
-  // 17–23%; raising more often cost pots with several players, which matter more here.
+  // Practice targets from Codex (2026-10-31), with every hand starting at 100 big blinds: enough pots
+  // with three or more players to practice them. PFR (raising before the flop) measures about 16%, a
+  // little under Codex's provisional 17–23%; raising more often cost pots with several players.
+  // "Flop seen" counts flops someone could still bet on (not automatic run-outs after all-ins).
   it("plays loosely enough that many flops have three or more players", () => {
-    const stats = tableStats(tableBot, [11, 12, 13, 14, 15, 16, 17, 18], 1000);
+    const stats = tableStats(tableBot, [11, 12, 13, 14, 15, 16, 17, 18], 1000, { fixedStacks: true });
     expect(stats.flopSeen).toBeGreaterThanOrEqual(0.35);
     expect(stats.flopSeen).toBeLessThanOrEqual(0.5);
     expect(stats.multiway).toBeGreaterThanOrEqual(0.15);
@@ -203,4 +212,61 @@ describe("bot-2 at the six-player table", () => {
     expect(stats.pfr).toBeGreaterThanOrEqual(0.15);
     expect(stats.pfr).toBeLessThanOrEqual(0.23);
   }, 300_000);
+
+  /**
+   * Plays one hand at a six-seat table (button seat 0, small blind 1, big blind 2, under the gun 3) with
+   * 200 chips each: `script` gives other seats' moves in order, and `botSeat` is played by bot-2.
+   * Returns the bot's moves.
+   */
+  function scripted(botSeat: number, botHand: string[], script: [number, Move][]): Move[] {
+    const used = new Set(botHand);
+    const deck = "23456789TJQKA".split("").flatMap((r) => "shdc".split("").map((x) => r + x)).filter((c) => !used.has(c));
+    const hands = Array.from({ length: 6 }, (_, seat) => (seat === botSeat ? botHand : deck.splice(0, 2)));
+    const table = new Table({ seats: Array.from({ length: 6 }, (_, i) => ({ id: `p${i}`, name: `P${i}`, stack: 200 })), smallBlind: 1, bigBlind: 2 });
+    table.dealHand({ hands, board: deck.slice(0, 5) });
+    const history: PublicAction[] = [];
+    const botMoves: Move[] = [];
+    const queue = [...script];
+    while (!table.view(null).handOver && table.view(null).street === "preflop") {
+      const seat = table.view(null).actionTo!;
+      let move: Move;
+      if (seat === botSeat) {
+        move = tableBot(table.view(seat), table.legalMoves(seat)!, seeded(1), history);
+        botMoves.push(move);
+      } else {
+        if (!queue.length) break;
+        const [who, next] = queue.shift()!;
+        expect(who, "script order").toBe(seat);
+        move = next;
+      }
+      history.push({ seat, street: "preflop", move });
+      expect(table.move(seat, move).ok).toBe(true);
+    }
+    return botMoves;
+  }
+  const fold: [number, Move][] = [3, 4, 5, 0].map((seat) => [seat, { type: "fold" }]);
+
+  it("doesn't give up every small-blind limp to a small raise (Codex's bot-2.1 review)", () => {
+    // Hands the small blind limps (button range, not cutoff range): each one calls a raise to 4.
+    for (const hand of [["Ks", "2s"], ["Qh", "5h"], ["Ad", "3c"], ["9c", "8d"], ["Ts", "7s"], ["Jh", "8c"]]) {
+      const moves = scripted(1, hand, [...fold, [2, { type: "raise", to: 4 }]]);
+      expect(moves, hand.join("")).toEqual([{ type: "call" }, { type: "call" }]);
+    }
+  });
+
+  it("calls a big all-in only with hands strong enough for it (Codex's bot-2.1 review)", () => {
+    const shove: [number, Move][] = [[3, { type: "fold" }], [4, { type: "fold" }], [5, { type: "fold" }], [0, { type: "raise", to: 200 }], [1, { type: "fold" }]];
+    expect(scripted(2, ["8s", "7s"], shove)).toEqual([{ type: "fold" }]);
+    expect(scripted(2, ["4h", "4d"], shove)).toEqual([{ type: "fold" }]);
+    expect(scripted(2, ["Qh", "Qd"], shove)).toEqual([{ type: "call" }]);
+    // A big raise short of all-in also narrows the defense.
+    const big: [number, Move][] = [[3, { type: "fold" }], [4, { type: "fold" }], [5, { type: "fold" }], [0, { type: "raise", to: 30 }], [1, { type: "fold" }]];
+    expect(scripted(2, ["8s", "7s"], big)).toEqual([{ type: "fold" }]);
+  });
+
+  it("calls behind a player who limped, with hands that do well in multi-player pots", () => {
+    // In self-play only the small blind limps, so this checks the learner limping under the gun.
+    expect(scripted(4, ["5d", "4d"], [[3, { type: "call" }]])).toEqual([{ type: "call" }]);
+    expect(scripted(4, ["7c", "2d"], [[3, { type: "call" }]])).toEqual([{ type: "fold" }]);
+  });
 });
