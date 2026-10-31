@@ -99,7 +99,10 @@ export function coachLines(view: TableView): CoachLine[] {
     // States the order plainly rather than counting who's left: after a raise, everyone
     // who already acted gets another turn, so a count of "players after you" can mislead.
     const position = positionOf(view, seat);
-    const later = postflopRank(view, seat) === n ? "you act last on every later round" : `you act ${ordinal(postflopRank(view, seat))} on later rounds if everyone stays in`;
+    // Later rounds: count only players who still have chips to bet (all-in players stay in but don't act).
+    const actors = view.seats.filter((s) => s && s.status !== "folded" && s.status !== "out" && s.status !== "all-in" && s.stack + s.betThisStreet > 0);
+    const rank = actors.filter((s) => postflopRank(view, s!.seat) <= postflopRank(view, seat)).length;
+    const later = rank === actors.length ? "you act last on every later round" : `you act ${ordinal(rank)} on later rounds if everyone stays in`;
     lines.push({
       topic: "position",
       text: `You're ${SEAT_PHRASE[position]} (${position}). Before the flop, betting goes around from under the gun to the big blind, and a raise gives everyone else another turn. After the flop, ${later}.`,

@@ -135,5 +135,12 @@ describe("coach", () => {
       v.seats[0]!.cards = ["7c", "4d"];
       expect(text(v).find((l) => l.startsWith("Your best five"))).toMatch(/so everyone still in shares it\.$/);
     });
+  
+    it("counts only players who can still bet when saying where you'll act later", () => {
+      // Button in seat 3, so you (seat 0) are under the gun; the big blind (seat 5) is all-in.
+      const view = six({ button: 3, bets: [0, 0, 0, 0, 1, 2] });
+      view.seats[5] = { ...view.seats[5]!, stack: 0, status: "all-in" };
+      expect(text(view)[0]).toMatch(/After the flop, you act second on later rounds if everyone stays in\.$/);
+    });
   });
 });
