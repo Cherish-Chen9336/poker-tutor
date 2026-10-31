@@ -13,6 +13,9 @@ import { useHands } from "../app/hand-store";
 import { spokenText } from "../learn/card-names";
 import { CardText } from "../learn/cards";
 import { PokerTable } from "../ui/PokerTable";
+import { equityRequests } from "../game/equity";
+import { OddsBox } from "./OddsBox";
+import { useEquity } from "./useEquity";
 
 const COACH_KEY = "poker-tutor:coach";
 
@@ -217,6 +220,10 @@ export default function PlayPage() {
     afterChange(before);
   }
 
+  // Odds are estimated only on the learner's turn, with the coach on.
+  const oddsHole = started && coachOn && !match.handOver && view.actionTo === YOU_SEAT && view.seats[YOU_SEAT]?.cards?.every(Boolean) ? (view.seats[YOU_SEAT]!.cards as string[]) : null;
+  const estimates = useEquity(oddsHole, view.board, oddsHole ? equityRequests(view, YOU_SEAT) : []);
+
   if (!started) {
     return (
       <section className="panel play-intro">
@@ -246,6 +253,7 @@ export default function PlayPage() {
 
   const coach = coachOn ? coachLines(view) : [];
   const yourTurn = !match.handOver && view.actionTo === YOU_SEAT && legal;
+  const hole = view.seats[YOU_SEAT]?.cards?.every(Boolean) ? (view.seats[YOU_SEAT]!.cards as string[]) : null;
   const stack = view.seats[YOU_SEAT]!.stack;
   // Count only finished hands, so a posted blind doesn't look like a loss.
   const totals = session.results.get(match.matchNumber) ?? { hands: 0, net: 0 };
@@ -325,13 +333,16 @@ export default function PlayPage() {
             </div>
             {coachOn ? (
               yourTurn ? (
-                <ul className="coach-list">
-                  {coach.map((line, i) => (
-                    <li key={i} className={`topic-${line.topic}`}>
-                      <CardText text={line.text} />
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  <ul className="coach-list">
+                    {coach.map((line, i) => (
+                      <li key={i} className={`topic-${line.topic}`}>
+                        <CardText text={line.text} />
+                      </li>
+                    ))}
+                  </ul>
+                  {hole && <OddsBox estimates={estimates} />}
+                </>
               ) : (
                 <p className="mono">Hints appear when it's your turn.</p>
               )

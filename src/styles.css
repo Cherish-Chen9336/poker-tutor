@@ -412,6 +412,12 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 }
 .rt-dealer.p0 { left: calc(50% + 96px); top: 86%; }
 
+.odds-box { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.odds-title { font: 500 12px var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--brass); }
+.odds-box p, .odds-box ul { margin: 0; }
+.odds-box ul { padding-left: 18px; }
+.odds-note { font-size: 13.5px; color: var(--muted); }
+
 /* Quick checks */
 .quiz { margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 16px; max-width: 68ch; }
 .quiz h2 { font-family: var(--f-display); font-size: 26px; margin: 0; }
