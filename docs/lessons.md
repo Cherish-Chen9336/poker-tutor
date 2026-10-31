@@ -230,37 +230,28 @@ They're called "blinds" because they're paid before seeing any cards.
 
 ## Lesson 5: Your moves
 
-When it's your turn, you choose one move:
+On your turn, first ask: **do you owe chips?**
 
-| Move | When you can | What it does |
-|---|---|---|
-| **Fold** | Always | Give up the hand. Chips you already put in stay in the pot. |
-| **Check** | Only when there's **nothing to call** | Pass without putting in chips. |
-| **Call** | When someone bet more than you have in | Put in just enough to match the bet. |
-| **Bet** | When nobody has bet this round | Put in chips that others must match. |
-| **Raise** | When someone has bet | Put in more than the bet, so others must match the new amount. |
+[Diagram: three situation cards, side by side (stacked on phones): "Nobody has bet this round" → Check (pass for free) or Bet (put in chips; others may call, raise, or fold); "You're the big blind, and everyone just matched your 2" → Check or Raise. Nothing to call isn't the same as nobody bet; "On the flop, both players have 100 chips. Your opponent bets 20." → Fold, Call 20 (match it), or Raise to at least 40.]
 
-**If you owe chips, you can't check.** You can fold, call, or raise if allowed.
+**If you owe chips, you can't check.** You can fold, call, or raise if allowed. You can always **fold**: you give up the hand, and chips you already put in stay in the pot. Folding when you could check for free just throws the hand away.
 
-**A bet and a raise are the same idea.** A bet is the first chips anyone puts in during a betting round. A raise makes an existing bet bigger. After either one, **every other player who can still act gets a turn** to fold, call, or raise if allowed, including a player who bet earlier and now faces a raise. Nobody has to call. The round ends as Lesson 1 describes.
+**A raise is a bigger bet.** After a bet or raise, every other player who can still act gets a turn, including a player who bet earlier. Nobody has to call. The round ends as Lesson 1 describes.
 
-**Why bet or raise at all?** There are two main reasons:
-- **For value:** you think your hand is probably best, and you want worse hands to put more chips in the pot.
+**Why bet or raise?**
+- **For value:** your hand is probably best, and you want worse hands to put in more.
 - **As a bluff:** your hand is probably worse, and you want better hands to fold.
 
-With a medium hand, checking or calling is often better. A bet would mostly get called by better hands and fold out worse ones. Lessons after you start playing go deeper into this, including why bluffing has to be part of good play.
+With a medium hand, checking or calling is often better: betting may make weaker hands fold while stronger hands call.
 
-**"Nothing to call" isn't the same as "nobody bet."** The big blind already has 2 in. If everyone just calls 2, the big blind has nothing more to put in, so they may check.
+**"Raise to" vs. "raise by."** This app always says **"raise to"**: your total for this round. The big blind is 2. You **raise to 6**: that's 4 more, so you **raised by 4**.
 
-**"Raise to" vs. "raise by."** This app always uses **"raise to"**: the total you'll have in for this betting round.
-- The big blind is 2. You **raise to 6**. That's 4 more than the big blind, so you **raised by 4**.
+[Diagram: the existing "raise to / raise by" bars, plus a third bar: "next full raise: to at least 10 (6 + 4)".]
 
-[Diagram: a chip stack of 2 (the big blind), then a stack of 6, with the extra 4 highlighted as "the raise."]
-
-**The minimum bet and raise:**
+**Smallest and largest bets:**
 - The smallest **bet** is the big blind (2).
-- A full **raise** must add at least as much as the last full bet or raise this round. If A raises to 6 (by 4), the next player must raise to at least 10 (6 + 4).
-- In No-Limit Hold'em, the only maximum is your stack: you can bet everything you have, which is called going **all-in** (Lesson 6).
+- A full **raise** must add at least as much as the last full bet or raise this round. After a raise to 6 (by 4), the next full raise is to at least 10.
+- In No-Limit Hold'em, the only maximum is your stack. Betting everything is going **all-in** (Lesson 6).
 
 ### Quick checks
 
@@ -650,15 +641,17 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 ## Lesson 12: Sunk cost
 
-**A sunk cost** is something you've already paid and can't get back. The trap is letting it drive your next decision: "I've already put 60 in, so I can't fold now."
+**A sunk cost** is something you've already paid and can't get back. The trap: "I've already put 60 in, so I can't fold now."
 
-**Chips in the pot aren't yours anymore.** Once you bet, those chips belong to the pot. Folding doesn't lose them again; they were already gone. The only question is: from here, does the next call pay off on average?
+**Chips in the pot aren't yours anymore.** Folding costs no new chips. Judge the next call by what it costs and whether it pays on average.
 
-**But don't ignore everything earlier.** Two things from the past still matter:
-- **The size of the pot.** Your earlier bets made the pot bigger. The bigger the pot, the smaller the chance of winning you need for the same call to pay off (Lesson 9). For example, calling 20 to win a pot of 40 needs a 33% chance: 20 ÷ (40 + 20). Calling the same 20 to win a pot of 180 needs only 10%: 20 ÷ (180 + 20). That's a real reason to call, and it's the same no matter *who* put those chips in.
-- **What the betting told you.** How your opponent bet earlier is information about their hand.
+**What still matters from earlier:**
+- **The size of the pot.** The bigger the pot, the smaller the chance you need for the same call to pay off (Lesson 9), no matter who put the chips in.
+- **What the betting told you** about your opponent's hand.
 
-**A test you can use:** imagine someone else had put in your earlier chips, and you just sat down in this exact spot with this pot. Would you call? If yes, call. If no, your earlier chips are no reason to.
+[Diagram: two heads-up situations side by side. Each pot includes the opponent's bet; calling 20 ends the betting; "Pot 40 → you need 20 ÷ (40 + 20) ≈ 33.3%"; "Pot 180 → you need 20 ÷ (180 + 20) = 10%". In each pot, some chips have a dashed outline labeled "yours earlier, now the pot's". Caption: "Pot size and call price set the chance you need. Who put the chips in doesn't."]
+
+**A test:** keep everything the same (cards, pot, stacks, betting), but imagine someone else put in your earlier chips. Would you call? That's your answer.
 
 ### Quick checks
 
@@ -678,23 +671,17 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 ## Lesson 13: Resulting
 
-**Resulting** means judging a decision by how it turned out. In poker that's a trap, because luck decides single hands.
+**Resulting** means judging a decision by how it turned out. But one hand's result depends on both your decision and luck.
 
-**A good decision can lose.** In Lesson 9's Case 2, calling was right: you needed 11.1% and had 20.5%. Yet you lose that hand about 4 times in 5. Losing it doesn't make the call a mistake.
-
-**A bad decision can win.** Calling in Case 1 (needing 33.3% with 20.5%) loses chips on average. When the heart comes, it wins this time, but it's still a bad habit.
+[Diagram: a 2×2 grid built on Lesson 9's example, shown once above it: you hold 7♥ 6♥, your opponent K♠ J♦, the board is K♥ 9♥ 2♣ 3♠, one card to come, and your call ends the betting. For this example, both hands are known before the call. You win only if a heart comes (9 of the 44 unseen cards, 20.5%); Rows: Good call: pot 200, call 25, you need 11.1%. Bad call: pot 100, call 50, you need 33.3%; Columns: A heart comes (you win) and No heart (you lose); Cells: "+200. Good call, winning result." "−25. Good call, losing result." "+100. Bad call, winning result." "−50. Bad call, losing result."; Caption: "Amounts are chips won or lost by calling. Either call wins 20.5% of the time and loses 79.5%; the boxes' size doesn't show the chances."]
 
 **Even the best spots lose often.** Before the flop, A♥ A♠ all-in against K♣ K♦ wins 81.1% of the time, loses 18.6%, and ties 0.4% (counted over all 1,712,304 possible boards). If you play that spot 10 times, you'll likely lose it at least once.
 
-**Why can the aces lose?** When both players are all-in before the flop, no one can fold anymore, but all 5 shared cards are still to come, and they can change who's ahead:
-- **A king comes.** Two kings are still in the deck. If one lands on the board, the kings become three of a kind (or better) and usually beat the pair of aces, unless the aces improve too, for example when an ace also comes. For example, with a board of K♥ 7♣ 2♦ 9♠ 4♥, the kings have K-K-K and the aces have just a pair. This decides about 16 boards in 100.
+**Why can the aces lose?** Once both are all-in, nobody can fold, but all 5 shared cards are still to come:
+- **A king comes.** The kings become three of a kind (or better) and usually beat the pair of aces, unless the aces improve too, for example when an ace also comes. For example, with a board of K♥ 7♣ 2♦ 9♠ 4♥, the kings have K-K-K and the aces have just a pair. This decides about 16 boards in 100.
 - **No king comes, but the kings make a straight or a flush.** For example, four clubs on the board give K♣ a flush, and the aces have no club. This decides about 2.6 boards in 100.
-- **Together, that's the 18.6%.** The aces' pair is better *now*, but it isn't a finished hand until the river.
 
-**How to judge instead:**
-- Ask what you knew *at the moment you decided*: your cards, the board, the pot, the price, and what the betting suggested.
-- Ask whether the decision made sense with that information, before looking at how it ended. The Review screen shows each decision this way.
-- One result proves little. Many results together can tell you whether a habit works.
+**How to judge instead:** ask what you knew when you decided (your cards, the board, the pot, the price, the betting) and whether the decision made sense with that. The Review screen shows each decision this way. One result proves little; many results can show whether a habit works.
 
 ### Quick checks
 
@@ -715,38 +702,26 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 ## Lesson 14: Bankroll and the Kelly criterion
 
-**Your bankroll** is the money you set aside for a game. This app uses play chips only, but the idea matters for any risky choice: how much of what you have should you risk at once?
+**Your bankroll** is the money you set aside for a game. This app uses play chips only, but the question matters for any risky choice: how much of what you have should you risk at once?
 
-**The Kelly criterion** (John Kelly, Bell Labs, 1956) answers that for a simple, repeated bet where you know your exact chance of winning. For a bet that pays b for each 1 you risk, with chance p of winning and no ties:
+**The Kelly criterion** (John Kelly, 1956) gives the fraction of your current bankroll to risk on each of many independent, repeated bets. Assume you know your chance of winning p, you profit b for each 1 you risk, and there are no ties:
 
-**Kelly fraction = (b × p − (1 − p)) ÷ b**, or nothing if that comes out at zero or less.
+**Kelly fraction = (b × p − (1 − p)) ÷ b**, or nothing if that's zero or less.
 
 **Example:** an even-money bet (b = 1) that wins 55% of the time. Kelly says risk (0.55 − 0.45) ÷ 1 = **10%** of your bankroll each time.
 
-**What Kelly does and doesn't promise:** it makes your bankroll grow fastest *over the long run*. It doesn't promise profit in the short run, and the swings along the way are large.
+**Kelly makes a bankroll grow fastest over the long run.** It doesn't promise short-run profit, and the swings are large.
 
-**Betting too much is worse than betting too little.** Take a typical run of 100 bets in the 55% example: 55 wins and 45 losses. Each win multiplies your bankroll by (1 + the fraction you bet), and each loss by (1 − that fraction). The order doesn't change the final balance: multiplying gives the same answer in any order. Starting with 100:
+**Betting too much is worse than betting too little.** Take 100 bets with the typical result, 55 wins and 45 losses, starting with 100. Each win multiplies your bankroll by (1 + the fraction you bet), and each loss by (1 − that fraction). The order doesn't change the final balance: multiplying gives the same answer in any order.
 
-| You risk each time | After 55 wins and 45 losses |
-|---|---|
-| Half Kelly (5%) | about 146 (1.05⁵⁵ × 0.95⁴⁵) |
-| Kelly (10%) | about 165 (1.10⁵⁵ × 0.90⁴⁵) |
-| Twice Kelly (20%) | about 99 (1.20⁵⁵ × 0.80⁴⁵) |
+[Diagram: three bars starting from 0, with a line marking the starting 100: Half Kelly (5%) → 146, Kelly (10%) → 165, Twice Kelly (20%) → 99. Beside them, a small chain: "100 → lose 20% → 80 → win 20% → 96". Caption: "Rounded balances after 55 wins and 45 losses, starting from 100. Real results vary."]
 
-- **Half Kelly** grows at about three-quarters of Kelly's speed (as a growth rate per bet), with much smaller swings.
-- **Twice Kelly** ends up about where it started, even though you won 55% of the time. Losing 20% takes you to 80, and winning 20% from there only gets you back to 96. That drag eats the whole edge, and a little more: its growth per bet is slightly below zero, so over thousands of bets it slowly shrinks (100 becomes about 25 after 10,000 bets).
-- Real runs are luckier or unluckier than "55 out of 100", but over many bets this is the typical result.
+- **Half Kelly's** long-run growth rate is about three-quarters of full Kelly's, with much smaller swings.
+- **Twice Kelly** ends up about where it started, even though you won 55% of the time. Losing 20% takes you to 80, and winning 20% from there only gets you back to 96. Its growth per bet is slightly below zero, so over thousands of bets it slowly shrinks (100 becomes about 25 after 10,000 bets).
 
-**Kelly is a guide, not a rule.** Each player chooses how much to risk: full Kelly, half, a quarter, or a simple rule of their own. A smaller fraction grows more slowly but swings less, and it hurts less if you've overestimated your edge.
+**Kelly is a guide, not a rule.** Many players risk half or a quarter of Kelly: it grows more slowly but swings less, and it hurts less if you've overestimated your edge. In poker you never know your exact edge, and overestimating it makes Kelly bet too much, which is the costly direction.
 
-**Why poker players risk much less than Kelly:**
-- In poker, you never know your exact chance of winning, and your edge comes and goes with your opponents and your own play.
-- If you overestimate your edge, Kelly tells you to bet too much, and too much is the costly direction.
-- So players use fractions of Kelly, or simple rules such as keeping many times the amount they bring to one table.
-
-**Don't use Kelly on single hands.** It's about how much of your bankroll to bring and risk over many games, not how much to bet in one pot. Inside a hand, use pot odds (Lesson 9).
-
-This lesson explains the math; it isn't advice about real money.
+**Don't use Kelly on single hands.** It's about how much of your bankroll to risk over many games, not what to bet in one pot. Inside a hand, use pot odds (Lesson 9). This lesson explains the math; it isn't advice about real money.
 
 ### Quick checks
 
@@ -826,31 +801,22 @@ With six players, each seat has a name, counted clockwise from the button. Switc
 
 When a player goes all-in for less than others bet, they can only win as much from each opponent as they put in themselves (Lesson 6). With three or more players, the others' matched extra chips form a **side pot** the all-in player can't win. Unmatched chips go back.
 
-**Example.** Three players are all-in before the flop:
-- **A** has 30 chips.
-- **B** has 80 chips.
-- **C** has 100 chips.
+**Example.** Three players are all-in before the flop: **A** with 30 chips, **B** with 80, and **C** with 100.
 
-[Diagram: three stacked bars of 30, 80, and 100 chips, sliced into the main pot (30 from each), the side pot (50 each from B and C), and C's unmatched 20.]
-
-| Pot | Made of | Amount | Who can win it |
-|---|---|---|---|
-| **Main pot** | 30 from each player | 90 | A, B, and C |
-| **Side pot** | 50 more each from B and C | 100 | B and C only |
-| **Returned** | C's last 20, which nobody matched | 20 | goes back to C |
+[Diagram: the existing three stacked bars (30, 80, 100), with a label block beside each band instead of the table:; Main pot: 30 × 3 = 90. A, B, or C can win it; Side pot: 50 × 2 = 100. Only B or C can win it; Returned: 20 to C. Nobody matched it.]
 
 **Each pot has its own winner.** Suppose A has the best hand, B the second best, and C the worst:
 - **A wins the main pot (90).** A beat both other players.
 - **B wins the side pot (100).** A can't win it, so it goes to the better hand between B and C.
 - **C gets back 20** and loses the other 80.
 
-So the shortest stack can win at most the main pot. Winning the main pot doesn't mean winning the side pot.
+So the shortest stack can win at most the main pot.
 
 **Things to keep straight:**
-- **A side pot isn't a split pot.** Side pots are separate pots with different players who can win them. A split pot is one pot shared by tied hands.
-- **Folded chips stay in.** If someone folds after betting, their chips stay in whichever pots they were in, but they can't win any of them.
-- **Ties are settled pot by pot.** Tied hands share each pot they can win. Any leftover chips go one at a time to the tied players, starting left of the button.
-- **One all-in doesn't stop the others.** Players who still have chips can keep betting against each other, and those bets go into the side pot.
+- **A side pot isn't a split pot.** A split pot is one pot shared by tied hands.
+- **Folded chips stay in** the pots they went into, but the player who folded can't win them.
+- **Ties are settled pot by pot.** Each pot is split equally among its tied winners; any leftover chips go one at a time, starting left of the button.
+- **One all-in doesn't stop the others.** Two or more players with chips can keep betting against each other, into a side pot.
 
 ### Quick checks
 

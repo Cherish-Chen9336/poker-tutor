@@ -6,10 +6,11 @@ import { describe, expect, it } from "vitest";
 import lessonsDoc from "../../docs/lessons.md?raw";
 import { allBoardsOdds, compareHands, handName } from "../game/hands";
 import { Table } from "../game/table";
+import { breakEven, kellyBalance, LESSON9_EXAMPLE, LESSON13_CALLS } from "./diagram-data";
 import type { Move } from "../game/types";
-import { Lesson3, Lesson6 } from "./content/rules-lessons";
+import { Lesson3, Lesson5, Lesson6 } from "./content/rules-lessons";
 import { Lesson9 } from "./content/thinking-lessons";
-import { Lesson11, Lesson13, Lesson14 } from "./content/after-play-lessons";
+import { Lesson11, Lesson12, Lesson13, Lesson14 } from "./content/after-play-lessons";
 import { Lesson16 } from "./content/table-lessons";
 
 /** Visible text of a lesson, with card pictures read as their labels ("A♥" style isn't used; tokens become names). */
@@ -138,11 +139,52 @@ describe("lesson text claims", () => {
     stated(Lesson14, "Losing 20% takes you to 80, and winning 20% from there only gets you back to 96.");
     const after = (f: number) => 100 * (1 + f) ** 55 * (1 - f) ** 45;
     expect([after(0.05), after(0.1), after(0.2)].map(Math.round)).toEqual([146, 165, 99]);
+    expect([0.05, 0.1, 0.2].map((f) => Math.round(kellyBalance(f)))).toEqual([146, 165, 99]); // the bars
+    for (const end of ["100 → 146", "100 → 165", "100 → 99"]) expect(shown(Lesson14)).toContain(end);
     const rate = (f: number) => 0.55 * Math.log(1 + f) + 0.45 * Math.log(1 - f);
     expect(rate(0.05) / rate(0.1)).toBeCloseTo(0.75, 2); // "about three-quarters of Kelly's speed"
     expect(100 * 0.8 * 1.2).toBeCloseTo(96);
     stated(Lesson14, "so over thousands of bets it slowly shrinks (100 becomes about 25 after 10,000 bets).");
     expect(Math.round(100 * Math.exp(10_000 * rate(0.2)))).toBe(25);
+  });
+
+  it("lesson 5: the situation cards match the legal moves", () => {
+    const text = shown(Lesson5);
+    expect(text).toContain("On the flop, both players have 100 chips. Your opponent bets 20.");
+    expect(text).toContain("Raise to at least 40");
+    // The big blind, after everyone just called, may check or raise (no fold-to-nothing, no call).
+    const t = table([200, 200, 200]);
+    t.move(0, { type: "call" });
+    t.move(1, { type: "call" });
+    const bb = t.legalMoves(2)!;
+    expect([bb.check, bb.call, bb.raise !== null]).toEqual([true, null, true]);
+  });
+
+  it("lesson 12: the two pots' break-even chances", () => {
+    const text = shown(Lesson12);
+    expect([breakEven(40, 20), breakEven(180, 20)].map((x) => (x * 100).toFixed(1))).toEqual(["33.3", "10.0"]);
+    expect(text).toContain("you need 20 ÷ (40 + 20) ≈ 33.3%");
+    expect(text).toContain("you need 20 ÷ (180 + 20) = 10%");
+  });
+
+  it("lesson 13: the result grid, on Lesson 9's example", () => {
+    const { you, opponent, board } = LESSON9_EXAMPLE;
+    // Every unseen river card, checked with the evaluator: exactly the 9 hearts win, and nothing ties.
+    const seen = new Set([...you, ...opponent, ...board]);
+    const deck = [..."23456789TJQKA"].flatMap((r) => [..."shdc"].map((x) => r + x)).filter((c) => !seen.has(c));
+    const results = deck.map((c) => compareHands(you, opponent, [...board, c]));
+    expect(deck.length).toBe(LESSON13_CALLS.unseen);
+    expect(results.filter((r) => r === "a").length).toBe(LESSON13_CALLS.winCards);
+    expect(results.filter((r) => r === "tie").length).toBe(0);
+    expect(deck.filter((_, i) => results[i] === "a").every((c) => c[1] === "h")).toBe(true);
+    // One call is good (needs less than 20.5%), the other bad.
+    const need = LESSON13_CALLS.calls.map((c) => breakEven(c.pot, c.call));
+    expect(need.map((x) => (x * 100).toFixed(1))).toEqual(["11.1", "33.3"]);
+    const text = shown(Lesson13);
+    for (const cell of ["+200 Good call, winning result.", "−25 Good call, losing result.", "+100 Bad call, winning result.", "−50 Bad call, losing result."]) {
+      expect(text.replace(/\s+/g, " ")).toContain(cell);
+    }
+    expect(text).toContain("Either call wins 20.5% of the time and loses 79.5%");
   });
 
   it("lesson 16: the side-pot example's numbers", () => {

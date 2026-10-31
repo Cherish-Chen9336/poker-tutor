@@ -290,6 +290,46 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 .calc-out dd { margin: 0 0 8px; font: 500 16px var(--f-mono); }
 .key { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: -1px; margin: 0 2px 0 6px; }
 .key.call { background: var(--brass); }
+.key.mine { background: var(--felt); outline: 1.5px dashed var(--brass); outline-offset: -1.5px; }
+.key.returned { background: transparent; outline: 1.5px dashed var(--muted); outline-offset: -1.5px; }
+.key.start { width: 0; height: 12px; border-left: 2px solid var(--ink); border-radius: 0; }
+
+/* Step 1b visuals (src/learn/visuals.tsx). */
+.visual-setup { margin: 0 0 12px; font-size: 14.5px; }
+.situations { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.situation { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.situation-when { margin: 0; font-size: 14px; color: var(--muted); }
+.situation-moves { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
+.situation-moves b { color: var(--brass); }
+.situation-what { color: var(--muted); font-size: 13.5px; }
+.situation-note { margin: 0; font-size: 13.5px; border-top: 1px solid var(--line); padding-top: 6px; }
+.pot-compare { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.pot-compare p { margin: 6px 0 0; font-size: 14.5px; }
+.pot-bar { display: flex; gap: 2px; height: 26px; }
+.pot-bar span { border-radius: 4px; }
+.pot-mine { background: var(--felt); outline: 1.5px dashed var(--brass); outline-offset: -1.5px; }
+.pot-rest { background: var(--felt); }
+.pot-call { background: var(--brass); margin-left: 8px; }
+.result-grid { border-collapse: separate; border-spacing: 6px; width: 100%; font-size: 14.5px; }
+.result-grid th, .result-grid td { padding: 10px; border-radius: 8px; text-align: left; vertical-align: top; }
+.result-grid thead th { font-size: 13.5px; color: var(--muted); font-weight: 600; padding-bottom: 2px; }
+.result-grid tbody th { background: var(--panel); font-weight: 400; }
+.result-grid tbody th b { display: block; }
+.result-grid tbody th span { font-size: 13px; color: var(--muted); }
+.result-grid tbody td { background: var(--panel); border: 1px solid var(--line); }
+.result-grid tr.good th b { color: var(--good); }
+.result-grid tr.bad th b { color: var(--bad); }
+.result-grid td b { display: block; font-size: 17px; }
+.kelly-bars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.kelly-bars li { display: grid; grid-template-columns: 140px minmax(0, 1fr) 92px; gap: 12px; align-items: center; }
+.kelly-label { font-size: 14px; }
+.kelly-track { position: relative; height: 26px; background: var(--panel); border-radius: 4px; }
+.kelly-fill { position: absolute; inset: 0 auto 0 0; background: var(--brass); border-radius: 4px; }
+.kelly-fill.down { background: var(--muted); }
+.kelly-start { position: absolute; top: -4px; bottom: -4px; border-left: 2px solid var(--ink); }
+.kelly-end { font-size: 13.5px; text-align: right; }
+.kelly-chain { margin: 12px 0 0; font-size: 13.5px; }
+.pot-labels { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 14.5px; }
 .key.pot { background: var(--felt); }
 
 /* Gambler's fallacy demo (lesson 10) */
@@ -479,6 +519,11 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   .ladder-odds { max-width: none; }
   .ladder-head { display: none; }
   .bar-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .situations { grid-template-columns: minmax(0, 1fr); }
+  .kelly-bars li { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
+  .kelly-label { grid-column: 1 / -1; }
+  .result-grid { font-size: 13.5px; border-spacing: 4px; }
+  .result-grid th, .result-grid td { padding: 8px; }
   .kick-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .diagram { padding: 14px 12px; }
   .pager .button { width: 100%; }

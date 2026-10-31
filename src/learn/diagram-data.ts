@@ -66,3 +66,23 @@ export function formatOneIn(count: number, total: number): string {
 
 /** Lesson 9's example: a heart flush draw against a pair of kings, one card to come. */
 export const LESSON9_EXAMPLE = { you: ["7h", "6h"], opponent: ["Ks", "Jd"], board: ["Kh", "9h", "2c", "3s"] };
+
+/** The chance of winning a call needs to break even when it ends the betting (no ties): call ÷ (pot + call). */
+export function breakEven(pot: number, call: number): number {
+  return call / (pot + call);
+}
+
+/** Lesson 13's grid: Lesson 9's two calls, and how many river cards win (checked against the evaluator in tests). */
+export const LESSON13_CALLS = {
+  winCards: 9,
+  unseen: 44,
+  calls: [
+    { pot: 200, call: 25 },
+    { pot: 100, call: 50 },
+  ],
+};
+
+/** Lesson 14: a bankroll of 100 after 55 wins and 45 losses, risking fraction f each time. */
+export function kellyBalance(f: number): number {
+  return 100 * (1 + f) ** 55 * (1 - f) ** 45;
+}

@@ -195,17 +195,27 @@ export function RaiseToBy() {
       <div className="bars" aria-hidden="true">
         <div className="bar-row">
           <span className="bar-label">Big blind</span>
-          <span className="bar-track"><span className="seg-a" style={{ width: "33.3%" }}>2</span></span>
+          <span className="bar-track"><span className="seg-a" style={{ width: "20%" }}>2</span></span>
         </div>
         <div className="bar-row">
           <span className="bar-label">You raise to 6</span>
           <span className="bar-track">
-            <span className="seg-a" style={{ width: "33.3%" }}>2</span>
-            <span className="seg-b" style={{ width: "66.7%" }}>+4 the raise</span>
+            <span className="seg-a" style={{ width: "20%" }}>2</span>
+            <span className="seg-b" style={{ width: "40%" }}>+4 the raise</span>
+          </span>
+        </div>
+        <div className="bar-row">
+          <span className="bar-label">Next full raise</span>
+          <span className="bar-track">
+            <span className="seg-a" style={{ width: "60%" }}>6</span>
+            <span className="seg-b" style={{ width: "40%" }}>+4 or more</span>
           </span>
         </div>
       </div>
-      <figcaption>The big blind is 2. Raising to 6 means 6 in total, which is 4 more: you raised by 4.</figcaption>
+      <figcaption>
+        The big blind is 2. Raising to 6 means 6 in total, which is 4 more: you raised by 4. The next full raise must add
+        at least 4 again, so it's to at least 10 (6 + 4).
+      </figcaption>
     </figure>
   );
 }
@@ -277,16 +287,22 @@ export function SidePotBars() {
             <span className="bar-track">
               <span className="seg-a" style={{ width: width(30) }}>30</span>
               {r.stack > 30 && <span className="seg-b" style={{ width: width(50) }}>50</span>}
-              {r.stack > 80 && <span className="seg-c" style={{ width: width(20) }}>20 back</span>}
+              {r.stack > 80 && <span className="seg-c" style={{ width: width(20) }}>20</span>}
             </span>
           </div>
         ))}
       </div>
-      <figcaption>
-        <span className="key call" /> the main pot: 30 from each player (90), which A, B, and C can win.{" "}
-        <span className="key pot" /> the side pot: 50 more each from B and C (100), which only B and C can win. C's last 20
-        is returned, because nobody could match it.
-      </figcaption>
+      <ul className="pot-labels">
+        <li>
+          <span className="key call" /> <b>Main pot: 30 × 3 = 90.</b> A, B, or C can win it.
+        </li>
+        <li>
+          <span className="key pot" /> <b>Side pot: 50 × 2 = 100.</b> Only B or C can win it.
+        </li>
+        <li>
+          <span className="key returned" /> <b>Returned: 20 to C.</b> Nobody matched it.
+        </li>
+      </ul>
     </figure>
   );
 }

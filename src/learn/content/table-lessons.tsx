@@ -61,43 +61,14 @@ export function Lesson16() {
     <>
       <p>
         When a player goes all-in for less than others bet, they can only win as much from each opponent as they put in
-        themselves (Lesson 6). With three or more players, the others' matched extra chips form a <T>side pot</T> the all-in player can't win. Unmatched chips go back.
+        themselves (Lesson 6). With three or more players, the others' matched extra chips form a <T>side pot</T> the
+        all-in player can't win. Unmatched chips go back.
       </p>
       <h2>An example</h2>
-      <p>Three players are all-in before the flop: A has 30 chips, B has 80, and C has 100.</p>
+      <p>
+        Three players are all-in before the flop: <b>A</b> with 30 chips, <b>B</b> with 80, and <b>C</b> with 100.
+      </p>
       <SidePotBars />
-      <div className="table-wrap">
-        <table className="moves">
-          <thead>
-            <tr>
-              <th scope="col">Pot</th>
-              <th scope="col">Made of</th>
-              <th scope="col">Amount</th>
-              <th scope="col">Who can win it</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Main pot</th>
-              <td>30 from each player</td>
-              <td>90</td>
-              <td>A, B, and C</td>
-            </tr>
-            <tr>
-              <th scope="row">Side pot</th>
-              <td>50 more each from B and C</td>
-              <td>100</td>
-              <td>B and C only</td>
-            </tr>
-            <tr>
-              <th scope="row">Returned</th>
-              <td>C's last 20, which nobody matched</td>
-              <td>20</td>
-              <td>goes back to C</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
       <p>
         <b>Each pot has its own winner.</b> Suppose A has the best hand, B the second best, and C the worst:
       </p>
@@ -112,23 +83,22 @@ export function Lesson16() {
           <b>C gets back 20</b> and loses the other 80.
         </li>
       </ul>
-      <p>So the shortest stack can win at most the main pot. Winning the main pot doesn't mean winning the side pot.</p>
+      <p>So the shortest stack can win at most the main pot.</p>
       <h2>Things to keep straight</h2>
       <ul>
         <li>
-          <b>A side pot isn't a split pot.</b> Side pots are separate pots with different players who can win them. A split
-          pot is one pot shared by tied hands.
+          <b>A side pot isn't a split pot.</b> A split pot is one pot shared by tied hands.
         </li>
         <li>
-          <b>Folded chips stay in.</b> If someone folds after betting, their chips stay in whichever pots they were in, but
-          they can't win any of them.
+          <b>Folded chips stay in</b> the pots they went into, but the player who folded can't win them.
         </li>
         <li>
-          <b>Ties are settled pot by pot.</b> Tied hands share each pot they can win. Any leftover chips go one at a time to the tied players, starting left of the button.
+          <b>Ties are settled pot by pot.</b> Each pot is split equally among its tied winners; any leftover chips go one at
+          a time, starting left of the button.
         </li>
         <li>
-          <b>One all-in doesn't stop the others.</b> Players who still have chips can keep betting against each other, and
-          those bets go into the side pot.
+          <b>One all-in doesn't stop the others.</b> Two or more players with chips can keep betting against each other,
+          into a side pot.
         </li>
       </ul>
     </>

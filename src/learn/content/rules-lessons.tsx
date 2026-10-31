@@ -2,6 +2,7 @@
 import type { ReactNode } from "react";
 import { C } from "../cards";
 import { AllInRefund, BestFiveRows, KickerCompare, RaiseToBy, RankLadder, SeatMap, StreetTimeline } from "../diagrams";
+import { SituationCards } from "../visuals";
 
 function T({ children }: { children: ReactNode }) {
   return <b className="term">{children}</b>;
@@ -181,88 +182,44 @@ export function Lesson4() {
 export function Lesson5() {
   return (
     <>
-      <p>When it's your turn, you choose one move:</p>
-      <div className="table-wrap">
-        <table className="moves">
-          <thead>
-            <tr>
-              <th scope="col">Move</th>
-              <th scope="col">When you can</th>
-              <th scope="col">What it does</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Fold</th>
-              <td>Always</td>
-              <td>Give up the hand. Chips you already put in stay in the pot.</td>
-            </tr>
-            <tr>
-              <th scope="row">Check</th>
-              <td>
-                Only when there's <b>nothing to call</b>
-              </td>
-              <td>Pass without putting in chips.</td>
-            </tr>
-            <tr>
-              <th scope="row">Call</th>
-              <td>When someone bet more than you have in</td>
-              <td>Put in just enough to match the bet.</td>
-            </tr>
-            <tr>
-              <th scope="row">Bet</th>
-              <td>When nobody has bet this round</td>
-              <td>Put in chips that others must match.</td>
-            </tr>
-            <tr>
-              <th scope="row">Raise</th>
-              <td>When someone has bet</td>
-              <td>Put in more than the bet, so others must match the new amount.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
       <p>
-        <b>If you owe chips, you can't check.</b> You can fold, call, or raise if allowed.
+        On your turn, first ask: <b>do you owe chips?</b>
+      </p>
+      <SituationCards />
+      <p>
+        <b>If you owe chips, you can't check.</b> You can fold, call, or raise if allowed. You can always <T>fold</T>: you
+        give up the hand, and chips you already put in stay in the pot. Folding when you could check for free just throws
+        the hand away.
       </p>
       <p>
-        <b>A bet and a raise are the same idea.</b> A bet is the first chips anyone puts in during a betting round. A raise
-        makes an existing bet bigger. After either one, <b>every other player who can still act gets a turn</b> to fold, call, or raise if allowed, including a player who bet earlier and now faces a raise. Nobody has to call. The round ends as Lesson 1 describes.
+        <b>A raise is a bigger bet.</b> After a bet or raise, every other player who can still act gets a turn, including a
+        player who bet earlier. Nobody has to call. The round ends as Lesson 1 describes.
       </p>
-      <h2>Why bet or raise at all?</h2>
-      <p>There are two main reasons:</p>
+      <h2>Why bet or raise?</h2>
       <ul>
         <li>
-          <b>For value:</b> you think your hand is probably best, and you want worse hands to put more chips in the pot.
+          <b>For value:</b> your hand is probably best, and you want worse hands to put in more.
         </li>
         <li>
           <b>As a bluff:</b> your hand is probably worse, and you want better hands to fold.
         </li>
       </ul>
-      <p>
-        With a medium hand, checking or calling is often better. A bet would mostly get called by better hands and fold out
-        worse ones. Lessons after you start playing go deeper into this, including why bluffing has to be part of good play.
-      </p>
-      <p>
-        <b>"Nothing to call" isn't the same as "nobody bet."</b> The big blind already has 2 in. If everyone just calls 2,
-        the big blind has nothing more to put in, so they may check.
-      </p>
+      <p>With a medium hand, checking or calling is often better: betting may make weaker hands fold while stronger hands call.</p>
       <h2>"Raise to" vs. "raise by"</h2>
       <p>
-        This app always uses <b>"raise to"</b>: the total you'll have in for this betting round. The big blind is 2. You{" "}
-        <b>raise to 6</b>. That's 4 more than the big blind, so you <b>raised by 4</b>.
+        This app always says <b>"raise to"</b>: your total for this round. The big blind is 2. You <b>raise to 6</b>: that's
+        4 more, so you <b>raised by 4</b>.
       </p>
       <RaiseToBy />
-      <h2>The minimum bet and raise</h2>
+      <h2>Smallest and largest bets</h2>
       <ul>
         <li>The smallest <b>bet</b> is the big blind (2).</li>
         <li>
-          A full <b>raise</b> must add at least as much as the last full bet or raise this round. If A raises to 6 (by 4), the next
-          player must raise to at least 10 (6 + 4).
+          A full <b>raise</b> must add at least as much as the last full bet or raise this round. After a raise to 6 (by 4),
+          the next full raise is to at least 10.
         </li>
         <li>
-          In No-Limit Hold'em, the only maximum is your stack: you can bet everything you have, which is called going <T>all-in</T>{" "}
-          (Lesson 6).
+          In No-Limit Hold'em, the only maximum is your stack. Betting everything is going <T>all-in</T> (Lesson 6).
         </li>
       </ul>
     </>
