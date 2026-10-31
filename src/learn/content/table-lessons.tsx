@@ -76,6 +76,12 @@ export function Lesson15() {
         <b>More players, stronger hands needed.</b> When several players stay in, it's more likely that someone holds a
         strong hand. A pair that was good heads-up is often behind in a five-way pot.
       </p>
+      <p>
+        <b>About the practice bots.</b> The bots at this table are simplified practice opponents, not strong players. They
+        call more often than careful players do, so you'll often see pots with three or more players. Against players who
+        call a lot, a common guideline is to <b>bet your good hands for value</b> (so worse hands pay you) and{" "}
+        <b>bluff less</b> (a bluff only works when the other players fold).
+      </p>
     </>
   );
 }

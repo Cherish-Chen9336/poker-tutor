@@ -804,6 +804,8 @@ With six players, each seat has a name. They're counted from the button:
 
 **More players, stronger hands needed.** When several players stay in, it's more likely that someone holds a strong hand. A pair that was good heads-up is often behind in a five-way pot.
 
+**About the practice bots.** The bots at this table are simplified practice opponents, not strong players. They call more often than careful players do, so you'll often see pots with three or more players. Against players who call a lot, a common guideline is to **bet your good hands for value** (so worse hands pay you) and **bluff less** (a bluff only works when the other players fold).
+
 ### Quick checks
 
 **L15-Q1.** Six players. Who acts first before the flop?

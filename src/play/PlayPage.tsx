@@ -244,6 +244,12 @@ export default function PlayPage() {
         <ul>
           <li>The bots play a simple, fixed style. Each sees only its own cards, never yours.</li>
           {size === 6 && <li>A bot that runs out of chips is topped back up to 200. If you run out, a new session starts.</li>}
+          {size === 6 && (
+            <li>
+              The bots are simplified practice opponents that call a lot, so expect pots with several players. Against frequent
+              callers, bet your good hands and bluff less.
+            </li>
+          )}
           <li>The coach describes your situation before each move. It doesn't tell you what to do.</li>
           <li>Play chips only. Your hands are saved in this browser, so you can replay them in Review.</li>
         </ul>
