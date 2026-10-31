@@ -770,3 +770,121 @@ This lesson explains the math; it isn't advice about real money.
 - C. Poker doesn't involve risk
 - *Why:* Kelly needs a known chance of winning. In poker the edge is uncertain, so a smaller fraction protects against overestimating it.
 - *Checked by:* review
+
+---
+
+# At a bigger table (Step 6)
+
+These two lessons come with the 6-player table in Play.
+
+## Lesson 15: Position at a six-player table
+
+With six players, each seat has a name. They're counted from the button:
+
+| Seat | Name | Before the flop | After the flop |
+|---|---|---|---|
+| Left of the button | **Small blind (SB)** | acts 5th | acts 1st |
+| Next | **Big blind (BB)** | acts last (6th) | acts 2nd |
+| Next | **Under the gun (UTG)** | acts **first** | acts 3rd |
+| Next | **Hijack (HJ)** | acts 2nd | acts 4th |
+| Next | **Cutoff (CO)** | acts 3rd | acts 5th |
+| The dealer | **Button (BTN)** | acts 4th | acts **last** |
+
+[Diagram: the six-seat table with each seat's name and its place in the order, before and after the flop.]
+
+- **"Under the gun"** is the first player to act before the flop. The name comes from feeling the pressure of acting first.
+- The **cutoff** is the seat just before the button, and the **hijack** is the one before that.
+- After the flop, the order counts only players still in the hand. If the small blind folded, the big blind acts first.
+- The names stay with the seats for the whole hand, even after other players fold. They move one seat to the left with the button for the next hand.
+
+**Why position matters even more with six players:**
+- **Acting first is harder.** From under the gun, five players act after you, and any of them could hold a strong hand. A common guideline is to play only your stronger starting hands from early seats.
+- **Acting last is easier.** On the button, you've seen what everyone else did before you choose, and you act last on every round after the flop. A common guideline is to play more hands from late seats.
+- **The cards don't change; the information does.** Position doesn't make your cards better. It lets you decide with more information.
+
+**More players, stronger hands needed.** When several players stay in, it's more likely that someone holds a strong hand. A pair that was good heads-up is often behind in a five-way pot.
+
+### Quick checks
+
+**L15-Q1.** Six players. Who acts first before the flop?
+- A. The small blind
+- B. **Under the gun (the seat left of the big blind)** ✓
+- C. The button
+- *Why:* Before the flop, the first player to act sits just left of the big blind. The blinds act last.
+- *Checked by:* table
+
+**L15-Q2.** Six players, everyone still in after the flop. Who acts first?
+- A. **The small blind** ✓
+- B. Under the gun
+- C. The button
+- *Why:* After the flop, the first player still in the hand left of the button acts first. The button acts last.
+- *Checked by:* table
+
+**L15-Q3.** Why do many players play fewer hands from under the gun than from the button?
+- A. The cards are worse in early seats
+- B. **Five players still act after them, and they act first after the flop too** ✓
+- C. Under the gun pays a bigger blind
+- *Why:* Early seats decide with the least information. The cards are random in every seat.
+- *Checked by:* review
+
+---
+
+## Lesson 16: Side pots
+
+When a player goes all-in for less than others bet, they can only win as much from each opponent as they put in themselves (Lesson 6). With three or more players, the chips beyond that go into a **side pot** that the all-in player can't win.
+
+**Example.** Three players are all-in before the flop:
+- **A** has 30 chips.
+- **B** has 80 chips.
+- **C** has 100 chips.
+
+[Diagram: three stacked bars of 30, 80, and 100 chips, sliced into the main pot (30 from each), the side pot (50 each from B and C), and C's unmatched 20.]
+
+| Pot | Made of | Amount | Who can win it |
+|---|---|---|---|
+| **Main pot** | 30 from each player | 90 | A, B, and C |
+| **Side pot** | 50 more each from B and C | 100 | B and C only |
+| **Returned** | C's last 20, which nobody matched | 20 | goes back to C |
+
+**Each pot has its own winner.** Suppose A has the best hand, B the second best, and C the worst:
+- **A wins the main pot (90).** A beat both other players.
+- **B wins the side pot (100).** A can't win it, so it goes to the better hand between B and C.
+- **C gets back 20** and loses the other 80.
+
+So the shortest stack can win at most the main pot. Winning the main pot doesn't mean winning the side pot.
+
+**Things to keep straight:**
+- **A side pot isn't a split pot.** Side pots are separate pots with different players who can win them. A split pot is one pot shared by tied hands.
+- **Folded chips stay in.** If someone folds after betting, their chips stay in whichever pots they were in, but they can't win any of them.
+- **Ties are settled pot by pot.** Tied hands share each pot they can win. If a pot can't be split evenly, the leftover chip goes to the tied player sitting first to the left of the button.
+- **One all-in doesn't stop the others.** Players who still have chips can keep betting against each other, and those bets go into the side pot.
+
+### Quick checks
+
+**L16-Q1.** A is all-in for 30, B for 80, and C bets 100. How big is the main pot?
+- A. 30
+- B. **90** ✓
+- C. 210
+- *Why:* Each player can match 30, so the main pot is 30 × 3 = 90.
+- *Checked by:* table
+
+**L16-Q2.** In that hand, A has the best hand and B the second best. Who wins the side pot of 100?
+- A. A
+- B. **B** ✓
+- C. It's split between A and B
+- *Why:* A didn't put chips into the side pot, so A can't win it. B beats C for it.
+- *Checked by:* table
+
+**L16-Q3.** What happens to C's last 20 chips?
+- A. They go to the main pot
+- B. They go to the side pot
+- C. **They go back to C** ✓
+- *Why:* Nobody had chips to match them, so they're returned.
+- *Checked by:* table
+
+**L16-Q4.** What's the difference between a side pot and a split pot?
+- A. **A side pot is a separate pot some players can't win; a split pot is one pot shared by tied hands** ✓
+- B. They're the same thing
+- C. A split pot only happens with side pots
+- *Why:* Side pots exist when someone is all-in for less. Splits happen when hands tie.
+- *Checked by:* review

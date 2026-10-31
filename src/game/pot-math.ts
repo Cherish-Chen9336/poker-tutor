@@ -12,7 +12,8 @@ export interface CallPrice {
   toCall: number;
   /**
    * Everything a call can win, including the player's own call. Opposing chips
-   * above what the player can match are excluded: they'd be refunded.
+   * above what the player can match are excluded: they'd be refunded, or go to
+   * a side pot this player can't win.
    */
   potIfCalled: number;
   /** The chance of winning a call needs to break even, if the call ends the betting: toCall ÷ potIfCalled. */
@@ -23,7 +24,9 @@ export interface CallPrice {
 export function callPrice(view: TableView, seat: number): CallPrice | null {
   const me = view.seats[seat];
   if (!me) return null;
-  const highest = Math.max(0, ...view.seats.map((s) => s?.betThisStreet ?? 0));
+  // Before the flop, a short big blind still counts as the full blind: callers owe the whole amount.
+  const bets = Math.max(0, ...view.seats.map((s) => s?.betThisStreet ?? 0));
+  const highest = view.street === "preflop" ? Math.max(bets, view.bigBlind) : bets;
   if (highest <= me.betThisStreet) return null;
   const toCall = Math.min(highest - me.betThisStreet, me.stack);
   const myTotal = me.betThisStreet + toCall;

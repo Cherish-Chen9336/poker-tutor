@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { callPrice, potTotal, sizedTo } from "./pot-math";
+import { Table } from "./table";
 import type { LegalMoves, TableView } from "./types";
 
 /** A heads-up view from seat 0's side with the given pot, bets, and stacks. */
@@ -47,5 +48,37 @@ describe("pot math", () => {
     expect(sizedTo(view(40, [0, 20], [100, 80]), 0, raiseLegal, 0.5)).toBe(60);
     expect(sizedTo(view(40, [0, 20], [100, 80]), 0, raiseLegal, 0.1)).toBe(40); // clamped to the minimum raise
     expect(sizedTo(view(40, [0, 20], [100, 80]), 0, { ...raiseLegal, raise: null }, 0.5)).toBeNull();
+  });
+
+  it("owes the same amount the engine does, at every decision of random multi-player hands", () => {
+    let seed = 99;
+    const random = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    let decisions = 0;
+    let shortBlindSeen = false;
+    for (let hand = 0; hand < 400; hand++) {
+      const n = 2 + Math.floor(random() * 5);
+      const stacks = Array.from({ length: n }, (_, seat) => ((seat === 2 || (n === 2 && seat === 1)) && random() < 0.25 ? 1 : 5 + Math.floor(random() * 200)));
+      const table = new Table({ seats: stacks.map((stack, i) => ({ id: `p${i}`, name: `P${i}`, stack })), smallBlind: 1, bigBlind: 2, random });
+      table.dealHand();
+      for (let guard = 0; guard < 80 && !table.view(null).handOver; guard++) {
+        const seat = table.view(null).actionTo;
+        if (seat === null) break;
+        const legal = table.legalMoves(seat)!;
+        const view = table.view(seat);
+        const price = callPrice(view, seat);
+        expect(price?.toCall ?? null, JSON.stringify({ stacks, seat, street: view.street })).toBe(legal.call);
+        if (view.street === "preflop" && stacks[2] === 1 && n > 2) shortBlindSeen = true;
+        decisions++;
+        const pick = random();
+        const move =
+          pick < 0.15 && legal.call !== null ? { type: "fold" as const }
+          : pick < 0.35 && legal.raise ? { type: "raise" as const, to: legal.raise.min }
+          : pick < 0.45 && legal.bet ? { type: "bet" as const, to: legal.bet.min }
+          : legal.check ? { type: "check" as const } : { type: "call" as const };
+        expect(table.move(seat, move).ok).toBe(true);
+      }
+    }
+    expect(decisions).toBeGreaterThan(2000);
+    expect(shortBlindSeen).toBe(true);
   });
 });
