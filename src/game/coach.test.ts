@@ -43,7 +43,7 @@ describe("coach", () => {
   it("names the hand, draws counted once, and board threats", () => {
     const lines = text(view(["8h", "7h"], ["6h", "5c", "Kh"], { pot: 10 }));
     expect(lines).toContain("Your best five: {Kh} {8h} {7h} {6h} {5c}, high card.");
-    expect(lines).toContain("15 unseen cards could complete a flush or straight on the turn or river. Some could still lose, for example to a bigger flush or a full house.");
+    expect(lines).toContain("15 unseen cards could complete a flush or straight on the turn or river. Even then, a stronger hand could still beat you.");
     expect(lines).toContain("Nothing to call: you can check for free.");
   });
 

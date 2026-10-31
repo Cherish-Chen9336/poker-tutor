@@ -22,20 +22,42 @@ export function loadHands(storage: Storage | null): HandRecord[] {
   }
 }
 
-function isView(value: unknown): boolean {
-  const v = value as { seats?: unknown; board?: unknown; street?: unknown; pots?: unknown };
+const CARD = /^[2-9TJQKA][shdc]$/;
+const STATUSES = ["active", "folded", "all-in", "out"];
+const STREETS = ["preflop", "flop", "turn", "river", "showdown"];
+const MOVES = ["fold", "check", "call", "bet", "raise"];
+const isNumber = (v: unknown) => typeof v === "number" && Number.isFinite(v);
+
+function isSeat(value: unknown): boolean {
+  const s = value as { seat?: unknown; stack?: unknown; betThisStreet?: unknown; status?: unknown; cards?: unknown; name?: unknown };
   return (
-    typeof v === "object" && v !== null && Array.isArray(v.seats) && v.seats.length === 2 &&
-    v.seats.every((seat) => seat === null || (typeof seat === "object" && typeof (seat as { stack?: unknown }).stack === "number")) &&
-    Array.isArray(v.board) && v.board.every((c) => typeof c === "string") && typeof v.street === "string" && Array.isArray(v.pots)
+    typeof s === "object" && s !== null && isNumber(s.seat) && isNumber(s.stack) && isNumber(s.betThisStreet) &&
+    typeof s.name === "string" && STATUSES.includes(s.status as string) &&
+    (s.cards === null || (Array.isArray(s.cards) && s.cards.length === 2 && s.cards.every((c) => c === null || (typeof c === "string" && CARD.test(c)))))
+  );
+}
+
+/** Every part of a table view that the Review screen reads. */
+function isView(value: unknown): boolean {
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v === "object" && v !== null && isNumber(v.viewerSeat) && STREETS.includes(v.street as string) &&
+    Array.isArray(v.seats) && v.seats.length === 2 && v.seats.every(isSeat) &&
+    Array.isArray(v.board) && v.board.length <= 5 && v.board.every((c) => typeof c === "string" && CARD.test(c)) &&
+    Array.isArray(v.pots) && v.pots.every((p) => typeof p === "object" && p !== null && isNumber((p as { amount?: unknown }).amount) && Array.isArray((p as { eligibleSeats?: unknown }).eligibleSeats)) &&
+    (v.buttonSeat === null || isNumber(v.buttonSeat)) && isNumber(v.smallBlind) && isNumber(v.bigBlind) && typeof v.handOver === "boolean" &&
+    (v.winners === null || (Array.isArray(v.winners) && v.winners.every((w) => typeof w === "object" && w !== null && isNumber((w as { seat?: unknown }).seat) && isNumber((w as { amount?: unknown }).amount))))
   );
 }
 
 function isMove(value: unknown): boolean {
-  const m = value as { who?: unknown; move?: { type?: unknown }; view?: unknown; after?: unknown; legal?: unknown };
+  const m = value as { who?: unknown; move?: { type?: unknown; to?: unknown }; view?: unknown; after?: unknown; legal?: unknown };
+  const move = m?.move;
   return (
-    typeof m === "object" && m !== null && (m.who === "you" || m.who === "bot") && typeof m.move?.type === "string" &&
-    isView(m.view) && isView(m.after) && (m.legal === null || typeof m.legal === "object")
+    typeof m === "object" && m !== null && (m.who === "you" || m.who === "bot") &&
+    typeof move === "object" && move !== null && MOVES.includes(move.type as string) &&
+    (move.type !== "bet" && move.type !== "raise" ? true : isNumber(move.to)) &&
+    isView(m.view) && isView(m.after) && (m.legal === null || (typeof m.legal === "object" && m.legal !== null))
   );
 }
 
@@ -45,7 +67,9 @@ export function isHandRecord(value: unknown): value is HandRecord {
   return (
     typeof r === "object" && r !== null && r.version === 1 && typeof r.id === "string" && typeof r.botVersion === "string" &&
     typeof r.matchNumber === "number" && typeof r.handNumber === "number" && Array.isArray(r.startStacks) &&
-    r.startStacks.length === 2 && Array.isArray(r.moves) && r.moves.every(isMove) && isView(r.final) && typeof r.net === "number"
+    r.startStacks.length === 2 && r.startStacks.every(isNumber) && Array.isArray(r.moves) && r.moves.every(isMove) &&
+    isView(r.final) && (r.final as { handOver?: unknown }).handOver === true && Array.isArray((r.final as { winners?: unknown }).winners) &&
+    isNumber(r.net)
   );
 }
 

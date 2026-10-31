@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { HandRecord, RecordedMove } from "../game/match";
 import type { TableView } from "../game/types";
+import { practiceBot } from "../game/bot";
+import { Match } from "../game/match";
 import { isHandRecord, loadHands, MAX_BYTES, MAX_HANDS, saveHands, trimHands } from "./hand-store";
 
 function memoryStorage(fail = false): Storage {
@@ -33,7 +35,7 @@ function record(n: number, padding = 0): HandRecord {
   const move: RecordedMove = { who: "you", move: { type: "check" }, view: view(), after: view(), legal: null };
   return {
     version: 1, id: `h${n}`, botVersion: "bot-1", matchNumber: 1, handNumber: n, startStacks: [200, 200],
-    moves: [move], final: view("x".repeat(padding)), net: 0,
+    moves: [move], final: { ...view("x".repeat(padding)), handOver: true, winners: [{ seat: 0, amount: 4, bestHand: null, description: null }] }, net: 0,
   };
 }
 
@@ -74,6 +76,15 @@ describe("saved hands", () => {
     expect(isHandRecord({ ...record(1), moves: [null] })).toBe(false);
     expect(isHandRecord({ ...record(1), final: {} })).toBe(false);
     expect(isHandRecord({ ...record(1), moves: [{ ...record(1).moves[0], after: { seats: "x" } }] })).toBe(false);
+    // Codex's verification cases: each of these used to pass the checks and crash Review.
+    const good = record(1);
+    const withView = (change: Partial<TableView>) => ({ ...good, moves: [{ ...good.moves[0], view: { ...good.moves[0].view, ...change } }] });
+    expect(isHandRecord(withView({ seats: [null, null] }))).toBe(false);
+    expect(isHandRecord(withView({ viewerSeat: undefined as never }))).toBe(false);
+    expect(isHandRecord(withView({ board: ["XX", "7d", "9h"] }))).toBe(false);
+    expect(isHandRecord(withView({ pots: [null as never] }))).toBe(false);
+    expect(isHandRecord({ ...good, moves: [{ ...good.moves[0], move: { type: "dance" } as never }] })).toBe(false);
+    expect(isHandRecord({ ...good, final: { ...good.final!, handOver: false } })).toBe(false);
   });
 
   it("drops a single record too big to fit, and trims when loading", () => {
@@ -81,5 +92,21 @@ describe("saved hands", () => {
     const storage = memoryStorage();
     storage.setItem("poker-tutor:hands", JSON.stringify({ version: 1, hands: Array.from({ length: 70 }, (_, i) => record(i)) }));
     expect(loadHands(storage)).toHaveLength(MAX_HANDS);
+  });
+
+  it("accepts every real hand recorded by a match", () => {
+    let seed = 7;
+    const random = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const match = new Match({ bot: practiceBot, random, botRandom: random });
+    for (let n = 0; n < 200; n++) {
+      match.dealNext();
+      while (!match.handOver) {
+        const legal = match.legalMoves()!;
+        const pick = random();
+        match.act(pick < 0.15 ? { type: "fold" } : legal.check ? { type: "check" } : pick < 0.3 && legal.raise ? { type: "raise", to: legal.raise.max } : { type: "call" });
+      }
+      const saved = JSON.parse(JSON.stringify({ ...match.current!, id: `r${n}`, playedAt: "2026-10-31T00:00:00Z" }));
+      expect(isHandRecord(saved), `hand ${n}`).toBe(true);
+    }
   });
 });

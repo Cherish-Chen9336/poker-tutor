@@ -98,7 +98,7 @@ export function coachLines(view: TableView): CoachLine[] {
       const more = view.board.length === 3 ? "on the turn or river" : "on the river";
       lines.push({
         topic: "draw",
-        text: `${read.drawCards.length} unseen cards could complete a ${kinds} ${more}. Some could still lose, for example to a bigger flush or a full house.`,
+        text: `${read.drawCards.length} unseen cards could complete a ${kinds} ${more}. Even then, a stronger hand could still beat you.`,
       });
     }
     for (const note of boardThreats(view.board)) lines.push({ topic: "board", text: note });
