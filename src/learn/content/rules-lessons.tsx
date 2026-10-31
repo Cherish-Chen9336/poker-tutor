@@ -13,26 +13,26 @@ export function Lesson1() {
     <>
       <p>
         <b>The goal is to win chips.</b> Each hand, players put chips into a shared pile in the middle called the{" "}
-        <T>pot</T>. Whoever wins the hand takes the pot. The chips you have in front of you are your <T>stack</T>.
+        <T>pot</T>. Whoever wins the hand takes the pot. The chips in front of you are your <T>stack</T>.
       </p>
       <h2>Two ways to win a pot</h2>
       <ol>
         <li>
           <b>Everyone else folds.</b> To <T>fold</T> means to give up the hand. If every other player folds, you win the
-          pot at once. You don't even show your cards. This happens in many hands.
+          pot at once, without showing your cards. This happens in many hands.
         </li>
         <li>
-          <b>The showdown.</b> If two or more players are still in after the last betting round, they turn their cards
-          face up. The best five-card hand wins.
+          <b>The showdown.</b> If two or more players are still in after the last betting round, they show their cards. The
+          best five-card hand wins; equal hands share the pot.
         </li>
       </ol>
-      <p>So you can win with the best cards, or by making everyone else give up. Most of poker is deciding which hands to keep playing.</p>
       <h2>A hand has four betting rounds</h2>
-      <p>Between them, shared cards are dealt face up in the middle of the table:</p>
+      <p>Before each one, cards are dealt:</p>
       <StreetTimeline />
       <p>
-        After each deal there's a betting round. In it, players take turns choosing to bet, match a bet, or fold (Lesson 5
-        explains each move). A betting round ends when everyone still in has matched the biggest bet or is all-in, and everyone who can still act has had a turn. Then the hand moves on.
+        In each betting round, players take turns to bet, match a bet, or fold (Lesson 5 explains each move). A betting
+        round ends when everyone still in has matched the biggest bet or is all-in, and everyone who still has a decision to
+        make has had a turn. Then the hand moves on.
       </p>
       <p>
         <b>Before any cards are dealt,</b> two players must put in forced bets called <T>blinds</T>, so there's always
@@ -53,29 +53,11 @@ export function Lesson2() {
         <b>Your hand is the best 5 cards out of these 7.</b> You can use both hole cards, just one, or even none:
       </p>
       <BestFiveRows />
-      <ul>
-        <li>
-          <b>Both cards:</b> You hold <C c="5c" /> <C c="5d" />, and the board is <C c="5h" /> <C c="Kd" /> <C c="9c" />{" "}
-          <C c="2s" /> <C c="3d" />. Your best hand is three fives plus K and 9.
-        </li>
-        <li>
-          <b>One card:</b> You hold <C c="Ah" /> <C c="3c" />, and the board is <C c="Kh" /> <C c="9h" /> <C c="6h" />{" "}
-          <C c="2h" /> <C c="Ts" />. Your best hand is a flush in hearts: <C c="Ah" /> plus the board's four hearts. Your{" "}
-          <C c="3c" /> doesn't count.
-        </li>
-        <li>
-          <b>No cards ("playing the board"):</b> You hold <C c="Js" /> <C c="Jd" />, and the board is <C c="As" />{" "}
-          <C c="Ad" /> <C c="Kc" /> <C c="Kh" /> <C c="Qs" />. The best hand is A-A-K-K-Q, which is all on the board. Your
-          pair of jacks doesn't help, because a hand has only 5 cards. An opponent holding <C c="3c" /> <C c="2d" /> has
-          exactly the same hand, so you'd split the pot.
-        </li>
-      </ul>
       <h2>Read the board for what's possible</h2>
       <p>
-        Every player shares the same board, so ask: "What's the best hand anyone could have here?" The best possible hand on
-        a given board is called <T>the nuts</T>. On <C c="Ks" /> <C c="9h" /> <C c="4c" /> <C c="2d" /> <C c="7s" />,
-        nobody can have a straight or a flush, and with no pair on the board, nobody can have a full house. The nuts is three
-        kings, from a player holding two kings.
+        Ask: "What's the best hand anyone could have here?" The best possible hand on a board is called <T>the nuts</T>. On{" "}
+        <C c="Ks" /> <C c="9h" /> <C c="4c" /> <C c="2d" /> <C c="7s" />, nobody can have a straight or a flush, and with no
+        pair on the board, nobody can have a full house. The nuts is three kings, from a player holding two kings.
       </p>
       <h2>Starting hands</h2>
       <p>
@@ -93,32 +75,32 @@ export function Lesson3() {
       <p>From strongest to weakest, with how often each comes up:</p>
       <RankLadder />
       <p>
-        <b>How often</b> is the chance that your 7 cards (your 2 plus all 5 on the board) make that hand as their best, if
-        you see the river. These numbers were counted exactly over all 133,784,560 possible 7-card combinations. They're
-        not your chance of <i>winning</i>: your opponents get 7 cards too.
+        <b>How often</b> means: how often 7 random cards (your 2 plus the 5 on the board) make that hand as their best,
+        counted exactly over all 133,784,560 possible 7-card combinations. It's not your chance of <i>winning</i>: your
+        opponents get 7 cards too.
       </p>
       <p>
         <b>Notice:</b> with 7 cards, one pair (43.8%) and two pair (23.5%) are more common than no pair at all (17.4%).
-        That's why a single pair is often not enough to win. Hand rankings come from how rare each hand is in 5-card poker.
-        With 7 cards the order stays the same, with one exception: no pair at all becomes rarer than one pair or two pair.
+        That's why a single pair is often not enough to win. The ranking follows how rare hands are in five-card poker.
+        Seven-card frequencies don't change which hand wins.
       </p>
       <h2>Three rules that surprise beginners</h2>
       <ol>
         <li>
-          <b>The ace can be low in a straight:</b> A-2-3-4-5 is a straight (the lowest one). But a straight can't wrap
-          around, so Q-K-A-2-3 is not a straight.
+          <b>The ace can be low in a straight:</b> A-2-3-4-5 is the lowest straight. A straight can't wrap around: Q-K-A-2-3
+          is not a straight.
         </li>
         <li>
-          <b>Suits never break ties.</b> No suit beats another. On <C c="Qd" /> <C c="Jc" /> <C c="Th" /> <C c="2s" />{" "}
-          <C c="3c" />, <C c="Ah" /> <C c="Kh" /> and <C c="As" /> <C c="Ks" /> both make the same straight and tie. (A suit
-          only matters when five cards of it make a flush. On a board with three hearts, <C c="Ah" /> <C c="Kh" /> would
-          make a flush and win.)
+          <b>Suits never break ties.</b> On <C c="Qd" /> <C c="Jc" /> <C c="Th" /> <C c="2s" /> <C c="3c" />,{" "}
+          <C c="Ah" /> <C c="Kh" /> and <C c="As" /> <C c="Ks" /> both make the same straight and tie. (A suit only matters
+          when five cards of it make a flush. On a board with three hearts, <C c="Ah" /> <C c="Kh" /> would make a flush and
+          win.)
         </li>
         <li>
           <b>A flush beats a straight.</b> Flushes are harder to make.
         </li>
       </ol>
-      <p>When two hands are the same type, the higher cards win. Lesson 7 covers how ties are broken.</p>
+      <p>When two hands are the same kind, Lesson 7 shows how they're compared.</p>
     </>
   );
 }
@@ -127,53 +109,45 @@ export function Lesson4() {
   return (
     <>
       <p>
-        <T>The button</T> is a marker showing which player is the "dealer" for this hand. It moves one seat to the left
-        (clockwise) after every hand, so everyone takes turns.
+        <T>The button</T> marks the "dealer" for this hand. It moves one seat to the left (clockwise) after every hand, so
+        everyone takes turns.
       </p>
       <h2>The blinds</h2>
-      <p>The blinds are the forced bets that start each pot:</p>
+      <p>The blinds are forced bets paid before anyone sees cards. With three or more players:</p>
       <ul>
         <li>
-          The <T>small blind (SB)</T> sits just left of the button and puts in 1 chip.
+          The <T>small blind (SB)</T>, just left of the button, puts in 1 chip.
         </li>
         <li>
-          The <T>big blind (BB)</T> sits next to the small blind and puts in 2 chips.
+          The <T>big blind (BB)</T>, next to the small blind, puts in 2 chips.
         </li>
       </ul>
-      <p>They're called "blinds" because they're paid before seeing any cards.</p>
+      <p>Posting a blind happens automatically before the cards are dealt; it doesn't replace that player's turn.</p>
       <p>
-        <b>Posting the blinds isn't a turn.</b> The small blind and big blind put in their chips automatically before the
-        cards are dealt. Then the real choices begin.
+        <b>You'll play heads-up (two players) first.</b> There, the button also posts the small blind. The button acts{" "}
+        <b>first</b> before the flop and <b>last</b> after the flop.
       </p>
       <h2>Order of play</h2>
-      <p>It always goes to the left (clockwise). Try the buttons to compare:</p>
-      <SeatMap />
+      <SeatMap initialPlayers={2} />
+      <p>It always goes to the left (clockwise):</p>
       <ul>
         <li>
-          <b>Preflop:</b> the first player to act sits just left of the big blind. The action goes around the table, and the
-          blinds choose <b>last</b>: the small blind, then the big blind. With 6 players, the order is: the seat left of the
-          big blind, the next two seats, the button, the small blind, and the big blind. The blinds act last because their
-          chips already count as bets.
+          <b>Before the flop,</b> action starts left of the big blind and ends with the blinds: the small blind, then the big
+          blind.
         </li>
         <li>
-          <b>Flop, turn, and river:</b> the first player still in the hand left of the button acts first.{" "}
+          <b>After the flop,</b> the first player left of the button who can still act goes first.{" "}
           <b>The button acts last.</b>
         </li>
       </ul>
-      <p>
-        <b>With only two players ("heads-up")</b> the order flips before the flop. The button posts the small blind and acts
-        first preflop. The other player posts the big blind. From the flop on, the big blind acts first and the button acts
-        last, as usual. You'll play heads-up first, so this matters right away.
-      </p>
       <h2>Why acting last is an advantage</h2>
       <p>
-        The player who acts last sees what everyone else did before deciding. If the others check, you might take the pot
-        with a bet. If someone bets big, you can fold cheaply. Your place in the order is called your <T>position</T>.
-        Acting last is "being in position."
+        You see what everyone else did before deciding. If they check, you might take the pot with a bet. If someone bets
+        big, you can fold cheaply. Your place in the order is your <T>position</T>; acting last is "being in position."
       </p>
       <p>
         <b>The big blind's option.</b> If everyone just calls the big blind before the flop, the big blind can still check
-        (end the round) or raise. This is called the big blind's <T>option</T>.
+        (ending the round) or raise. This is the big blind's <T>option</T>.
       </p>
     </>
   );
@@ -235,27 +209,25 @@ export function Lesson6() {
       </p>
       <h2>When you can't afford a call</h2>
       <p>
-        Heads-up, your opponent bets 100, and you have only 30. You may still call for 30, all-in. You can only win as much from your
-        opponent as you put in yourself, so <b>the 70 nobody matched goes back to your opponent</b>.
+        Heads-up, your opponent bets 100, and you have only 30. You may still call for 30, all-in. You can only win as much
+        from your opponent as you put in yourself, so <b>the 70 nobody matched goes back to your opponent</b>.
       </p>
       <AllInRefund />
       <p>
-        <b>Heads-up, when your opponent is all-in and you owe chips:</b> you can only call or fold. Nobody is left to match a raise.
+        <b>Heads-up, when your opponent is all-in and you owe chips:</b> you can only call or fold. Nobody is left to match
+        a raise.
       </p>
       <p>
-        <b>Heads-up, after an all-in is called,</b> no more betting can happen. The remaining shared cards are simply dealt
-        out ("run out"), and then the showdown decides.
-      </p>
-      <p>
-        <b>An all-in can be smaller than a minimum raise.</b> If the minimum raise is to 10 and you have only 8, you may
-        still go all-in for 8.
+        <b>Heads-up, after an all-in is called,</b> no more betting can happen. The remaining shared cards are dealt out
+        ("run out"), and the showdown decides.
       </p>
       <p>
         <b>More than two players?</b> Two things change, and you'll practice both at a bigger table later:
       </p>
       <ul>
         <li>
-          The players who still have chips can keep betting against each other. Their matched extra chips go into a{" "} <T>side pot</T> the all-in player can't win; unmatched chips go back.
+          The players who still have chips can keep betting against each other. Their matched extra chips go into a{" "}
+          <T>side pot</T> the all-in player can't win; unmatched chips go back.
         </li>
         <li>
           <b>A short all-in may not reopen the betting.</b> A player who already bet or raised can raise again only if the
@@ -264,7 +236,6 @@ export function Lesson6() {
           several short all-ins add up to a full raise, A may raise again.
         </li>
       </ul>
-      <p>Heads-up never needs side pots.</p>
     </>
   );
 }
@@ -275,23 +246,23 @@ export function Lesson7() {
       <p>At the showdown, the remaining players show their cards, and the best five-card hand wins.</p>
       <h2>Kickers can decide otherwise matching hands</h2>
       <p>
-        A <T>kicker</T> is a card that doesn't make up the pair or other combination but still counts toward the 5. Board:{" "}
-        <C c="Ad" /> <C c="8c" /> <C c="4s" /> <C c="9h" /> <C c="2c" />. You hold <C c="As" /> <C c="Kd" />; your
+        A <T>kicker</T> is a card that doesn't make up the pair or other combination but still counts toward the 5. First
+        compare the pair (or other combination); if it matches, compare the other cards one at a time, highest first.
+      </p>
+      <p>
+        Board: <C c="Ad" /> <C c="8c" /> <C c="4s" /> <C c="9h" /> <C c="2c" />. You hold <C c="As" /> <C c="Kd" />; your
         opponent holds <C c="Ac" /> <C c="Qh" />.
       </p>
       <KickerCompare />
       <p>
-        Both have a pair of aces. Compare the next-highest cards: your K beats their Q. <b>You win.</b> Kickers are compared
-        one at a time, highest first, until one is different.
-      </p>
-      <p>
         <b>Sometimes the kicker is on the board.</b> Board: <C c="As" /> <C c="Kc" /> <C c="Ks" /> <C c="Qd" />{" "}
-        <C c="Jh" />. You hold <C c="Ac" /> <C c="3d" />; your opponent holds <C c="Ad" /> <C c="4h" />. Both best hands
-        are A-A-K-K-Q. Your 3 and their 4 don't play, so you <b>split the pot</b>.
+        <C c="Jh" />. You hold <C c="Ac" /> <C c="3d" />; your opponent holds <C c="Ad" /> <C c="4h" />. Neither the 3 nor
+        the 4 is among the best five cards: both players have A-A-K-K-Q, so you <b>split the pot</b>.
       </p>
       <h2>Split pots</h2>
       <p>
-        When hands are exactly equal, the pot is shared equally. Any leftover chips go one at a time to the tied players, starting left of the button.
+        When hands are exactly equal, the pot is shared equally. Any leftover chips go one at a time to the tied players,
+        starting left of the button.
       </p>
       <h2>Showing and mucking</h2>
       <p>

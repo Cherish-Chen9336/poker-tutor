@@ -1,6 +1,6 @@
 # Step 1b, batch 2a: simpler text and visuals (lessons 1, 2, 3, 4, 6, 7)
 
-Each lesson below is the complete proposed text; it replaces the lesson's current text (quizzes unchanged). **[Visual: …]** describes a new or changed picture. Pinned facts (the sentences the tests check) are kept word for word.
+Each lesson below is the complete proposed text; it replaces the lesson's current text (quizzes unchanged). **[Visual: …]** describes a new or changed picture. Pinned facts (the sentences the tests check) are kept word for word. Reviewed by Codex ("approve with changes"; changes applied, except Lesson 1 uses "everyone who still has a decision to make has had a turn" instead of "after all required turns").
 
 ---
 
@@ -16,7 +16,7 @@ Each lesson below is the complete proposed text; it replaces the lesson's curren
 
 [Visual: the existing timeline (Preflop: 2 private cards each; Flop: 3 shared cards; Turn: a 4th; River: the 5th; "then a betting round" after each), plus a side note on it: "Everyone else folds → the hand ends at once, with no more cards."]
 
-In each betting round, players take turns to bet, match a bet, or fold (Lesson 5 explains each move). A betting round ends when everyone still in has matched the biggest bet or is all-in, and everyone who can still act has had a turn. Then the hand moves on.
+In each betting round, players take turns to bet, match a bet, or fold (Lesson 5 explains each move). A betting round ends when everyone still in has matched the biggest bet or is all-in, and everyone who still has a decision to make has had a turn. Then the hand moves on.
 
 **Before any cards are dealt,** two players must put in forced bets called **blinds**, so there's always something to win. Lesson 4 explains who pays them.
 
@@ -31,9 +31,9 @@ You get **2 private cards** (your **hole cards**). Nobody else sees them. The **
 **Your hand is the best 5 cards out of these 7.** You can use both hole cards, just one, or even none:
 
 [Visual: the existing three rows, each showing your 2 cards and the board with the 5 cards that count highlighted. New result labels:
-- **Uses 2 of your cards:** three fives (5♣ 5♦ 5♥, plus K and 9).
-- **Uses 1:** a flush in hearts (A♥ plus the board's four hearts). Your 3♣ doesn't count.
-- **Uses 0:** A-A-K-K-Q, all from the board. Your jacks don't play, so an opponent holding 3♣ 2♦ has the same hand and you split the pot.]
+- **Uses 2 private cards:** three fives (5♣ 5♦ 5♥, plus K and 9).
+- **Uses 1 private card:** a flush in hearts (A♥ plus the board's four hearts). Your 3♣ doesn't count.
+- **Uses 0 private cards:** A-A-K-K-Q, all from the board. Your jacks don't play, so an opponent holding 3♣ 2♦ has the same hand and you split the pot.]
 
 **Read the board for what's possible.** Ask: "What's the best hand anyone could have here?" The best possible hand on a board is called **the nuts**. On K♠ 9♥ 4♣ 2♦ 7♠, nobody can have a straight or a flush, and with no pair on the board, nobody can have a full house. The nuts is three kings, from a player holding two kings.
 
@@ -51,11 +51,11 @@ From strongest to weakest, with how often each comes up:
 
 **How often** means: how often 7 random cards (your 2 plus the 5 on the board) make that hand as their best, counted exactly over all 133,784,560 possible 7-card combinations. It's not your chance of *winning*: your opponents get 7 cards too.
 
-**Notice:** with 7 cards, one pair (43.8%) and two pair (23.5%) are more common than no pair at all (17.4%). That's why a single pair is often not enough to win. The ranking comes from 5-card poker; with 7 cards only "no pair" moves out of that order.
+**Notice:** with 7 cards, one pair (43.8%) and two pair (23.5%) are more common than no pair at all (17.4%). That's why a single pair is often not enough to win. The ranking follows how rare hands are in five-card poker. Seven-card frequencies don't change which hand wins.
 
 **Three rules that surprise beginners:**
 1. **The ace can be low in a straight:** A-2-3-4-5 is the lowest straight. A straight can't wrap around: Q-K-A-2-3 is not a straight.
-2. **Suits never break ties.** On Q♦ J♣ 10♥ 2♠ 3♣, A♥ K♥ and A♠ K♠ make the same straight and tie. (A suit only matters when five cards of it make a flush. On a board with three hearts, A♥ K♥ would make a flush and win.)
+2. **Suits never break ties.** On Q♦ J♣ 10♥ 2♠ 3♣, A♥ K♥ and A♠ K♠ both make the same straight and tie. (A suit only matters when five cards of it make a flush. On a board with three hearts, A♥ K♥ would make a flush and win.)
 3. **A flush beats a straight.** Flushes are harder to make.
 
 When two hands are the same kind, Lesson 7 shows how they're compared.
@@ -68,7 +68,7 @@ When two hands are the same kind, Lesson 7 shows how they're compared.
 
 **The button** marks the "dealer" for this hand. It moves one seat to the left (clockwise) after every hand, so everyone takes turns.
 
-**The blinds** are the forced bets that start each pot, paid before anyone sees cards:
+**The blinds** are forced bets paid before anyone sees cards. With three or more players:
 - The **small blind (SB)**, just left of the button, puts in 1 chip.
 - The **big blind (BB)**, next to the small blind, puts in 2 chips.
 
@@ -76,7 +76,7 @@ Posting a blind happens automatically before the cards are dealt; it doesn't rep
 
 **You'll play heads-up (two players) first.** There, the button also posts the small blind. The button acts **first** before the flop and **last** after the flop.
 
-[Visual: the seat diagram from Lesson 15, opening on **Heads-up** here, with the 6-player view one tap away. Its numbers show the order of the first turns; a raise sends the action around again.]
+[Visual: the seat diagram from Lesson 15, opening on **Heads-up** here, with the 6-player view one tap away. Numbers show the first order of play, assuming everyone can act. A raise gives players facing it another turn.]
 
 **Order of play** always goes to the left (clockwise):
 - **Before the flop,** action starts left of the big blind and ends with the blinds: the small blind, then the big blind.
@@ -99,7 +99,7 @@ Posting a blind happens automatically before the cards are dealt; it doesn't rep
 [Visual: three steps in a row, replacing the two bars:
 1. **Your opponent bets 100.**
 2. **You call all-in for 30.**
-3. **30 of theirs matches your 30; their other 70 goes back.** The pot gains 30 + 30 = 60 (plus anything already in it).]
+3. **30 of theirs matches your 30; their other 70 goes back.** These bets add 30 + 30 = 60 to the pot.]
 
 **Heads-up, when your opponent is all-in and you owe chips:** you can only call or fold. Nobody is left to match a raise.
 

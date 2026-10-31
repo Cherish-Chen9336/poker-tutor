@@ -295,6 +295,10 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 .key.start { width: 0; height: 12px; border-left: 2px solid var(--ink); border-radius: 0; }
 
 /* Step 1b visuals (src/learn/visuals.tsx). */
+.t-fold { margin: 12px 0 0; font-size: 14.5px; padding: 8px 12px; border-left: 3px solid var(--brass); background: var(--panel); border-radius: 0 8px 8px 0; }
+.steps { list-style: none; margin: 0 0 14px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.steps li { display: flex; gap: 10px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 14.5px; }
+.step-num { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--brass); color: var(--brass-ink); display: grid; place-items: center; font: 700 13px var(--f-mono); }
 .visual-setup { margin: 0 0 12px; font-size: 14.5px; }
 .situations { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .situation { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
@@ -520,6 +524,7 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   .ladder-head { display: none; }
   .bar-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .situations { grid-template-columns: minmax(0, 1fr); }
+  .steps { grid-template-columns: minmax(0, 1fr); }
   .kelly-bars li { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
   .kelly-label { grid-column: 1 / -1; }
   .result-grid { font-size: 13.5px; border-spacing: 4px; }

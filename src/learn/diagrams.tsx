@@ -1,8 +1,8 @@
 // Lesson diagrams, drawn in code. Each one has a text equivalent (a caption
 // or a label) so it works without seeing it.
-import { useId, useState } from "react";
+import { useId, useState, type ReactNode } from "react";
 import { bestFive } from "../game/hands";
-import { Card, Cards } from "./cards";
+import { C, Card, Cards } from "./cards";
 import { formatOneIn, formatPercent, RANK_LADDER, SEAT_LAYOUTS, SEVEN_CARD_TOTAL } from "./diagram-data";
 
 /** Lesson 1: the four betting rounds and how the board grows. */
@@ -32,15 +32,46 @@ export function StreetTimeline() {
           <span className="t-note">if 2 or more players are still in</span>
         </li>
       </ol>
+      <p className="t-fold">
+        <b>Everyone else folds</b> → the hand ends at once, with no more cards.
+      </p>
       <figcaption>The board grows from 0 to 3, 4, then 5 shared cards, with a betting round after each deal.</figcaption>
     </figure>
   );
 }
 
-const BEST_FIVE_ROWS = [
-  { label: "Both cards", hole: ["5c", "5d"], board: ["5h", "Kd", "9c", "2s", "3d"], result: "Three fives" },
-  { label: "One card", hole: ["Ah", "3c"], board: ["Kh", "9h", "6h", "2h", "Ts"], result: "A flush in hearts" },
-  { label: "No cards", hole: ["Js", "Jd"], board: ["As", "Ad", "Kc", "Kh", "Qs"], result: "A-A-K-K-Q, all from the board" },
+const BEST_FIVE_ROWS: { label: string; hole: string[]; board: string[]; result: ReactNode }[] = [
+  {
+    label: "Uses 2 private cards",
+    hole: ["5c", "5d"],
+    board: ["5h", "Kd", "9c", "2s", "3d"],
+    result: (
+      <>
+        Three fives (<C c="5c" /> <C c="5d" /> <C c="5h" />, plus K and 9).
+      </>
+    ),
+  },
+  {
+    label: "Uses 1 private card",
+    hole: ["Ah", "3c"],
+    board: ["Kh", "9h", "6h", "2h", "Ts"],
+    result: (
+      <>
+        A flush in hearts (<C c="Ah" /> plus the board's four hearts). Your <C c="3c" /> doesn't count.
+      </>
+    ),
+  },
+  {
+    label: "Uses 0 private cards",
+    hole: ["Js", "Jd"],
+    board: ["As", "Ad", "Kc", "Kh", "Qs"],
+    result: (
+      <>
+        A-A-K-K-Q, all from the board. Your jacks don't play, so an opponent holding <C c="3c" /> <C c="2d" /> has the
+        same hand and you split the pot.
+      </>
+    ),
+  },
 ];
 
 /** Lesson 2: which 5 of the 7 cards count. The highlight is computed, not typed in. */
@@ -108,8 +139,8 @@ export function RankLadder() {
 }
 
 /** Lesson 4: who sits where and the order of play, before and after the flop. */
-export function SeatMap() {
-  const [players, setPlayers] = useState(6);
+export function SeatMap({ initialPlayers = 6 }: { initialPlayers?: 2 | 6 }) {
+  const [players, setPlayers] = useState<number>(initialPlayers);
   const [street, setStreet] = useState<"preflop" | "postflop">("preflop");
   const layout = SEAT_LAYOUTS.find((l) => l.players === players)!;
   const order = layout[street];
@@ -181,7 +212,8 @@ export function SeatMap() {
         })}
       </svg>
       <figcaption>
-        Numbers show who acts 1st, 2nd, 3rd…; switch the betting round to compare. <b>Order:</b> {spoken}. The seats are
+        Numbers show the first order of play (1st, 2nd, 3rd…), assuming everyone can act; a raise gives players facing it
+        another turn. Switch the betting round to compare. <b>Order:</b> {spoken}. The seats are
         named clockwise from the button (marked D).
       </figcaption>
     </figure>
@@ -222,22 +254,36 @@ export function RaiseToBy() {
 
 /** Lesson 6: calling all-in for less than the bet. */
 export function AllInRefund() {
+  const steps = [
+    "Your opponent bets 100.",
+    "You call all-in for 30.",
+    "30 of theirs matches your 30; their other 70 goes back. These bets add 30 + 30 = 60 to the pot.",
+  ];
   return (
     <figure className="diagram">
+      <ol className="steps">
+        {steps.map((step, i) => (
+          <li key={step}>
+            <span className="step-num" aria-hidden="true">
+              {i + 1}
+            </span>
+            <span>{step}</span>
+          </li>
+        ))}
+      </ol>
       <div className="bars" aria-hidden="true">
         <div className="bar-row">
-          <span className="bar-label">Opponent bets 100</span>
+          <span className="bar-label">Their 100</span>
           <span className="bar-track">
-            <span className="seg-a" style={{ width: "30%" }}>30 into the pot</span>
+            <span className="seg-a" style={{ width: "30%" }}>30</span>
             <span className="seg-c" style={{ width: "70%" }}>70 goes back</span>
           </span>
         </div>
         <div className="bar-row">
-          <span className="bar-label">You call all-in</span>
+          <span className="bar-label">Your 30</span>
           <span className="bar-track"><span className="seg-a" style={{ width: "30%" }}>30</span></span>
         </div>
       </div>
-      <figcaption>You can only win as much from your opponent as you put in. Your 30 matches 30 of their bet; the other 70 is returned.</figcaption>
     </figure>
   );
 }
