@@ -127,6 +127,18 @@ function playOne(random: () => number, forceTie: boolean) {
   const expected = referee(contrib, folded, hands, board, 0);
 
   expect(engineNet, JSON.stringify({ stacks, folded, contrib, hands, board })).toEqual(expected.net);
+  // The adapter's per-pot results add up to exactly what the engine paid each player.
+  const paid = new Array(n).fill(0);
+  for (const w of view.winners ?? []) paid[w.seat] += w.amount;
+  const fromPots = new Array(n).fill(0);
+  for (const pot of view.potResults ?? []) {
+    expect(pot.winners.reduce((sum, w) => sum + w.amount, 0)).toBe(pot.amount);
+    for (const w of pot.winners) {
+      expect(pot.eligibleSeats).toContain(w.seat);
+      fromPots[w.seat] += w.amount;
+    }
+  }
+  expect(fromPots).toEqual(paid);
   expect(engineNet.reduce((a, b) => a + b, 0)).toBe(0);
   return { n, tie: forceTie, sidePots: new Set(contrib.filter((c, seat) => !folded[seat] && c > 0)).size > 1 };
 }
@@ -146,6 +158,22 @@ describe("multi-player settlement matches an independent referee", () => {
     expect(sixHanded).toBeGreaterThan(400);
     expect(ties).toBe(600);
     expect(withSidePots).toBeGreaterThan(1000);
+  });
+
+  it("the adapter lists the lesson's main pot and side pot separately", () => {
+    const table = new Table({
+      seats: [{ id: "c", name: "C", stack: 100 }, { id: "a", name: "A", stack: 30 }, { id: "b", name: "B", stack: 80 }],
+      smallBlind: 1,
+      bigBlind: 2,
+    });
+    table.dealHand({ hands: [["7c", "7d"], ["Ac", "Ad"], ["Kc", "Kd"]], board: ["2s", "5h", "9d", "Js", "3c"] });
+    table.move(0, { type: "raise", to: 100 });
+    table.move(1, { type: "call" });
+    table.move(2, { type: "call" });
+    expect(table.view(null).potResults).toEqual([
+      { amount: 90, eligibleSeats: [0, 1, 2], winners: [{ seat: 1, amount: 90 }] },
+      { amount: 100, eligibleSeats: [0, 2], winners: [{ seat: 2, amount: 100 }] },
+    ]);
   });
 
   it("the referee agrees with the side-pot lesson's example", () => {

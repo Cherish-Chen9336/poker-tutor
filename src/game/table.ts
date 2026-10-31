@@ -4,11 +4,13 @@
 import { getBrowserRNG, PokerEngine } from "@pokertools/engine/browser";
 import { ActionType, PlayerStatus, Street as EngineStreet, type Action } from "@pokertools/types";
 import { deckTopFor, shuffleDrawsFor, type FixedDeal } from "./fixed-deal";
+import { handScore } from "./hands";
 import type {
   LegalMoves,
   Move,
   MoveResult,
   PlayerSetup,
+  PotResult,
   SeatStatus,
   Street,
   TableView,
@@ -191,7 +193,50 @@ export class Table {
           bestHand: w.hand ? [...w.hand] : null,
           description: w.handRank,
         })) ?? null,
+      potResults: raw.winners === null ? null : this.potResults(),
     };
+  }
+
+  /**
+   * The pots of a finished hand, worked out from each player's contribution
+   * (the engine already subtracts refunds) by the TDA rules: layers by
+   * contribution, merged when the same players can win them; ties share a pot,
+   * and leftover chips go one at a time from the first seat left of the button.
+   * src/engine/multiway.test.ts checks these against the engine's payouts.
+   */
+  private potResults(): PotResult[] {
+    const raw = this.engine.state;
+    const players = raw.players;
+    const n = players.length;
+    const contrib = players.map((p) => p?.totalInvestedThisHand ?? 0);
+    const live = (seat: number) => {
+      const p = players[seat];
+      return !!p && p.status !== PlayerStatus.FOLDED && p.hand !== null;
+    };
+    const pots: PotResult[] = [];
+    let previous = 0;
+    for (const level of [...new Set(contrib.filter((c) => c > 0))].sort((a, b) => a - b)) {
+      const amount = contrib.reduce((sum, c) => sum + Math.max(0, Math.min(c, level) - previous), 0);
+      const eligibleSeats = contrib.map((_, seat) => seat).filter((seat) => live(seat) && contrib[seat] >= level);
+      const last = pots.at(-1);
+      if (last && last.eligibleSeats.join() === eligibleSeats.join()) last.amount += amount;
+      else pots.push({ amount, eligibleSeats, winners: [] });
+      previous = level;
+    }
+    const button = raw.buttonSeat ?? 0;
+    const fromButton = (seat: number) => ((seat - button - 1 + n) % n);
+    for (const pot of pots) {
+      if (pot.eligibleSeats.length === 0) continue;
+      const scores = pot.eligibleSeats.map((seat) =>
+        pot.eligibleSeats.length === 1 ? 0 : handScore([...(players[seat]!.hand as string[]), ...raw.board]),
+      );
+      const best = Math.min(...scores);
+      const tied = pot.eligibleSeats.filter((_, i) => scores[i] === best).sort((a, b) => fromButton(a) - fromButton(b));
+      const share = Math.floor(pot.amount / tied.length);
+      const extra = pot.amount - share * tied.length;
+      pot.winners = tied.map((seat, i) => ({ seat, amount: share + (i < extra ? 1 : 0) }));
+    }
+    return pots.filter((pot) => pot.eligibleSeats.length > 0);
   }
 
   /** Chips each seat won (+) or lost (-) in the last hand. Only meaningful once the hand is over. */

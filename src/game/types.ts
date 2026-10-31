@@ -57,6 +57,13 @@ export interface WinnerView {
   description: string | null;
 }
 
+/** One pot after the hand: its size, who could win it, and who won how much of it. */
+export interface PotResult {
+  amount: number;
+  eligibleSeats: number[];
+  winners: { seat: number; amount: number }[];
+}
+
 /** Everything one viewer is allowed to see. Opponents' cards stay hidden until shown. */
 export interface TableView {
   /** The seat this view is for, or null for a spectator. */
@@ -76,6 +83,12 @@ export interface TableView {
   /** True once the pot has been awarded. */
   handOver: boolean;
   winners: WinnerView[] | null;
+  /**
+   * Once the hand is over: each pot (main pot first, then side pots) with its
+   * winners. Separate pots aren't a split pot; a split is several winners of one pot.
+   * Missing in hands saved before Step 6.
+   */
+  potResults?: PotResult[] | null;
 }
 
 export interface PlayerSetup {
