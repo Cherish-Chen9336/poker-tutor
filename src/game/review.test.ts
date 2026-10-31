@@ -57,7 +57,7 @@ describe("review comments", () => {
     const c = commentOn(step(view(["Ac", "Qd"], ["As", "9h", "4c", "2d", "7s"], { pot: 60, bets: [0, 20] }), facing(20), { type: "fold" }));
     expect(c.verdict).toBe("note");
     expect(c.text).toBe(
-      "Calling cost 20 to win a pot of 100: break-even was 20.0% if the betting ended there. Whether folding was right depends on how often the bot had a better hand here, which the app can't know.",
+      "Calling cost 20 to win a pot of 100: break-even was winning 20.0% of the time (a tie counts as half) if the betting ended there. Whether folding was right depends on how often the bot had a better hand here, which the app can't know.",
     );
     const bet = commentOn(step(view(["8h", "7h"], ["6h", "5c", "Kh"], { pot: 12 }), free, { type: "bet", to: 8 }));
     expect(bet.text).toBe("15 unseen cards could have completed your draw, though some might still have lost. You put in 8 more, about two-thirds of the pot (12 before your move).");

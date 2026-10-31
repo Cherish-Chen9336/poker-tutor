@@ -337,10 +337,11 @@ const checks: Record<string, () => void> = {
     expectAnswer("L14-Q1", 1);
   },
   "L14-Q2": () => {
-    // Growth per bet at 20% (twice Kelly for a 55% even-money bet) is about zero, and slightly below.
+    // Growth per bet at 20% (twice Kelly for a 55% even-money bet) is slightly below zero, so a long run shrinks.
     const growth = 0.55 * Math.log(1.2) + 0.45 * Math.log(0.8);
-    expect(Math.abs(growth)).toBeLessThan(0.0005);
     expect(growth).toBeLessThan(0);
+    expect(Math.round(100 * 1.2 ** 55 * 0.8 ** 45)).toBe(99); // about where it started after 100 bets
+    expect(Math.round(100 * Math.exp(10_000 * growth))).toBe(25); // about 25 after 10,000 bets
     expectAnswer("L14-Q2", 1);
   },
 };

@@ -615,7 +615,7 @@ These four lessons come after the Play area opens, so they can point back to han
 Choosing between moves at random, in fixed proportions, is called a **mixed strategy**. The point isn't to be random for its own sake; it's to keep your bets from telling your opponent what you hold.
 
 **The formulas from this game** (pot P, bet B, no other choices):
-- A bluff breaks even if your opponent folds more than **B ÷ (P + B)** of the time.
+- A bluff breaks even when your opponent folds exactly **B ÷ (P + B)** of the time, and profits if they fold more often.
 - Your opponent's calls break even when **B ÷ (P + 2B)** of your bets are bluffs.
 
 These hold only in this toy game. Real hands have many in-between holdings, more betting rounds, and ties.
@@ -662,10 +662,10 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 ### Quick checks
 
-**L12-Q1.** Two situations look the same: same cards, same pot, same bet to call. In one, you put 60 of the pot's chips in; in the other, your opponent did. Should your decision differ?
+**L12-Q1.** 60 of the pot's chips are ones you put in earlier. On its own, should that change whether you call now?
 - A. Yes, protect your 60
-- B. **No; only the pot and the price matter now** ✓
-- *Why:* The chips in the pot are the same either way. Who put them there doesn't change what a call wins or costs from here.
+- B. **No; on its own it doesn't change what a call wins or costs** ✓
+- *Why:* The pot is the same size whoever put the chips in. (What the earlier betting tells you about your opponent's hand still matters.)
 - *Checked by:* review
 
 **L12-Q2.** Which earlier fact is a good reason to consider calling?
@@ -687,7 +687,7 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 **Even the best spots lose often.** Before the flop, A♥ A♠ all-in against K♣ K♦ wins 81.1% of the time, loses 18.6%, and ties 0.4% (counted over all 1,712,304 possible boards). If you play that spot 10 times, you'll likely lose it at least once.
 
 **Why can the aces lose?** When both players are all-in before the flop, no one can fold anymore, but all 5 shared cards are still to come, and they can change who's ahead:
-- **A king comes.** Two kings are still in the deck. If one lands on the board, the kings become three of a kind (or better) and beat the pair of aces. For example, with a board of K♥ 7♣ 2♦ 9♠ 4♥, the kings have K-K-K and the aces have just a pair. This decides about 16 boards in 100.
+- **A king comes.** Two kings are still in the deck. If one lands on the board, the kings become three of a kind (or better) and usually beat the pair of aces, unless the aces improve too, for example when an ace also comes. For example, with a board of K♥ 7♣ 2♦ 9♠ 4♥, the kings have K-K-K and the aces have just a pair. This decides about 16 boards in 100.
 - **The kings make a straight or a flush.** For example, four clubs on the board give K♣ a flush, and the aces have no club. This decides about 2.6 boards in 100.
 - **Together, that's the 18.6%.** The aces' pair is better *now*, but it isn't a finished hand until the river.
 
@@ -734,7 +734,7 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 | Twice Kelly (20%) | about 99 (1.20⁵⁵ × 0.80⁴⁵) |
 
 - **Half Kelly** grows at about three-quarters of Kelly's speed (as a growth rate per bet), with much smaller swings.
-- **Twice Kelly** ends up about where it started, even though you won 55% of the time. Losing 20% takes you to 80, and winning 20% from there only gets you back to 96. That drag eats the whole edge.
+- **Twice Kelly** ends up about where it started, even though you won 55% of the time. Losing 20% takes you to 80, and winning 20% from there only gets you back to 96. That drag eats the whole edge, and a little more: its growth per bet is slightly below zero, so over thousands of bets it slowly shrinks (100 becomes about 25 after 10,000 bets).
 - Real runs are luckier or unluckier than "55 out of 100", but over many bets this is the typical result.
 
 **Kelly is a guide, not a rule.** Each player chooses how much to risk: full Kelly, half, a quarter, or a simple rule of their own. A smaller fraction grows more slowly but swings less, and it hurts less if you've overestimated your edge.
@@ -759,9 +759,9 @@ This lesson explains the math; it isn't advice about real money.
 
 **L14-Q2.** In the 55% example, what happens if you always bet twice the Kelly fraction (20%)?
 - A. You grow twice as fast
-- B. **You grow about not at all over the long run** ✓
+- B. **You don't grow; over a long run you slowly lose** ✓
 - C. You can't lose
-- *Why:* Betting too much makes the losses hurt more than the wins help. At twice Kelly, the long-run growth drops to about zero.
+- *Why:* Betting too much makes the losses hurt more than the wins help. At twice Kelly, growth per bet is slightly below zero: after 100 bets you're about where you started, and after many more you slowly shrink.
 - *Checked by:* math
 
 **L14-Q3.** Why do poker players usually risk less than Kelly suggests?

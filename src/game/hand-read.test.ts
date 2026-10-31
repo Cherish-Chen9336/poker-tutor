@@ -55,3 +55,24 @@ describe("isUnbeatable", () => {
     expect(isUnbeatable(["2c", "3d"], ["As", "Ks", "Qs", "Js", "Ts"])).toBe(true); // everyone ties the board
   });
 });
+
+describe("Codex's Step 5 audit cases", () => {
+  it("counts a straight or flush that improves on the board's own", () => {
+    expect(strength("Ts 2d", "5s 6h 7c 8d 9s")).toBe("strong"); // a 10-high straight over the board's 9-high
+    expect(strength("As 2d", "Ks 9s 4s Js 3s")).toBe("strong"); // the ace improves the board's flush
+    expect(strength("2s 3d", "Ks 9s 4s Js 6s")).toBe("nothing"); // the 2 doesn't improve it: playing the board
+  });
+
+  it("never downgrades an unbeatable hand", () => {
+    expect(strength("As Ks", "Qs Js Ts Qd")).toBe("strong"); // a royal flush on a paired board
+    expect(strength("Ac 2d", "Ks Kh Kd Kc")).toBe("strong"); // four kings with the ace kicker
+    expect(strength("3c 2d", "Ks Kh Kd Kc 9s")).toBe("nothing"); // the board's 9 beats a 3 kicker: playing the board
+  });
+
+  it("counts a draw to a higher straight than the board would make", () => {
+    // Any 5 gives 3-4-5-6-7 to the player, though it also gives the board 2-3-4-5-6.
+    const read = readHand(["7c", "Kh"], ["2h", "3s", "4c", "6d"]);
+    expect(read.straightDraw).toBe("gutshot");
+    expect(read.drawCards.sort()).toEqual(["5c", "5d", "5h", "5s"]);
+  });
+});

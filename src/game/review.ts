@@ -61,7 +61,7 @@ export function commentOn(step: RecordedMove): { verdict: Verdict; text: string 
   const parts: string[] = [];
   if (price) {
     parts.push(
-      `Calling cost ${price.toCall} to win a pot of ${price.potIfCalled}: break-even was ${(price.breakEven * 100).toFixed(1)}% if the betting ended there.`,
+      `Calling cost ${price.toCall} to win a pot of ${price.potIfCalled}: break-even was winning ${(price.breakEven * 100).toFixed(1)}% of the time (a tie counts as half) if the betting ended there.`,
     );
   }
   if (!river && view.board.length >= 3 && hole.length === 2) {

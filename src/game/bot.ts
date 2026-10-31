@@ -133,7 +133,8 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, h: Start): Mo
 function postflop(view: TableView, legal: LegalMoves, seat: number, hole: string[], random: () => number): Move {
   const read = readHand(hole, view.board);
   const river = view.board.length === 5;
-  const nuts = river && isUnbeatable(hole, view.board);
+  // Never fold a hand nothing can beat right now (on the river, nothing ever can).
+  const nuts = read.strength !== "strong" && isUnbeatable(hole, view.board);
   const strong = read.strength === "strong" || nuts;
   const bigDraw = !river && (read.flushDraw || read.straightDraw === "open");
   // Bet sizes don't depend on the hand, so they give nothing away: ½ or ⅔ of the pot.

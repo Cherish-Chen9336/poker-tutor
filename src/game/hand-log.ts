@@ -57,8 +57,16 @@ export function handLog(record: HandRecord): string[] {
   const first = record.moves[0]?.view ?? record.final;
   const lines: string[] = [];
   if (first) {
-    const youHaveButton = first.buttonSeat === YOU_SEAT;
-    lines.push(youHaveButton ? "You post the small blind (1). The bot posts the big blind (2)." : "The bot posts the small blind (1). You post the big blind (2).");
+    // Heads-up, the button posts the small blind. A player with fewer chips posts what they have, all-in.
+    const button = first.buttonSeat ?? YOU_SEAT;
+    const posted = (seat: number, blind: number) => {
+      const amount = Math.min(blind, record.startStacks[seat]);
+      return amount < blind ? `${amount}, all-in` : `${amount}`;
+    };
+    const who = (seat: number, verb: string) => (seat === YOU_SEAT ? `You ${verb}` : `The bot ${verb}s`);
+    lines.push(
+      `${who(button, "post")} the small blind (${posted(button, first.smallBlind)}). ${who(1 - button, "post")} the big blind (${posted(1 - button, first.bigBlind)}).`,
+    );
     const cards = first.seats[YOU_SEAT]!.cards;
     if (cards?.every(Boolean)) lines.push(`Your cards: {${cards[0]}} {${cards[1]}}.`);
   }

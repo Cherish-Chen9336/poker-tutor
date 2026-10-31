@@ -118,7 +118,7 @@ export function coachLines(view: TableView): CoachLine[] {
       : "More betting may follow, which changes this math. We haven't estimated your chance of winning.";
     lines.push({
       topic: "price",
-      text: `Calling costs ${price.toCall} to win a pot of ${price.potIfCalled}. If the betting ended here, you'd need to win ${pct}% of the time to break even.${allIn} ${caveat}`,
+      text: `Calling costs ${price.toCall} to win a pot of ${price.potIfCalled}. If the betting ended here, you'd need to win ${pct}% of the time to break even, counting a tie as half a win.${allIn} ${caveat}`,
     });
   }
   return lines;

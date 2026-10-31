@@ -112,3 +112,38 @@ describe("practice bot", () => {
     expect(decisions[2]).toEqual(decisions[0]);
   });
 });
+
+describe("practice bot never folds an unbeatable hand (Codex's Step 5 audit)", () => {
+  function botView(hole: string[], board: string[]): TableView {
+    return {
+      viewerSeat: 1,
+      handNumber: 1,
+      street: board.length === 4 ? "turn" : "river",
+      board,
+      pots: [{ amount: 40, eligibleSeats: [0, 1] }],
+      seats: [
+        { seat: 0, id: "you", name: "You", stack: 120, betThisStreet: 60, status: "active", cards: null },
+        { seat: 1, id: "bot", name: "Bot", stack: 180, betThisStreet: 0, status: "active", cards: hole },
+      ],
+      buttonSeat: 0,
+      bigBlindSeat: 1,
+      smallBlind: 1,
+      bigBlind: 2,
+      actionTo: 1,
+      handOver: false,
+      winners: null,
+    };
+  }
+  const facing60: LegalMoves = { fold: true, check: false, call: 60, bet: null, raise: { min: 120, max: 180 } };
+
+  for (const [hole, board] of [
+    [["As", "Ks"], ["Qs", "Js", "Ts", "Qd"]], // a royal flush on a paired board
+    [["Ac", "2d"], ["Ks", "Kh", "Kd", "Kc"]], // four kings on the board, ace kicker
+  ]) {
+    it(`${hole.join(" ")} on ${board.join(" ")}`, () => {
+      for (let seed = 1; seed <= 20; seed++) {
+        expect(practiceBot(botView(hole, board), facing60, seeded(seed)).type).not.toBe("fold");
+      }
+    });
+  }
+});

@@ -109,7 +109,8 @@ export function Lesson11() {
       <p>With pot P, bet B, and no other choices:</p>
       <ul>
         <li>
-          A bluff breaks even if your opponent folds more than <b>B ÷ (P + B)</b> of the time.
+          A bluff breaks even when your opponent folds exactly <b>B ÷ (P + B)</b> of the time, and profits if they fold
+          more often.
         </li>
         <li>
           Your opponent's calls break even when <b>B ÷ (P + 2B)</b> of your bets are bluffs.
@@ -186,7 +187,7 @@ export function Lesson13() {
       <ul>
         <li>
           <b>A king comes.</b> Two kings are still in the deck. If one lands on the board, the kings become three of a kind
-          (or better) and beat the pair of aces. For example, with a board of <C c="Kh" /> <C c="7c" /> <C c="2d" />{" "}
+          (or better) and usually beat the pair of aces, unless the aces improve too, for example when an ace also comes. For example, with a board of <C c="Kh" /> <C c="7c" /> <C c="2d" />{" "}
           <C c="9s" /> <C c="4h" />, the kings have K-K-K and the aces have just a pair. This decides about 16 boards in 100.
         </li>
         <li>
@@ -274,7 +275,9 @@ export function Lesson14() {
         </li>
         <li>
           <b>Twice Kelly</b> ends up about where it started, even though you won 55% of the time. Losing 20% takes you to
-          80, and winning 20% from there only gets you back to 96. That drag eats the whole edge.
+          80, and winning 20% from there only gets you back to 96. That drag eats the whole edge, and a little more: its
+          growth per bet is slightly below zero, so over thousands of bets it slowly shrinks (100 becomes about 25 after
+          10,000 bets).
         </li>
         <li>Real runs are luckier or unluckier than "55 out of 100", but over many bets this is the typical result.</li>
       </ul>

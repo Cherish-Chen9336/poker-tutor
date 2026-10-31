@@ -108,7 +108,10 @@ describe("lesson text claims", () => {
     expect(bluffShare).toBeCloseTo(B / (P + 2 * B));
     expect(bluffShare * (P + B) - (1 - bluffShare) * B).toBeCloseTo(0); // calling breaks even
     expect((1 / 3) * P - (2 / 3) * B).toBeCloseTo(0); // bluffing breaks even against calls 2 times in 3
-    expect(1 / 3).toBeCloseTo(B / (P + B)); // the fold rate a bluff needs
+    expect(1 / 3).toBeCloseTo(B / (P + B)); // the fold rate at which a bluff breaks even
+    stated(Lesson11, "A bluff breaks even when your opponent folds exactly B ÷ (P + B) of the time, and profits if they fold more often.");
+    const bluffAt = (foldRate: number) => foldRate * P - (1 - foldRate) * B;
+    expect(bluffAt(0.5)).toBeGreaterThan(0); // folding more often makes it profitable
   });
 
   it("lesson 13: aces against kings, and how the kings win", () => {
@@ -117,6 +120,9 @@ describe("lesson text claims", () => {
     const pct = (n: number) => ((n / odds.total) * 100).toFixed(1);
     expect([odds.total, pct(odds.wins), pct(odds.losses), pct(odds.ties)]).toEqual([1_712_304, "81.1", "18.6", "0.4"]);
     expect(compareHands(["Kc", "Kd"], ["Ah", "As"], ["Kh", "7c", "2d", "9s", "4h"])).toBe("a");
+    // A king alone doesn't guarantee it: if an ace also comes, the aces' three of a kind wins.
+    stated(Lesson13, "usually beat the pair of aces, unless the aces improve too, for example when an ace also comes.");
+    expect(compareHands(["Kc", "Kd"], ["Ah", "As"], ["Kh", "Ac", "7c", "2d", "9s"])).toBe("b");
   });
 
   it("lesson 14: Kelly's table and the twice-Kelly drag", () => {
@@ -126,5 +132,7 @@ describe("lesson text claims", () => {
     const rate = (f: number) => 0.55 * Math.log(1 + f) + 0.45 * Math.log(1 - f);
     expect(rate(0.05) / rate(0.1)).toBeCloseTo(0.75, 2); // "about three-quarters of Kelly's speed"
     expect(100 * 0.8 * 1.2).toBeCloseTo(96);
+    stated(Lesson14, "so over thousands of bets it slowly shrinks (100 becomes about 25 after 10,000 bets).");
+    expect(Math.round(100 * Math.exp(10_000 * rate(0.2)))).toBe(25);
   });
 });

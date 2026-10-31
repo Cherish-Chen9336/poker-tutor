@@ -35,7 +35,7 @@ describe("coach", () => {
     expect(text(view(["Kd", "As"], [], { bets: [1, 2] }))).toEqual([
       "You have the button: you act first before the flop, and last on every later round.",
       "Your cards: {As} {Kd}: ace-king, different suits.",
-      "Calling costs 1 to win a pot of 4. If the betting ended here, you'd need to win 25.0% of the time to break even. More betting may follow, which changes this math. We haven't estimated your chance of winning.",
+      "Calling costs 1 to win a pot of 4. If the betting ended here, you'd need to win 25.0% of the time to break even, counting a tie as half a win. More betting may follow, which changes this math. We haven't estimated your chance of winning.",
     ]);
     expect(text(view(["7c", "7h"], [], { button: 1, bets: [2, 2] }))[1]).toBe("Your cards: {7c} {7h}: a pocket pair of 7s.");
   });
@@ -55,7 +55,7 @@ describe("coach", () => {
 
   it("gives the break-even price when the call ends the betting, without estimating a chance", () => {
     const river = text(view(["Ac", "Qd"], ["As", "9h", "4c", "2d", "7s"], { pot: 60, bets: [0, 20] }));
-    expect(river.at(-1)).toBe("Calling costs 20 to win a pot of 100. If the betting ended here, you'd need to win 20.0% of the time to break even. We haven't estimated your chance of winning.");
+    expect(river.at(-1)).toBe("Calling costs 20 to win a pot of 100. If the betting ended here, you'd need to win 20.0% of the time to break even, counting a tie as half a win. We haven't estimated your chance of winning.");
   });
 
   it("never tells the learner what to do, and gives no other percentages", () => {

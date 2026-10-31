@@ -39,4 +39,18 @@ describe("hand log", () => {
     }
     expect(showdowns).toBeGreaterThan(20);
   });
+
+  it("logs a short blind as all-in", () => {
+    const record = {
+      version: 1 as const,
+      botVersion: "bot-1",
+      matchNumber: 1,
+      handNumber: 9,
+      startStacks: [399, 1] as [number, number],
+      moves: [],
+      final: { viewerSeat: 0, handNumber: 9, street: "showdown", board: [], pots: [], buttonSeat: 0, bigBlindSeat: 1, smallBlind: 1, bigBlind: 2, actionTo: null, handOver: true, winners: [{ seat: 0, amount: 2, bestHand: null, description: null }], seats: [{ seat: 0, id: "you", name: "You", stack: 400, betThisStreet: 0, status: "active", cards: ["As", "Kd"] }, { seat: 1, id: "bot", name: "Bot", stack: 0, betThisStreet: 0, status: "all-in", cards: null }] } as never,
+      net: 1,
+    };
+    expect(handLog(record)[0]).toBe("You post the small blind (1). The bot posts the big blind (1, all-in).");
+  });
 });

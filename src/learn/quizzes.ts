@@ -381,10 +381,10 @@ export const QUIZZES: Record<number, Question[]> = {
   12: [
     {
       id: "L12-Q1",
-      prompt: "Two situations look the same: same cards, same pot, same bet to call. In one, you put 60 of the pot's chips in; in the other, your opponent did. Should your decision differ?",
-      choices: ["Yes, protect your 60", "No; only the pot and the price matter now"],
+      prompt: "60 of the pot's chips are ones you put in earlier. On its own, should that change whether you call now?",
+      choices: ["Yes, protect your 60", "No; on its own it doesn't change what a call wins or costs"],
       answer: 1,
-      why: "The chips in the pot are the same either way. Who put them there doesn't change what a call wins or costs from here.",
+      why: "The pot is the same size whoever put the chips in. (What the earlier betting tells you about your opponent's hand still matters.)",
       checkedBy: "review",
     },
     {
@@ -426,9 +426,9 @@ export const QUIZZES: Record<number, Question[]> = {
     {
       id: "L14-Q2",
       prompt: "In the 55% example, what happens if you always bet twice the Kelly fraction (20%)?",
-      choices: ["You grow twice as fast", "You grow about not at all over the long run", "You can't lose"],
+      choices: ["You grow twice as fast", "You don't grow; over a long run you slowly lose", "You can't lose"],
       answer: 1,
-      why: "Betting too much makes the losses hurt more than the wins help. At twice Kelly, the long-run growth drops to about zero.",
+      why: "Betting too much makes the losses hurt more than the wins help. At twice Kelly, growth per bet is slightly below zero: after 100 bets you're about where you started, and after many more you slowly shrink.",
       checkedBy: "math",
     },
     {

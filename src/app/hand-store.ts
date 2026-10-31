@@ -16,25 +16,45 @@ export function loadHands(storage: Storage | null): HandRecord[] {
     if (!raw) return [];
     const data = JSON.parse(raw) as { version?: unknown; hands?: unknown };
     if (data?.version !== VERSION || !Array.isArray(data.hands)) return [];
-    return data.hands.filter(isHandRecord);
+    return trimHands(data.hands.filter(isHandRecord));
   } catch {
     return [];
   }
 }
 
-function isHandRecord(value: unknown): value is HandRecord {
+function isView(value: unknown): boolean {
+  const v = value as { seats?: unknown; board?: unknown; street?: unknown; pots?: unknown };
+  return (
+    typeof v === "object" && v !== null && Array.isArray(v.seats) && v.seats.length === 2 &&
+    v.seats.every((seat) => seat === null || (typeof seat === "object" && typeof (seat as { stack?: unknown }).stack === "number")) &&
+    Array.isArray(v.board) && v.board.every((c) => typeof c === "string") && typeof v.street === "string" && Array.isArray(v.pots)
+  );
+}
+
+function isMove(value: unknown): boolean {
+  const m = value as { who?: unknown; move?: { type?: unknown }; view?: unknown; after?: unknown; legal?: unknown };
+  return (
+    typeof m === "object" && m !== null && (m.who === "you" || m.who === "bot") && typeof m.move?.type === "string" &&
+    isView(m.view) && isView(m.after) && (m.legal === null || typeof m.legal === "object")
+  );
+}
+
+/** Checks a loaded record closely enough that the Review screen can show it safely. */
+export function isHandRecord(value: unknown): value is HandRecord {
   const r = value as HandRecord;
   return (
-    typeof r === "object" && r !== null && r.version === 1 && typeof r.id === "string" && Array.isArray(r.moves) &&
-    typeof r.handNumber === "number" && r.final !== null && typeof r.final === "object" && typeof r.net === "number"
+    typeof r === "object" && r !== null && r.version === 1 && typeof r.id === "string" && typeof r.botVersion === "string" &&
+    typeof r.matchNumber === "number" && typeof r.handNumber === "number" && Array.isArray(r.startStacks) &&
+    r.startStacks.length === 2 && Array.isArray(r.moves) && r.moves.every(isMove) && isView(r.final) && typeof r.net === "number"
   );
 }
 
 /** Keeps the newest hands that fit both limits. */
 export function trimHands(hands: HandRecord[]): HandRecord[] {
-  let kept = hands.slice(-MAX_HANDS);
-  // JSON text is stored as UTF-16, about 2 bytes per character.
-  while (kept.length > 1 && JSON.stringify({ version: VERSION, hands: kept }).length * 2 > MAX_BYTES) kept = kept.slice(1);
+  const size = (value: unknown) => JSON.stringify(value).length * 2; // stored as UTF-16, about 2 bytes per character
+  // A single record too big to fit is dropped rather than allowed to fill the space.
+  let kept = hands.filter((hand) => size(hand) <= MAX_BYTES / 4).slice(-MAX_HANDS);
+  while (kept.length > 1 && size({ version: VERSION, hands: kept }) > MAX_BYTES) kept = kept.slice(1);
   return kept;
 }
 

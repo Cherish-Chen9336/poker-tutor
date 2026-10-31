@@ -1,6 +1,7 @@
 // The Play area: heads-up against the practice bot, with a coach that
 // describes the situation before each of the learner's moves.
 import { useEffect, useReducer, useRef, useState } from "react";
+import { useTakePendingFocus } from "../app/focus";
 import { BOT_POLICY_VERSION, practiceBot } from "../game/bot";
 import { coachLines } from "../game/coach";
 import { handLog } from "../game/hand-log";
@@ -109,14 +110,30 @@ function Actions({ view, legal, onMove }: { view: TableView; legal: LegalMoves; 
   );
 }
 
+// The match lives outside the page, so visiting Review (or a lesson) and coming
+// back continues the same match instead of starting over.
+const session = {
+  match: null as Match | null,
+  started: false,
+  /** Finished hands and the learner's total per match (kept small: no records). */
+  results: new Map<number, { hands: number; net: number }>(),
+  saved: new WeakSet<HandRecord>(),
+};
+
+function sessionMatch(): Match {
+  session.match ??= new Match({ bot: practiceBot, botVersion: BOT_POLICY_VERSION });
+  return session.match;
+}
+
 export default function PlayPage() {
-  const [match] = useState(() => new Match({ bot: practiceBot, botVersion: BOT_POLICY_VERSION }));
+  const match = sessionMatch();
   const [, rerender] = useReducer((n: number) => n + 1, 0);
-  const [started, setStarted] = useState(false);
+  const [started, setStarted] = useState(session.started);
+  const heading = useRef<HTMLHeadingElement>(null);
+  useTakePendingFocus(heading);
   const [coachOn, setCoachOn] = useState(loadCoachSetting);
   const [notice, setNotice] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
-  const [finished, setFinished] = useState<HandRecord[]>([]);
   const { addHand, saved } = useHands();
   const [focusTick, setFocusTick] = useState(0);
   const nextRef = useRef<HTMLButtonElement>(null);
@@ -137,9 +154,12 @@ export default function PlayPage() {
   function afterChange(linesBefore: number) {
     const lines = match.current ? handLog(match.current) : [];
     setAnnouncement(spokenText(lines.slice(linesBefore).join(" ")));
-    if (match.handOver && match.current && !finished.includes(match.current)) {
-      setFinished((list) => [...list, match.current!]);
-      addHand(match.current); // saved for the Review screen
+    const record = match.current;
+    if (match.handOver && record && !session.saved.has(record)) {
+      session.saved.add(record);
+      const totals = session.results.get(record.matchNumber) ?? { hands: 0, net: 0 };
+      session.results.set(record.matchNumber, { hands: totals.hands + 1, net: totals.net + (record.net ?? 0) });
+      addHand(record); // saved for the Review screen
     }
     setFocusTick((n) => n + 1);
     rerender();
@@ -147,6 +167,7 @@ export default function PlayPage() {
 
   function deal() {
     match.dealNext();
+    session.started = true;
     setStarted(true);
     setNotice(null);
     afterChange(0);
@@ -166,7 +187,9 @@ export default function PlayPage() {
   if (!started) {
     return (
       <section className="panel play-intro">
-        <h1 tabIndex={-1}>Play</h1>
+        <h1 tabIndex={-1} ref={heading}>
+          Play
+        </h1>
         <p className="lede">
           Heads-up against a practice bot. Blinds are 1/2 and you both start with 200 chips. The button switches every hand.
         </p>
@@ -186,15 +209,17 @@ export default function PlayPage() {
   const yourTurn = !match.handOver && view.actionTo === YOU_SEAT && legal;
   const stack = view.seats[YOU_SEAT]!.stack;
   // Count only finished hands, so a posted blind doesn't look like a loss.
-  const matchHands = finished.filter((r) => r.matchNumber === match.matchNumber);
-  const matchNet = matchHands.reduce((sum, r) => sum + (r.net ?? 0), 0);
+  const totals = session.results.get(match.matchNumber) ?? { hands: 0, net: 0 };
+  const matchNet = totals.net;
 
   return (
     <section className="panel play">
       <div className="play-head">
-        <h1 tabIndex={-1}>Play</h1>
+        <h1 tabIndex={-1} ref={heading}>
+          Play
+        </h1>
         <p className="mono">
-          Match {match.matchNumber} · {matchHands.length} {matchHands.length === 1 ? "hand" : "hands"} played ·{" "}
+          Match {match.matchNumber} · {totals.hands} {totals.hands === 1 ? "hand" : "hands"} played ·{" "}
           {matchNet > 0 ? `you're ${matchNet} up` : matchNet < 0 ? `you're ${-matchNet} down` : "you're even"}
         </p>
       </div>

@@ -1,7 +1,8 @@
 // The Review area: replay saved hands step by step from the learner's view,
 // with a comment on each of the learner's decisions. Results are shown last,
 // and the comments never depend on them.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useTakePendingFocus } from "../app/focus";
 import { useHands } from "../app/hand-store";
 import { handLog, resultLine } from "../game/hand-log";
 import type { HandRecord } from "../game/match";
@@ -99,10 +100,11 @@ function HandReplay({ record }: { record: HandRecord }) {
   );
 }
 
+/** A neutral title: your starting cards, but not the result (that comes at the end of the replay). */
 function handTitle(record: HandRecord): string {
-  const net = record.net ?? 0;
-  const result = net > 0 ? `+${net}` : net < 0 ? `−${-net}` : "even";
-  return `Match ${record.matchNumber}, hand ${record.handNumber} · ${result}`;
+  const first = record.moves[0]?.view ?? record.final!;
+  const cards = (first.seats[0]?.cards ?? []).filter(Boolean).map((c) => `{${c}}`).join(" ");
+  return `Match ${record.matchNumber}, hand ${record.handNumber}${cards ? ` · ${cards}` : ""}`;
 }
 
 export default function ReviewPage() {
@@ -110,12 +112,16 @@ export default function ReviewPage() {
   const newestFirst = [...hands].reverse();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const heading = useRef<HTMLHeadingElement>(null);
+  useTakePendingFocus(heading);
   const selected = newestFirst.find((h) => h.id === selectedId) ?? newestFirst[0];
 
   if (!selected) {
     return (
       <section className="panel">
-        <h1 tabIndex={-1}>Review</h1>
+        <h1 tabIndex={-1} ref={heading}>
+          Review
+        </h1>
         <p className="lede">No hands yet. Play a few hands, and each one will appear here to replay step by step.</p>
         <p className="note">
           <a href="#/play">Go to Play</a>
@@ -129,7 +135,9 @@ export default function ReviewPage() {
   return (
     <section className="panel review">
       <div className="play-head">
-        <h1 tabIndex={-1}>Review</h1>
+        <h1 tabIndex={-1} ref={heading}>
+          Review
+        </h1>
         <p className="mono">
           {hands.length} {hands.length === 1 ? "hand" : "hands"} saved in this browser (up to 50)
         </p>
@@ -141,7 +149,7 @@ export default function ReviewPage() {
             {newestFirst.map((h) => (
               <li key={h.id}>
                 <button type="button" aria-current={h.id === selected.id ? "true" : undefined} onClick={() => setSelectedId(h.id!)}>
-                  {handTitle(h)}
+                  <CardText text={handTitle(h)} />
                 </button>
               </li>
             ))}
@@ -163,7 +171,9 @@ export default function ReviewPage() {
           )}
         </nav>
         <div>
-          <h2 className="review-title">{handTitle(selected)}</h2>
+          <h2 className="review-title">
+            <CardText text={handTitle(selected)} />
+          </h2>
           <p className="mono review-sub">
             {selected.moves.filter((m) => m.who === "you").length} decisions by you
             {mistakes ? ` · ${mistakes} clear ${mistakes === 1 ? "mistake" : "mistakes"}` : ""}. Comments use only what you
