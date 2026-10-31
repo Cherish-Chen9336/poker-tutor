@@ -102,7 +102,18 @@ export function coachLines(view: TableView): CoachLine[] {
     // Later rounds: count only players who still have chips to bet (all-in players stay in but don't act).
     const actors = view.seats.filter((s) => s && s.status !== "folded" && s.status !== "out" && s.status !== "all-in" && s.stack + s.betThisStreet > 0);
     const rank = actors.filter((s) => postflopRank(view, s!.seat) <= postflopRank(view, seat)).length;
-    const later = rank === actors.length ? "you act last on every later round" : `you act ${ordinal(rank)} on later rounds if everyone stays in`;
+    // Says of how many and after whom, so the count is checkable against the table (it leaves out folded players).
+    const before = actors
+      .filter((s) => postflopRank(view, s!.seat) < postflopRank(view, seat))
+      .sort((a, b) => postflopRank(view, a!.seat) - postflopRank(view, b!.seat))
+      .map((s) => `the ${positionOf(view, s!.seat)}`);
+    const after = before.length === 1 ? before[0] : `${before.slice(0, -1).join(", ")} and ${before.at(-1)}`;
+    const later =
+      rank === actors.length
+        ? "you act last on every later round"
+        : rank === 1
+          ? `you act first of the ${actors.length} players still in`
+          : `if everyone still in stays in, you act ${ordinal(rank)} of ${actors.length}, after ${after}`;
     lines.push({
       topic: "position",
       text: `You're ${SEAT_PHRASE[position]} (${position}). Before the flop, betting goes around from under the gun to the big blind, and a raise gives everyone else another turn. After the flop, ${later}.`,
