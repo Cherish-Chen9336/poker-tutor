@@ -10,6 +10,7 @@ import type { Move } from "../game/types";
 import { Lesson3, Lesson6 } from "./content/rules-lessons";
 import { Lesson9 } from "./content/thinking-lessons";
 import { Lesson11, Lesson13, Lesson14 } from "./content/after-play-lessons";
+import { Lesson16 } from "./content/table-lessons";
 
 /** Visible text of a lesson, with card pictures read as their labels ("A♥" style isn't used; tokens become names). */
 function shown(Lesson: () => React.ReactNode): string {
@@ -134,5 +135,12 @@ describe("lesson text claims", () => {
     expect(100 * 0.8 * 1.2).toBeCloseTo(96);
     stated(Lesson14, "so over thousands of bets it slowly shrinks (100 becomes about 25 after 10,000 bets).");
     expect(Math.round(100 * Math.exp(10_000 * rate(0.2)))).toBe(25);
+  });
+
+  it("lesson 16: the side-pot example's numbers", () => {
+    stated(Lesson16, "A wins the main pot (90). A beat both other players.");
+    stated(Lesson16, "B wins the side pot (100). A can't win it, so it goes to the better hand between B and C.");
+    stated(Lesson16, "C gets back 20 and loses the other 80.");
+    // The engine checks of the same example are quiz verifications L16-Q1 to L16-Q3.
   });
 });

@@ -1,6 +1,6 @@
 // The lesson list. Texts and quick checks are in docs/lessons.md.
 
-export type Unit = "rules" | "practice" | "thinking" | "afterPlay";
+export type Unit = "rules" | "practice" | "thinking" | "afterPlay" | "bigTable";
 
 export interface LessonInfo {
   id: number;
@@ -15,6 +15,7 @@ export const UNITS: { id: Unit; title: string; intro: string }[] = [
   { id: "practice", title: "Practice", intro: "Four guided hands against a bot, with a coach at every step." },
   { id: "thinking", title: "Thinking well", intro: "The math and the mindset behind good decisions." },
   { id: "afterPlay", title: "After you've played", intro: "Four ideas that make more sense once you've played some hands in Play." },
+  { id: "bigTable", title: "At a bigger table", intro: "Seats and side pots for the six-player table in Play." },
 ];
 
 export const LESSONS: LessonInfo[] = [
@@ -32,6 +33,8 @@ export const LESSONS: LessonInfo[] = [
   { id: 12, unit: "afterPlay", minutes: 3, title: "Sunk cost", summary: "Chips in the pot aren't yours anymore, but the pot's size still matters." },
   { id: 13, unit: "afterPlay", minutes: 4, title: "Resulting", summary: "Why a good decision can lose, and how to judge decisions instead of results." },
   { id: 14, unit: "afterPlay", minutes: 5, title: "Bankroll and the Kelly criterion", summary: "How much to risk at once, and why betting too much is the costly mistake." },
+  { id: 15, unit: "bigTable", minutes: 4, title: "Position at a six-player table", summary: "The six seats' names, who acts when, and why seat matters more." },
+  { id: 16, unit: "bigTable", minutes: 4, title: "Side pots", summary: "How all-ins of different sizes split the chips into separate pots." },
 ];
 
 export function findLesson(id: number): LessonInfo | undefined {

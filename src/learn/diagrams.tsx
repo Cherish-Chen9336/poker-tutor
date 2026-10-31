@@ -121,8 +121,8 @@ export function SeatMap() {
     const angle = Math.PI / 2 + (seat * 2 * Math.PI) / layout.players;
     return { x: cx + 165 * Math.cos(angle), y: cy + 100 * Math.sin(angle) };
   };
-  const short = (label: string) =>
-    label.startsWith("Button") ? "BTN" : label === "Small blind" ? "SB" : label === "Big blind" ? "BB" : label.replace("Seat ", "S");
+  const SHORT: Record<string, string> = { "Small blind": "SB", "Big blind": "BB", "Under the gun": "UTG", Hijack: "HJ", Cutoff: "CO" };
+  const short = (label: string) => (label.startsWith("Button") ? "BTN" : (SHORT[label] ?? label));
   const spoken = order.map((seat) => layout.labels[seat]).join(", then ");
 
   return (
@@ -162,7 +162,8 @@ export function SeatMap() {
         })}
       </svg>
       <figcaption>
-        Numbers show who acts 1st, 2nd, 3rd… <b>Order:</b> {spoken}. BTN is the button, SB the small blind, BB the big blind.
+        Numbers show who acts 1st, 2nd, 3rd… <b>Order:</b> {spoken}. BTN is the button, SB the small blind, BB the big
+        blind{players === 6 ? ", UTG under the gun, HJ the hijack, CO the cutoff" : ""}.
       </figcaption>
     </figure>
   );
@@ -234,6 +235,39 @@ export function KickerCompare() {
       {row("You", you, "Kd", true)}
       {row("Opponent", them, "Qh", false)}
       <figcaption>Both have a pair of aces. Comparing the next-highest cards, the king beats the queen.</figcaption>
+    </figure>
+  );
+}
+
+/** Lesson 16: three all-in stacks sliced into the main pot, the side pot, and the returned chips. */
+export function SidePotBars() {
+  const rows = [
+    { name: "A", stack: 30 },
+    { name: "B", stack: 80 },
+    { name: "C", stack: 100 },
+  ];
+  const width = (n: number) => `${n}%`;
+  return (
+    <figure className="diagram">
+      <div className="bars" aria-hidden="true">
+        {rows.map((r) => (
+          <div key={r.name} className="bar-row">
+            <span className="bar-label">
+              {r.name} puts in {r.stack}
+            </span>
+            <span className="bar-track">
+              <span className="seg-a" style={{ width: width(30) }}>30</span>
+              {r.stack > 30 && <span className="seg-b" style={{ width: width(50) }}>50</span>}
+              {r.stack > 80 && <span className="seg-c" style={{ width: width(20) }}>20 back</span>}
+            </span>
+          </div>
+        ))}
+      </div>
+      <figcaption>
+        <span className="key call" /> the main pot: 30 from each player (90), which A, B, and C can win.{" "}
+        <span className="key pot" /> the side pot: 50 more each from B and C (100), which only B and C can win. C's last 20
+        is returned, because nobody could match it.
+      </figcaption>
     </figure>
   );
 }

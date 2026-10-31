@@ -5,6 +5,7 @@ import { Lesson1, Lesson2, Lesson3, Lesson4, Lesson5, Lesson6, Lesson7 } from ".
 // load only when opened. LessonPage shows them inside a Suspense boundary.
 const thinking = () => import("./thinking-lessons");
 const afterPlay = () => import("./after-play-lessons");
+const bigTable = () => import("./table-lessons");
 
 /** Lesson text by lesson id. */
 export const LESSON_CONTENT: Record<number, ComponentType> = {
@@ -22,4 +23,6 @@ export const LESSON_CONTENT: Record<number, ComponentType> = {
   12: lazy(() => afterPlay().then((m) => ({ default: m.Lesson12 }))),
   13: lazy(() => afterPlay().then((m) => ({ default: m.Lesson13 }))),
   14: lazy(() => afterPlay().then((m) => ({ default: m.Lesson14 }))),
+  15: lazy(() => bigTable().then((m) => ({ default: m.Lesson15 }))),
+  16: lazy(() => bigTable().then((m) => ({ default: m.Lesson16 }))),
 };

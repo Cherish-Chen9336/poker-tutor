@@ -41,7 +41,7 @@ export interface SeatLayout {
 export const SEAT_LAYOUTS: SeatLayout[] = [
   {
     players: 6,
-    labels: ["Button", "Small blind", "Big blind", "Seat 4", "Seat 5", "Seat 6"],
+    labels: ["Button", "Small blind", "Big blind", "Under the gun", "Hijack", "Cutoff"],
     preflop: [3, 4, 5, 0, 1, 2],
     postflop: [1, 2, 3, 4, 5, 0],
   },

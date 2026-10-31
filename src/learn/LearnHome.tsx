@@ -19,8 +19,8 @@ export function LearnHome({ progress, saved, onReset }: Props) {
       <section className="panel intro">
         <h1 tabIndex={-1}>Learn Texas Hold'em</h1>
         <p className="lede">
-          Ten short lessons take you from zero to playing your first hands, and four more help once you've played
-          some. Each one ends with a few quick questions, and every answer explains why.
+          Ten short lessons take you from zero to playing your first hands, four more help once you've played some, and
+          two prepare you for the six-player table. Each one ends with a few quick questions, and every answer explains why.
         </p>
         <div className="progress-row">
           <div className="meter">

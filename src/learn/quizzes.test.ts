@@ -65,6 +65,18 @@ function guided(id: number): GuidedRun {
 const LESSON9 = LESSON9_EXAMPLE;
 const percent = (x: number, digits = 1) => (x * 100).toFixed(digits);
 
+/** Lesson 16's example on the engine: C (button) has 100, A 30, B 80; all-in; A best, B second. */
+function sidePotExample() {
+  const table = new Table({
+    seats: [{ id: "c", name: "C", stack: 100 }, { id: "a", name: "A", stack: 30 }, { id: "b", name: "B", stack: 80 }],
+    smallBlind: 1,
+    bigBlind: 2,
+  });
+  table.dealHand({ hands: [["7c", "7d"], ["Ac", "Ad"], ["Kc", "Kd"]], board: ["2s", "5h", "9d", "Js", "3c"] });
+  play(table, [[0, { type: "raise", to: 100 }], [1, call], [2, call]]);
+  return table;
+}
+
 const checks: Record<string, () => void> = {
   "L1-Q1": () => {
     const t = table([200, 200, 200]);
@@ -343,6 +355,38 @@ const checks: Record<string, () => void> = {
     expect(Math.round(100 * 1.2 ** 55 * 0.8 ** 45)).toBe(99); // about where it started after 100 bets
     expect(Math.round(100 * Math.exp(10_000 * growth))).toBe(25); // about 25 after 10,000 bets
     expectAnswer("L14-Q2", 1);
+  },
+  "L15-Q1": () => {
+    const t = table([200, 200, 200, 200, 200, 200]);
+    const view = t.view(null);
+    // Seat 0 has the button, 1 the small blind, 2 the big blind: seat 3 (under the gun) acts first.
+    expect(view.actionTo).toBe((view.buttonSeat! + 3) % 6);
+    expectAnswer("L15-Q1", 1);
+  },
+  "L15-Q2": () => {
+    const t = table([200, 200, 200, 200, 200, 200]);
+    play(t, [[3, call], [4, call], [5, call], [0, call], [1, call], [2, check]]);
+    const view = t.view(null);
+    expect(view.street).toBe("flop");
+    expect(view.actionTo).toBe((view.buttonSeat! + 1) % 6); // the small blind
+    expectAnswer("L15-Q2", 0);
+  },
+  "L16-Q1": () => {
+    const view = sidePotExample().view(null);
+    expect(view.potResults?.[0]).toMatchObject({ amount: 90, eligibleSeats: [0, 1, 2] });
+    expectAnswer("L16-Q1", 1);
+  },
+  "L16-Q2": () => {
+    const view = sidePotExample().view(null);
+    expect(view.potResults?.[1]).toEqual({ amount: 100, eligibleSeats: [0, 2], winners: [{ seat: 2, amount: 100 }] });
+    expectAnswer("L16-Q2", 1);
+  },
+  "L16-Q3": () => {
+    const t = sidePotExample();
+    // C put in 100 but only 80 could be matched: C ends with 20, a net loss of 80.
+    expect(t.view(null).seats[0]!.stack).toBe(20);
+    expect(t.netResults()[0]).toBe(-80);
+    expectAnswer("L16-Q3", 2);
   },
 };
 
