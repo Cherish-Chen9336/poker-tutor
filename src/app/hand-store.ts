@@ -2,10 +2,11 @@
 // and about 2 MiB; the oldest are dropped first. If the browser won't save,
 // hands are kept in memory for this visit. Nothing leaves the browser.
 import { useCallback, useSyncExternalStore } from "react";
-import type { HandRecord } from "../game/match";
+import type { HandRecord, SeatInfo } from "../game/match";
 
 const KEY = "poker-tutor:hands";
-const VERSION = 1;
+/** Version 1 held heads-up records only; version 2 holds records for 2–6 seats. */
+const VERSION = 2;
 export const MAX_HANDS = 50;
 export const MAX_BYTES = 2 * 1024 * 1024;
 
@@ -15,8 +16,8 @@ export function loadHands(storage: Storage | null): HandRecord[] {
     const raw = storage?.getItem(KEY);
     if (!raw) return [];
     const data = JSON.parse(raw) as { version?: unknown; hands?: unknown };
-    if (data?.version !== VERSION || !Array.isArray(data.hands)) return [];
-    return trimHands(data.hands.filter(isHandRecord));
+    if ((data?.version !== 1 && data?.version !== VERSION) || !Array.isArray(data.hands)) return [];
+    return trimHands(data.hands.map(upgrade).filter(isHandRecord));
   } catch {
     return [];
   }
@@ -28,8 +29,8 @@ const STREETS = ["preflop", "flop", "turn", "river", "showdown"];
 const MOVES = ["fold", "check", "call", "bet", "raise"];
 const isNumber = (v: unknown) => typeof v === "number" && Number.isFinite(v);
 
-const isSeatIndex = (v: unknown) => v === 0 || v === 1;
-const isSeatOrNull = (v: unknown) => v === null || isSeatIndex(v);
+const isIndex = (v: unknown, n: number) => Number.isInteger(v) && (v as number) >= 0 && (v as number) < n;
+const isIndexOrNull = (v: unknown, n: number) => v === null || isIndex(v, n);
 
 function isSeat(value: unknown, index: number): boolean {
   const s = value as { seat?: unknown; stack?: unknown; betThisStreet?: unknown; status?: unknown; cards?: unknown; name?: unknown };
@@ -40,12 +41,22 @@ function isSeat(value: unknown, index: number): boolean {
   );
 }
 
-function isWinner(value: unknown): boolean {
+function isWinner(value: unknown, n: number): boolean {
   const w = value as { seat?: unknown; amount?: unknown; bestHand?: unknown; description?: unknown };
   return (
-    typeof w === "object" && w !== null && (w.seat === 0 || w.seat === 1) && isNumber(w.amount) &&
+    typeof w === "object" && w !== null && isIndex(w.seat, n) && isNumber(w.amount) &&
     (w.description === null || typeof w.description === "string") &&
     (w.bestHand === null || (Array.isArray(w.bestHand) && w.bestHand.every((c) => typeof c === "string" && CARD.test(c))))
+  );
+}
+
+function isPotResult(value: unknown, n: number): boolean {
+  const p = value as { amount?: unknown; eligibleSeats?: unknown; winners?: unknown };
+  return (
+    typeof p === "object" && p !== null && isNumber(p.amount) &&
+    Array.isArray(p.eligibleSeats) && p.eligibleSeats.every((seat) => isIndex(seat, n)) &&
+    Array.isArray(p.winners) && p.winners.length > 0 &&
+    p.winners.every((w) => typeof w === "object" && w !== null && isIndex((w as { seat?: unknown }).seat, n) && isNumber((w as { amount?: unknown }).amount))
   );
 }
 
@@ -63,45 +74,81 @@ function isLegal(value: unknown): boolean {
   );
 }
 
-/** Every part of a table view that the Review screen reads. The view is always the learner's (seat 0). */
-function isView(value: unknown): boolean {
+/** Every part of a table view that the Review screen reads, for a table of `n` seats seen by `learner`. */
+function isView(value: unknown, n: number, learner: number): boolean {
   const v = value as Record<string, unknown>;
   return (
-    typeof v === "object" && v !== null && v.viewerSeat === 0 && STREETS.includes(v.street as string) &&
-    Array.isArray(v.seats) && v.seats.length === 2 && v.seats.every((seat, i) => isSeat(seat, i)) &&
+    typeof v === "object" && v !== null && v.viewerSeat === learner && STREETS.includes(v.street as string) &&
+    Array.isArray(v.seats) && v.seats.length === n && v.seats.every((seat, i) => isSeat(seat, i)) &&
     Array.isArray(v.board) && v.board.length <= 5 && v.board.every((c) => typeof c === "string" && CARD.test(c)) &&
     Array.isArray(v.pots) &&
     v.pots.every((p) => {
       const pot = p as { amount?: unknown; eligibleSeats?: unknown };
-      return typeof p === "object" && p !== null && isNumber(pot.amount) && Array.isArray(pot.eligibleSeats) && pot.eligibleSeats.every(isSeatIndex);
+      return typeof p === "object" && p !== null && isNumber(pot.amount) && Array.isArray(pot.eligibleSeats) && pot.eligibleSeats.every((seat) => isIndex(seat, n));
     }) &&
-    isSeatOrNull(v.buttonSeat) && isSeatOrNull(v.bigBlindSeat) && isSeatOrNull(v.actionTo) &&
+    isIndexOrNull(v.buttonSeat, n) && isIndexOrNull(v.bigBlindSeat, n) && isIndexOrNull(v.actionTo, n) &&
     isNumber(v.smallBlind) && isNumber(v.bigBlind) && typeof v.handOver === "boolean" &&
-    (v.winners === null || (Array.isArray(v.winners) && v.winners.every(isWinner)))
+    (v.winners === null || (Array.isArray(v.winners) && v.winners.every((w) => isWinner(w, n)))) &&
+    (v.potResults === undefined || v.potResults === null || (Array.isArray(v.potResults) && v.potResults.every((p) => isPotResult(p, n))))
   );
 }
 
-function isMove(value: unknown): boolean {
-  const m = value as { who?: unknown; move?: { type?: unknown; to?: unknown }; view?: unknown; after?: unknown; legal?: unknown };
+function isMove(value: unknown, n: number, learner: number): boolean {
+  const m = value as { actorSeat?: unknown; move?: { type?: unknown; to?: unknown }; view?: unknown; after?: unknown; legal?: unknown };
   const move = m?.move;
   return (
-    typeof m === "object" && m !== null && (m.who === "you" || m.who === "bot") &&
+    typeof m === "object" && m !== null && isIndex(m.actorSeat, n) &&
     typeof move === "object" && move !== null && MOVES.includes(move.type as string) &&
     (move.type !== "bet" && move.type !== "raise" ? true : isNumber(move.to)) &&
-    isView(m.view) && isView(m.after) && (m.who === "you" ? isLegal(m.legal) : m.legal === null)
+    isView(m.view, n, learner) && isView(m.after, n, learner) && (m.actorSeat === learner ? isLegal(m.legal) : m.legal === null)
   );
+}
+
+function isSeatInfo(value: unknown, index: number, learner: number): boolean {
+  const s = value as SeatInfo;
+  return typeof s === "object" && s !== null && s.seat === index && typeof s.name === "string" && s.learner === (index === learner);
 }
 
 /** Checks a loaded record closely enough that the Review screen can show it safely. */
 export function isHandRecord(value: unknown): value is HandRecord {
   const r = value as HandRecord;
+  if (typeof r !== "object" || r === null || r.version !== 2 || !Array.isArray(r.seats)) return false;
+  const n = r.seats.length;
+  const learner = r.learnerSeat;
   return (
-    typeof r === "object" && r !== null && r.version === 1 && typeof r.id === "string" && typeof r.botVersion === "string" &&
-    typeof r.matchNumber === "number" && typeof r.handNumber === "number" && Array.isArray(r.startStacks) &&
-    r.startStacks.length === 2 && r.startStacks.every(isNumber) && Array.isArray(r.moves) && r.moves.every(isMove) &&
-    isView(r.final) && (r.final as { handOver?: unknown }).handOver === true && Array.isArray((r.final as { winners?: unknown }).winners) &&
-    isNumber(r.net)
+    n >= 2 && n <= 6 && isIndex(learner, n) && r.seats.every((seat, i) => isSeatInfo(seat, i, learner)) &&
+    typeof r.id === "string" && typeof r.botVersion === "string" && isNumber(r.matchNumber) && isNumber(r.handNumber) &&
+    Array.isArray(r.startStacks) && r.startStacks.length === n && r.startStacks.every(isNumber) &&
+    Array.isArray(r.toppedUp) && r.toppedUp.every((seat) => isIndex(seat, n) && seat !== learner) &&
+    Array.isArray(r.moves) && r.moves.every((m) => isMove(m, n, learner)) &&
+    isView(r.final, n, learner) && (r.final as { handOver?: unknown }).handOver === true &&
+    Array.isArray((r.final as { winners?: unknown }).winners) && isNumber(r.net)
   );
+}
+
+/**
+ * Converts a version 1 (heads-up) record to version 2: two seats, the learner
+ * in seat 0, and each move's "you"/"bot" turned into a seat number. Anything
+ * else is passed through for `isHandRecord` to judge.
+ */
+export function upgrade(value: unknown): unknown {
+  const r = value as { version?: unknown; moves?: unknown };
+  if (typeof r !== "object" || r === null || r.version !== 1 || !Array.isArray(r.moves)) return value;
+  return {
+    ...r,
+    version: 2,
+    learnerSeat: 0,
+    seats: [
+      { seat: 0, name: "You", learner: true },
+      { seat: 1, name: "Bot", learner: false },
+    ],
+    toppedUp: [],
+    moves: r.moves.map((m) => {
+      if (typeof m !== "object" || m === null) return m;
+      const { who, ...rest } = m as { who?: unknown };
+      return { ...rest, actorSeat: who === "you" ? 0 : who === "bot" ? 1 : -1 };
+    }),
+  };
 }
 
 /** Keeps the newest hands that fit both limits. */

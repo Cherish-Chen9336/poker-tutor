@@ -3,7 +3,7 @@ import type { HandRecord, RecordedMove } from "../game/match";
 import type { TableView } from "../game/types";
 import { practiceBot } from "../game/bot";
 import { Match } from "../game/match";
-import { isHandRecord, loadHands, MAX_BYTES, MAX_HANDS, saveHands, trimHands } from "./hand-store";
+import { isHandRecord, upgrade, loadHands, MAX_BYTES, MAX_HANDS, saveHands, trimHands } from "./hand-store";
 
 function memoryStorage(fail = false): Storage {
   const data = new Map<string, string>();
@@ -33,9 +33,11 @@ function view(note = ""): TableView {
 
 function record(n: number, padding = 0): HandRecord {
   const legal = { fold: true, check: true, call: null, bet: { min: 2, max: 198 }, raise: null };
-  const move: RecordedMove = { who: "you", move: { type: "check" }, view: view(), after: view(), legal };
+  const move: RecordedMove = { actorSeat: 0, move: { type: "check" }, view: view(), after: view(), legal };
   return {
-    version: 1, id: `h${n}`, botVersion: "bot-1", matchNumber: 1, handNumber: n, startStacks: [200, 200],
+    version: 2, id: `h${n}`, botVersion: "bot-1", learnerSeat: 0,
+    seats: [{ seat: 0, name: "You", learner: true }, { seat: 1, name: "Bot", learner: false }],
+    matchNumber: 1, handNumber: n, startStacks: [200, 200], toppedUp: [],
     moves: [move], final: { ...view("x".repeat(padding)), handOver: true, winners: [{ seat: 0, amount: 4, bestHand: null, description: null }] }, net: 0,
   };
 }
@@ -120,5 +122,44 @@ describe("saved hands", () => {
       const saved = JSON.parse(JSON.stringify({ ...match.current!, id: `r${n}`, playedAt: "2026-10-31T00:00:00Z" }));
       expect(isHandRecord(saved), `hand ${n}`).toBe(true);
     }
+  });
+
+  it("converts hands saved in the old heads-up format", () => {
+    const current = record(7);
+    const { learnerSeat: _l, seats: _s, toppedUp: _t, ...rest } = current;
+    void _l; void _s; void _t;
+    const old = { ...rest, version: 1, moves: current.moves.map(({ actorSeat, ...m }) => ({ ...m, who: actorSeat === 0 ? "you" : "bot" })) };
+    const storage = memoryStorage();
+    storage.setItem("poker-tutor:hands", JSON.stringify({ version: 1, hands: [old] }));
+    const loaded = loadHands(storage);
+    expect(loaded).toHaveLength(1);
+    expect(loaded[0]).toEqual(current);
+    expect(isHandRecord(upgrade({ ...old, moves: [{ ...old.moves[0], who: "someone" }] }))).toBe(false);
+    // Newly saved hands use the new format.
+    saveHands(storage, loaded);
+    expect(JSON.parse(storage.getItem("poker-tutor:hands")!).version).toBe(2);
+  });
+
+  it("accepts six-seat hands and checks their seat references", () => {
+    let seed = 11;
+    const random = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    // bot-1 is heads-up only; a simple stand-in plays the five bots until bot-2 exists.
+    const caller = (_view: unknown, legal: { check: boolean; call: number | null; raise: { max: number } | null }) =>
+      legal.check ? { type: "check" as const } : random() < 0.3 && legal.raise ? { type: "raise" as const, to: legal.raise.max } : { type: "call" as const };
+    const match = new Match({ bot: caller, players: 6, random, botRandom: random });
+    let toppedUp = 0;
+    for (let n = 0; n < 150; n++) {
+      match.dealNext();
+      while (!match.handOver) {
+        const legal = match.legalMoves()!;
+        match.act(legal.check ? { type: "check" } : random() < 0.4 ? { type: "fold" } : legal.raise && random() < 0.2 ? { type: "raise", to: legal.raise.max } : { type: "call" });
+      }
+      toppedUp += match.current!.toppedUp.length;
+      const saved = JSON.parse(JSON.stringify({ ...match.current!, id: `s${n}` }));
+      expect(isHandRecord(saved), `hand ${n}`).toBe(true);
+      expect(isHandRecord({ ...saved, toppedUp: [0] })).toBe(false); // the learner is never topped up
+      expect(isHandRecord({ ...saved, moves: saved.moves.map((m: { actorSeat: number }) => ({ ...m, actorSeat: 9 })) })).toBe(saved.moves.length === 0);
+    }
+    expect(toppedUp).toBeGreaterThan(0);
   });
 });

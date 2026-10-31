@@ -4,19 +4,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useTakePendingFocus } from "../app/focus";
 import { useHands } from "../app/hand-store";
-import { handLog, resultLine } from "../game/hand-log";
+import { handLog, moveSentence, resultLine } from "../game/hand-log";
 import type { HandRecord } from "../game/match";
 import { reviewHand, type Verdict } from "../game/review";
 import { CardText } from "../learn/cards";
 import { TableFelt } from "../ui/TableFelt";
 
 const VERDICT_LABEL: Record<Verdict, string> = { mistake: "✗ Mistake", good: "✓ Good", note: "Note" };
-
-function moveSentence(record: HandRecord, index: number): string {
-  // The log has two opening lines, then one line per move plus any "Flop:" lines.
-  const lines = handLog({ ...record, moves: record.moves.slice(0, index + 1), final: null, net: null });
-  return lines.filter((l) => /^(You|The bot) (fold|check|call|bet|raise)/.test(l)).at(-1) ?? "";
-}
 
 function HandReplay({ record }: { record: HandRecord }) {
   const comments = reviewHand(record);
@@ -41,7 +35,7 @@ function HandReplay({ record }: { record: HandRecord }) {
   return (
     <div className="guided">
       <div className="play-main">
-        <TableFelt view={view} youSeat={0} />
+        <TableFelt view={view} youSeat={record.learnerSeat} />
         <div className="replay-nav">
           <button type="button" className="button" disabled={step === 0} onClick={() => setStep(step - 1)}>
             ← Back
@@ -69,14 +63,14 @@ function HandReplay({ record }: { record: HandRecord }) {
                   <span className="verdict-tag">{VERDICT_LABEL[comment.verdict]}</span> <CardText text={comment.text} />
                 </p>
               ) : (
-                <p className="mono">The bot's move. Its cards stay hidden until a showdown.</p>
+                <p className="mono">A bot's move. Bots' cards stay hidden until a showdown.</p>
               )}
             </>
           ) : (
             <>
               <p className="coach-says">
                 <b>
-                  <CardText text={resultLine(record.final!, record.net!)} />
+                  <CardText text={resultLine(record.final!, record.net!, record.seats)} />
                 </b>
               </p>
               <p className="mono">
@@ -175,7 +169,7 @@ export default function ReviewPage() {
             <CardText text={handTitle(selected)} />
           </h2>
           <p className="mono review-sub">
-            {selected.moves.filter((m) => m.who === "you").length} decisions by you
+            {selected.moves.filter((m) => m.actorSeat === selected.learnerSeat).length} decisions by you
             {mistakes ? ` · ${mistakes} clear ${mistakes === 1 ? "mistake" : "mistakes"}` : ""}. Comments use only what you
             could see at the time.
           </p>

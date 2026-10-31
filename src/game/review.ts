@@ -87,5 +87,5 @@ export function commentOn(step: RecordedMove): { verdict: Verdict; text: string 
 
 /** Comments for every learner decision in a hand. */
 export function reviewHand(record: HandRecord): DecisionComment[] {
-  return record.moves.flatMap((step, moveIndex) => (step.who === "you" ? [{ moveIndex, ...commentOn(step) }] : []));
+  return record.moves.flatMap((step, moveIndex) => (step.actorSeat === record.learnerSeat ? [{ moveIndex, ...commentOn(step) }] : []));
 }

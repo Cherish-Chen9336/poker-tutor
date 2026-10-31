@@ -320,3 +320,48 @@ describe("randomized cross-check against the engine", () => {
     expect(decisions).toBeGreaterThan(1000);
   });
 });
+
+describe("topping up players who run out (Step 6)", () => {
+  it("keeps every seat filled and the button moving one seat per hand", () => {
+    const random = seededRandom(12);
+    const table = newTable([200, 6, 6, 6, 6, 6], random);
+    let toppedUp = 0;
+    let previousButton: number | null = null;
+    for (let hand = 0; hand < 60; hand++) {
+      const before = table.view(null);
+      if (hand > 0) expect(before.handOver).toBe(true);
+      for (let seat = 1; seat < 6; seat++) {
+        if (before.seats[seat]!.stack === 0) {
+          table.reseat(seat, 6);
+          toppedUp++;
+        }
+      }
+      if (table.view(null).seats[0]!.stack === 0) break;
+      const totalBefore = table.view(null).seats.reduce((sum, s) => sum + s!.stack, 0);
+      table.dealHand();
+      const view = table.view(null);
+      const button = view.buttonSeat!;
+      if (previousButton !== null) expect(button).toBe((previousButton + 1) % 6);
+      previousButton = button;
+      expect(view.seats[(button + 1) % 6]!.betThisStreet).toBe(1);
+      expect(view.seats[(button + 2) % 6]!.betThisStreet).toBe(2);
+      expect(view.bigBlindSeat).toBe((button + 2) % 6);
+      for (let guard = 0; guard < 60 && !table.view(null).handOver; guard++) {
+        const seat = table.view(null).actionTo!;
+        const legal = table.legalMoves(seat)!;
+        expect(table.move(seat, legal.call !== null ? { type: "call" } : { type: "check" }).ok).toBe(true);
+      }
+      // Top-ups are added before the hand, so results count only chips won or lost.
+      expect(table.netResults().reduce((a, b) => a + b, 0)).toBe(0);
+      expect(table.view(null).seats.reduce((sum, s) => sum + s!.stack, 0)).toBe(totalBefore);
+    }
+    expect(toppedUp).toBeGreaterThan(10);
+  });
+
+  it("refuses to top up during a hand or a player who still has chips", () => {
+    const table = newTable([200, 200, 200]);
+    expect(() => table.reseat(1, 200)).toThrow(/no chips/);
+    table.dealHand();
+    expect(() => table.reseat(1, 200)).toThrow(/between hands/);
+  });
+});

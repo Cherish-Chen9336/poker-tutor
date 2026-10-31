@@ -49,7 +49,7 @@ describe("Match", () => {
       expect(seats[YOU_SEAT]!.stack + seats[BOT_SEAT]!.stack).toBe(400);
       expect(record.net).toBe(seats[YOU_SEAT]!.stack - record.startStacks[YOU_SEAT]);
       for (const [i, step] of record.moves.entries()) {
-        if (step.who === "you") expect(step.legal).not.toBeNull();
+        if (step.actorSeat === YOU_SEAT) expect(step.legal).not.toBeNull();
         expect(step.view.viewerSeat).toBe(YOU_SEAT);
         // Each move's "after" view is the next move's "before" view.
         if (i + 1 < record.moves.length) expect(record.moves[i + 1].view).toEqual(step.after);

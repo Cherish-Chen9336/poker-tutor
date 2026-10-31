@@ -40,7 +40,7 @@ function seeded(seed: number): () => number {
 
 const free: LegalMoves = { fold: true, check: true, call: null, bet: { min: 2, max: 150 }, raise: null };
 const facing = (call: number): LegalMoves => ({ fold: true, check: false, call, bet: null, raise: { min: call * 2, max: 150 } });
-const step = (v: TableView, legal: LegalMoves, move: Move): RecordedMove => ({ who: "you", move, view: v, after: v, legal });
+const step = (v: TableView, legal: LegalMoves, move: Move): RecordedMove => ({ actorSeat: 0, move, view: v, after: v, legal });
 
 describe("review comments", () => {
   it("calls folding when checking was free a mistake", () => {

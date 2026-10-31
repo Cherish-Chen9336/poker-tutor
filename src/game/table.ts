@@ -45,6 +45,7 @@ export class Table {
   /** Shuffle numbers queued for a fixed deal; used before the secure random source. */
   private queuedDraws: number[] = [];
   private stacksAtHandStart: number[] = [];
+  private reseats = 0;
 
   constructor(options: TableOptions) {
     const random = options.random ?? getBrowserRNG();
@@ -86,6 +87,24 @@ export class Table {
     // Saved only after a successful deal. (If the blinds put everyone all-in,
     // the hand is already over at this point.)
     this.stacksAtHandStart = stacks;
+  }
+
+  /**
+   * Between hands: gives a player who has run out of chips a fresh stack, by
+   * having them leave the seat and sit back down. (The engine's add-on chips
+   * only arrive after its "enough players?" check, so they can't refill a
+   * table where most players are out.) Seats never go empty, and the button
+   * keeps moving one seat per hand; tests check both.
+   */
+  reseat(seat: number, stack: number): void {
+    const state = this.engine.state;
+    const player = state.players[seat];
+    if (!player) throw new Error(`No player in seat ${seat}`);
+    if (state.handNumber > 0 && state.winners === null) throw new Error("Players can only be topped up between hands");
+    if (player.stack !== 0) throw new Error("Only a player with no chips can be topped up");
+    this.reseats++;
+    this.engine.stand(player.id);
+    this.engine.sit(seat, `${player.id.split("~")[0]}~${this.reseats}`, player.name, stack);
   }
 
   /** What the player in `seat` may do, or null if it isn't their turn. */
