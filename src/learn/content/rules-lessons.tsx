@@ -31,8 +31,7 @@ export function Lesson1() {
       <StreetTimeline />
       <p>
         After each deal there's a betting round. In it, players take turns choosing to bet, match a bet, or fold (Lesson 5
-        explains each move). A betting round ends when everyone still in has put in the same amount, or is all-in. Then the
-        next card comes.
+        explains each move). A betting round ends when everyone still in has matched the biggest bet or is all-in, and everyone who can still act has had a turn. Then the hand moves on.
       </p>
       <p>
         <b>Before any cards are dealt,</b> two players must put in forced bets called <T>blinds</T>, so there's always
@@ -79,7 +78,7 @@ export function Lesson2() {
       </p>
       <h2>Starting hands</h2>
       <p>
-        There are 1,326 different 2-card starting hands. You'll hear names like <T>pocket pair</T> (two cards of the same
+        There are 1,326 possible two-card combinations. You'll hear names like <T>pocket pair</T> (two cards of the same
         rank, such as <C c="7c" /> <C c="7h" />), <T>suited</T> (both cards in the same suit), and "AK" (ace-king). A
         pocket pair comes about once every 17 hands.
       </p>
@@ -224,14 +223,11 @@ export function Lesson5() {
         </table>
       </div>
       <p>
-        <b>Facing a bet, you have three choices: fold, call, or raise.</b> Checking isn't one of them. You can't stay in the
-        hand for free once someone has put in more than you.
+        <b>If you owe chips, you can't check.</b> You can fold, call, or raise if allowed.
       </p>
       <p>
         <b>A bet and a raise are the same idea.</b> A bet is the first chips anyone puts in during a betting round. A raise
-        makes an existing bet bigger. After either one, <b>every other player still in the hand gets a turn</b> to fold,
-        call, or raise again, including a player who bet earlier and now faces a raise. Nobody has to match it. They can
-        always fold. The round ends when everyone still in has put in the same amount.
+        makes an existing bet bigger. After either one, <b>every other player who can still act gets a turn</b> to fold, call, or raise if allowed, including a player who bet earlier and now faces a raise. Nobody has to call. The round ends as Lesson 1 describes.
       </p>
       <h2>Why bet or raise at all?</h2>
       <p>There are two main reasons:</p>
@@ -261,11 +257,11 @@ export function Lesson5() {
       <ul>
         <li>The smallest <b>bet</b> is the big blind (2).</li>
         <li>
-          A <b>raise</b> must be at least as big as the last bet or raise in this round. If A raises to 6 (by 4), the next
+          A full <b>raise</b> must add at least as much as the last full bet or raise this round. If A raises to 6 (by 4), the next
           player must raise to at least 10 (6 + 4).
         </li>
         <li>
-          There's no maximum in No-Limit Hold'em. You can bet everything you have, which is called going <T>all-in</T>{" "}
+          In No-Limit Hold'em, the only maximum is your stack: you can bet everything you have, which is called going <T>all-in</T>{" "}
           (Lesson 6).
         </li>
       </ul>
@@ -282,13 +278,12 @@ export function Lesson6() {
       </p>
       <h2>When you can't afford a call</h2>
       <p>
-        Your opponent bets 100, and you have only 30. You may still call for 30, all-in. You can only win as much from your
+        Heads-up, your opponent bets 100, and you have only 30. You may still call for 30, all-in. You can only win as much from your
         opponent as you put in yourself, so <b>the 70 nobody matched goes back to your opponent</b>.
       </p>
       <AllInRefund />
       <p>
-        <b>Heads-up, when your opponent is all-in:</b> you can only call or fold. Raising makes no sense, because nobody is
-        left to match it.
+        <b>Heads-up, when your opponent is all-in and you owe chips:</b> you can only call or fold. Nobody is left to match a raise.
       </p>
       <p>
         <b>Heads-up, after an all-in is called,</b> no more betting can happen. The remaining shared cards are simply dealt
@@ -303,8 +298,7 @@ export function Lesson6() {
       </p>
       <ul>
         <li>
-          The players who still have chips can keep betting against each other. Their extra chips go into a{" "}
-          <T>side pot</T> that the all-in player can't win.
+          The players who still have chips can keep betting against each other. Their matched extra chips go into a{" "} <T>side pot</T> the all-in player can't win; unmatched chips go back.
         </li>
         <li>
           <b>A short all-in may not reopen the betting.</b> A player who already bet or raised can raise again only if the
@@ -322,7 +316,7 @@ export function Lesson7() {
   return (
     <>
       <p>At the showdown, the remaining players show their cards, and the best five-card hand wins.</p>
-      <h2>Kickers break ties between equal hands</h2>
+      <h2>Kickers can decide otherwise matching hands</h2>
       <p>
         A <T>kicker</T> is a card that doesn't make up the pair or other combination but still counts toward the 5. Board:{" "}
         <C c="Ad" /> <C c="8c" /> <C c="4s" /> <C c="9h" /> <C c="2c" />. You hold <C c="As" /> <C c="Kd" />; your
@@ -340,8 +334,7 @@ export function Lesson7() {
       </p>
       <h2>Split pots</h2>
       <p>
-        When hands are exactly equal, the pot is shared equally. If it can't be split evenly, the leftover chip goes to the
-        tied player sitting first to the left of the button.
+        When hands are exactly equal, the pot is shared equally. Any leftover chips go one at a time to the tied players, starting left of the button.
       </p>
       <h2>Showing and mucking</h2>
       <p>

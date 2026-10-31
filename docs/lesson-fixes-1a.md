@@ -56,7 +56,7 @@ Places where the current lesson text is slightly wrong or too loose, found with 
 1. **Now:** "With two cards to come and no more betting (for example, someone is all-in on the flop), multiply by 4."
    **Proposed:** "With two cards to come and no more betting (for example, heads-up after an all-in on the flop), multiply by 4."
    **Why:** At a bigger table, one player being all-in doesn't stop the others betting.
-2. **Quiz L9-Q1:** "you must call 20" → "you must call 20, and your call ends the betting". (Answer unchanged.)
+2. **Quiz L9-Q1:** "The pot is 60 (including the bet), and you must call 20." → "The pot is 60 (including the bet). You must call 20, and your call ends the betting.". (Answer unchanged.)
 
 ## Lesson 10: the gambler's fallacy
 

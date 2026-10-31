@@ -33,7 +33,7 @@ So you can win with the best cards, or by making everyone else give up. Most of 
 | **Turn** | A 4th shared card. |
 | **River** | A 5th and last shared card. |
 
-After each deal there's a betting round. In it, players take turns choosing to bet, match a bet, or fold (Lesson 5 explains each move). A betting round ends when everyone still in has put in the same amount, or is all-in. Then the next card comes.
+After each deal there's a betting round. In it, players take turns choosing to bet, match a bet, or fold (Lesson 5 explains each move). A betting round ends when everyone still in has matched the biggest bet or is all-in, and everyone who can still act has had a turn. Then the hand moves on.
 
 [Diagram: a timeline of the four rounds, showing the board growing from 0 to 3, 4, then 5 cards, with a "betting" marker after each deal and "showdown" at the end.]
 
@@ -78,7 +78,7 @@ You get **2 private cards** (your **hole cards**). Nobody else sees them. The **
 
 **Read the board for what's possible.** Every player shares the same board, so ask: "What's the best hand anyone could have here?" The best possible hand on a given board is called **the nuts**. On K♠ 9♥ 4♣ 2♦ 7♠, nobody can have a straight or a flush, and with no pair on the board, nobody can have a full house. The nuts is three kings, from a player holding two kings.
 
-**Starting hands.** There are 1,326 different 2-card starting hands. You'll hear names like "pocket pair" (two cards of the same rank, such as 7♣ 7♥), "suited" (both cards in the same suit), and "AK" (ace-king). A pocket pair comes about once every 17 hands.
+**Starting hands.** There are 1,326 possible two-card combinations. You'll hear names like "pocket pair" (two cards of the same rank, such as 7♣ 7♥), "suited" (both cards in the same suit), and "AK" (ace-king). A pocket pair comes about once every 17 hands.
 
 ### Quick checks
 
@@ -240,9 +240,9 @@ When it's your turn, you choose one move:
 | **Bet** | When nobody has bet this round | Put in chips that others must match. |
 | **Raise** | When someone has bet | Put in more than the bet, so others must match the new amount. |
 
-**Facing a bet, you have three choices: fold, call, or raise.** Checking isn't one of them. You can't stay in the hand for free once someone has put in more than you.
+**If you owe chips, you can't check.** You can fold, call, or raise if allowed.
 
-**A bet and a raise are the same idea.** A bet is the first chips anyone puts in during a betting round. A raise makes an existing bet bigger. After either one, **every other player still in the hand gets a turn** to fold, call, or raise again, including a player who bet earlier and now faces a raise. Nobody has to match it. They can always fold. The round ends when everyone still in has put in the same amount.
+**A bet and a raise are the same idea.** A bet is the first chips anyone puts in during a betting round. A raise makes an existing bet bigger. After either one, **every other player who can still act gets a turn** to fold, call, or raise if allowed, including a player who bet earlier and now faces a raise. Nobody has to call. The round ends as Lesson 1 describes.
 
 **Why bet or raise at all?** There are two main reasons:
 - **For value:** you think your hand is probably best, and you want worse hands to put more chips in the pot.
@@ -259,8 +259,8 @@ With a medium hand, checking or calling is often better. A bet would mostly get 
 
 **The minimum bet and raise:**
 - The smallest **bet** is the big blind (2).
-- A **raise** must be at least as big as the last bet or raise in this round. If A raises to 6 (by 4), the next player must raise to at least 10 (6 + 4).
-- There's no maximum in No-Limit Hold'em. You can bet everything you have, which is called going **all-in** (Lesson 6).
+- A full **raise** must add at least as much as the last full bet or raise this round. If A raises to 6 (by 4), the next player must raise to at least 10 (6 + 4).
+- In No-Limit Hold'em, the only maximum is your stack: you can bet everything you have, which is called going **all-in** (Lesson 6).
 
 ### Quick checks
 
@@ -277,7 +277,7 @@ With a medium hand, checking or calling is often better. A bet would mostly get 
 - *Why:* A raised by 4 (from 2 to 6). Your raise must also be at least 4 more, so you must raise to at least 10.
 - *Checked by:* table
 
-**L5-Q3.** On the flop, your opponent bets 20. Which moves can you make?
+**L5-Q3.** On the flop, both players have 100 chips. Your opponent bets 20. Which moves can you make?
 - A. Check or bet
 - B. **Fold, call 20, or raise to at least 40** ✓
 - C. Only call
@@ -304,25 +304,25 @@ With a medium hand, checking or calling is often better. A bet would mostly get 
 
 **All-in** means putting in all your chips. You can always call all-in, even with fewer chips than the bet. And whenever you're allowed to raise, you may go all-in even if that's less than a minimum raise.
 
-**When you can't afford a call:** your opponent bets 100, and you have only 30. You may still call for 30, all-in. You can only win as much from your opponent as you put in yourself, so **the 70 nobody matched goes back to your opponent**.
+**When you can't afford a call:** heads-up, your opponent bets 100, and you have only 30. You may still call for 30, all-in. You can only win as much from your opponent as you put in yourself, so **the 70 nobody matched goes back to your opponent**.
 
 [Diagram: the opponent's 100 split into 30 (matched, goes into the pot) and 70 (returned).]
 
-**Heads-up, when your opponent is all-in:** you can only call or fold. Raising makes no sense, because nobody is left to match it.
+**Heads-up, when your opponent is all-in and you owe chips:** you can only call or fold. Nobody is left to match a raise.
 
 **Heads-up, after an all-in is called,** no more betting can happen. The remaining shared cards are simply dealt out ("run out"), and then the showdown decides.
 
 **An all-in can be smaller than a minimum raise.** If the minimum raise is to 10 and you have only 8, you may still go all-in for 8.
 
 **More than two players?** Two things change, and you'll practice both at a bigger table later:
-- The players who still have chips can keep betting against each other. Their extra chips go into a **side pot** that the all-in player can't win.
+- The players who still have chips can keep betting against each other. Their matched extra chips go into a **side pot** the all-in player can't win; unmatched chips go back.
 - **A short all-in may not reopen the betting.** A player who already bet or raised can raise again only if the amount has gone up by at least a full raise since then. For example: A bets 10, B goes all-in for 16 (only 6 more), and C calls. A may call the 6 or fold, but may not raise. If A had only checked, A could raise. And if several short all-ins add up to a full raise, A may raise again.
 
 Heads-up never needs side pots.
 
 ### Quick checks
 
-**L6-Q1.** You have 30 chips. Your opponent bets 100. What can you do?
+**L6-Q1.** Heads-up, you have 30 chips. Your opponent bets 100. What can you do?
 - A. Only fold, because you can't afford it
 - B. **Fold, or call all-in for 30** ✓
 - C. Call 100 by borrowing chips
@@ -349,7 +349,7 @@ Heads-up never needs side pots.
 
 At the showdown, the remaining players show their cards, and the best five-card hand wins.
 
-**Kickers break ties between equal hands.** A **kicker** is a card that doesn't make up the pair or other combination but still counts toward the 5.
+**Kickers can decide otherwise matching hands.** A **kicker** is a card that doesn't make up the pair or other combination but still counts toward the 5.
 - Board: A♦ 8♣ 4♠ 9♥ 2♣. You hold A♠ K♦; your opponent holds A♣ Q♥.
 - Both have a pair of aces. Compare the next-highest cards: your K beats their Q. **You win.**
 - Kickers are compared one at a time, highest first, until one is different.
@@ -358,7 +358,7 @@ At the showdown, the remaining players show their cards, and the best five-card 
 
 **Sometimes the kicker is on the board.** Board: A♠ K♣ K♠ Q♦ J♥. You hold A♣ 3♦; your opponent holds A♦ 4♥. Both best hands are A-A-K-K-Q. Your 3 and their 4 don't play, so you **split the pot**.
 
-**Split pots.** When hands are exactly equal, the pot is shared equally. If it can't be split evenly, the leftover chip goes to the tied player sitting first to the left of the button.
+**Split pots.** When hands are exactly equal, the pot is shared equally. Any leftover chips go one at a time to the tied players, starting left of the button.
 
 **Showing and mucking.** In a real game, a player who loses at showdown may **muck**: throw their cards away face down without showing them. In this app, all hands at the showdown are shown, so you can learn from them.
 
@@ -517,7 +517,7 @@ Same cards, different prices, different answers. The price matters as much as yo
 
 **Ties count as half** when two players tie: if a river card would split the pot between you and one opponent, count it as half a win. (With more players, a tie pays your share: a third in a three-way tie.)
 
-**A shortcut: the rule of 2 and 4.** Count your outs. With one card to come, multiply by 2. With two cards to come and no more betting (for example, someone is all-in on the flop), multiply by 4. It's only an estimate. For a flush draw on the flop (9 outs, 47 unseen cards, and every out a winner), 9 × 4 = 36%, while the exact chance is 35.0%. With many outs it overestimates more: 15 × 4 = 60%, but the exact chance is 54.1%.
+**A shortcut: the rule of 2 and 4.** Count your outs. With one card to come, multiply by 2. With two cards to come and no more betting (for example, heads-up after an all-in on the flop), multiply by 4. It's only an estimate. For a flush draw on the flop (9 outs, 47 unseen cards, and every out a winner), 9 × 4 = 36%, while the exact chance is 35.0%. With many outs it overestimates more: 15 × 4 = 60%, but the exact chance is 54.1%.
 
 **Careful with outs:** some "outs" can still lose. For example, they might also give your opponent a better hand. The app's checks count every card exactly.
 
@@ -525,7 +525,7 @@ Same cards, different prices, different answers. The price matters as much as yo
 
 ### Quick checks
 
-**L9-Q1.** The pot is 60 (including the bet), and you must call 20. What chance of winning do you need to break even?
+**L9-Q1.** The pot is 60 (including the bet). You must call 20, and your call ends the betting. What chance of winning do you need to break even?
 - A. 33%
 - B. **25%** ✓
 - C. 20%
@@ -564,7 +564,7 @@ Same cards, different prices, different answers. The price matters as much as yo
 [Diagram, live: two bars. One shows "premium hands after 3 losses in a row." The other shows "premium hands in all hands." Both have a margin-of-error line and the expected 2.56% marked.]
 
 - **The chance** of a premium hand is 34 out of 1,326 starting hands, about **2.56%** (1 in 39). This doesn't change after losses.
-- **The counts will wobble.** Over a few hundred cases, the bar might show 2% or 3.5%. That's normal randomness, not a pattern. The margin-of-error line shows how much wobble to expect. As you deal more, the bars settle closer to 2.56% and the margin-of-error lines get shorter.
+- **The counts will wobble.** Over a few hundred cases, the bar might show 2% or 3.5%. That's normal randomness, not a pattern. The margin-of-error line shows how much wobble to expect. With more hands, the bars tend toward 2.56% and the margin-of-error lines generally get shorter.
 - The demo deals hands in groups of 4. It looks for groups where the first 3 hands were losses (a tie breaks the streak), then checks the 4th. This keeps every case independent.
 
 **Within one hand, though, seen cards do matter.** If you see 4 hearts, fewer hearts are left in the deck. That's how outs work in Lesson 9. The fallacy is about *separate* shuffles, not cards in the same hand.
@@ -580,11 +580,11 @@ Same cards, different prices, different answers. The price matters as much as yo
 - *Why:* Each hand is a new shuffle. The deck doesn't remember earlier hands.
 - *Checked by:* review (the simulation shows it)
 
-**L10-Q2.** The simulation shows premium hands at 3.1% after losing streaks, compared with 2.56% overall. What does that mean?
+**L10-Q2.** After losing streaks, 31 of 1,000 hands are premium: 3.1% (95% range: 2.2% to 4.4%), compared with the true chance of 2.56%. What does that mean?
 - A. Losing streaks bring better cards
 - B. **Probably random wobble; check the margin of error** ✓
 - C. The shuffle is broken
-- *Why:* A small sample always differs a little from the true chance. With more hands, it gets closer to 2.56%.
+- *Why:* The range includes 2.56%, so this difference fits ordinary random wobble.
 - *Checked by:* review
 
 **L10-Q3.** On the flop, you see 4 hearts (2 in your hand and 2 on the board). Are hearts now less likely on the turn than if you hadn't seen any?
@@ -640,10 +640,10 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 - *Why:* If every bet means the best hand, folding is always right. Bluffs make calling worthwhile, so your strong hands get paid.
 - *Checked by:* review
 
-**L11-Q3.** Your opponent never folds. Should you bluff?
+**L11-Q3.** In this lesson's game, your opponent never folds. Should you bluff?
 - A. Yes, at least 1 time in 3
 - B. **No; bet your good hands instead** ✓
-- *Why:* A bluff only wins when the opponent folds. Against someone who always calls, every bluff loses.
+- *Why:* In this game a bluff always loses when called, so against someone who never folds, every bluff loses 50.
 - *Checked by:* review
 
 ---
@@ -688,7 +688,7 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 **Why can the aces lose?** When both players are all-in before the flop, no one can fold anymore, but all 5 shared cards are still to come, and they can change who's ahead:
 - **A king comes.** Two kings are still in the deck. If one lands on the board, the kings become three of a kind (or better) and usually beat the pair of aces, unless the aces improve too, for example when an ace also comes. For example, with a board of K♥ 7♣ 2♦ 9♠ 4♥, the kings have K-K-K and the aces have just a pair. This decides about 16 boards in 100.
-- **The kings make a straight or a flush.** For example, four clubs on the board give K♣ a flush, and the aces have no club. This decides about 2.6 boards in 100.
+- **No king comes, but the kings make a straight or a flush.** For example, four clubs on the board give K♣ a flush, and the aces have no club. This decides about 2.6 boards in 100.
 - **Together, that's the 18.6%.** The aces' pair is better *now*, but it isn't a finished hand until the river.
 
 **How to judge instead:**
@@ -725,7 +725,7 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 **What Kelly does and doesn't promise:** it makes your bankroll grow fastest *over the long run*. It doesn't promise profit in the short run, and the swings along the way are large.
 
-**Betting too much is worse than betting too little.** Take a typical run of 100 bets in the 55% example: 55 wins and 45 losses. Each win multiplies your bankroll by (1 + the fraction you bet), and each loss by (1 − that fraction). The order doesn't matter, because multiplying gives the same answer in any order. Starting with 100:
+**Betting too much is worse than betting too little.** Take a typical run of 100 bets in the 55% example: 55 wins and 45 losses. Each win multiplies your bankroll by (1 + the fraction you bet), and each loss by (1 − that fraction). The order doesn't change the final balance: multiplying gives the same answer in any order. Starting with 100:
 
 | You risk each time | After 55 wins and 45 losses |
 |---|---|
@@ -759,9 +759,9 @@ This lesson explains the math; it isn't advice about real money.
 
 **L14-Q2.** In the 55% example, what happens if you always bet twice the Kelly fraction (20%)?
 - A. You grow twice as fast
-- B. **You don't grow; over a long run you slowly lose** ✓
+- B. **A typical run doesn't grow; over a long run it slowly shrinks** ✓
 - C. You can't lose
-- *Why:* Betting too much makes the losses hurt more than the wins help. At twice Kelly, growth per bet is slightly below zero: after 100 bets you're about where you started, and after many more you slowly shrink.
+- *Why:* Betting too much makes the losses hurt more than the wins help. At twice Kelly, growth per bet is slightly below zero: after 100 bets you're about where you started, and after many more you slowly shrink. A few lucky runs pull the average up, but a typical run shrinks.
 - *Checked by:* math
 
 **L14-Q3.** Why do poker players usually risk less than Kelly suggests?
@@ -785,12 +785,12 @@ With six players, each seat has a name, counted clockwise from the button. Switc
 
 - **"Under the gun"** is the first player to act before the flop. The name comes from feeling the pressure of acting first.
 - The **cutoff** is the seat just before the button, and the **hijack** is the one before that.
-- After the flop, the order counts only players still in the hand. If the small blind folded, the big blind acts first.
+- After the flop, start left of the button and skip anyone who folded or is all-in.
 - The names stay with the seats for the whole hand, even after other players fold. They move one seat to the left with the button for the next hand.
 
 **Why position matters even more with six players:**
 - **Acting first is harder.** From under the gun, five players act after you, and any of them could hold a strong hand. A common guideline is to play only your stronger starting hands from early seats.
-- **Acting last is easier.** On the button, you've seen what everyone else did before you choose, and you act last on every round after the flop. A common guideline is to play more hands from late seats.
+- **Acting last is easier.** On the button, you act last after the flop, so you see everyone else's choices first. A common guideline is to play more hands from late seats.
 - **The cards don't change; the information does.** Position doesn't make your cards better. It lets you decide with more information.
 
 **More players, stronger hands needed.** When several players stay in, it's more likely that someone holds a strong hand. A pair that was good heads-up is often behind in a five-way pot.
@@ -806,11 +806,11 @@ With six players, each seat has a name, counted clockwise from the button. Switc
 - *Why:* Before the flop, the first player to act sits just left of the big blind. The blinds act last.
 - *Checked by:* table
 
-**L15-Q2.** Six players, everyone still in after the flop. Who acts first?
+**L15-Q2.** Six players can all still act after the flop. Who acts first?
 - A. **The small blind** ✓
 - B. Under the gun
 - C. The button
-- *Why:* After the flop, the first player still in the hand left of the button acts first. The button acts last.
+- *Why:* After the flop, the first player left of the button who can act goes first. The button acts last.
 - *Checked by:* table
 
 **L15-Q3.** Why do many players play fewer hands from under the gun than from the button?
@@ -824,7 +824,7 @@ With six players, each seat has a name, counted clockwise from the button. Switc
 
 ## Lesson 16: Side pots
 
-When a player goes all-in for less than others bet, they can only win as much from each opponent as they put in themselves (Lesson 6). With three or more players, the chips beyond that go into a **side pot** that the all-in player can't win.
+When a player goes all-in for less than others bet, they can only win as much from each opponent as they put in themselves (Lesson 6). With three or more players, the others' matched extra chips form a **side pot** the all-in player can't win. Unmatched chips go back.
 
 **Example.** Three players are all-in before the flop:
 - **A** has 30 chips.
@@ -849,7 +849,7 @@ So the shortest stack can win at most the main pot. Winning the main pot doesn't
 **Things to keep straight:**
 - **A side pot isn't a split pot.** Side pots are separate pots with different players who can win them. A split pot is one pot shared by tied hands.
 - **Folded chips stay in.** If someone folds after betting, their chips stay in whichever pots they were in, but they can't win any of them.
-- **Ties are settled pot by pot.** Tied hands share each pot they can win. If a pot can't be split evenly, the leftover chip goes to the tied player sitting first to the left of the button.
+- **Ties are settled pot by pot.** Tied hands share each pot they can win. Any leftover chips go one at a time to the tied players, starting left of the button.
 - **One all-in doesn't stop the others.** Players who still have chips can keep betting against each other, and those bets go into the side pot.
 
 ### Quick checks

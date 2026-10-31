@@ -92,8 +92,7 @@ export function Lesson9() {
       </p>
       <h2>A shortcut: the rule of 2 and 4</h2>
       <p>
-        Count your outs. With one card to come, multiply by 2. With two cards to come and no more betting (for example,
-        someone is all-in on the flop), multiply by 4. It's only an estimate. For a flush draw on the flop (9 outs, 47
+        Count your outs. With one card to come, multiply by 2. With two cards to come and no more betting (for example, heads-up after an all-in on the flop), multiply by 4. It's only an estimate. For a flush draw on the flop (9 outs, 47
         unseen cards, and every out a winner), 9 × 4 = 36%, while the exact chance is 35.0%. With many outs it
         overestimates more: 15 × 4 = 60%, but the exact chance is 54.1%.
       </p>
@@ -134,8 +133,7 @@ export function Lesson10() {
         </li>
         <li>
           <b>The counts will wobble.</b> Over a few hundred cases, the bar might show 2% or 3.5%. That's normal randomness,
-          not a pattern. The margin-of-error line shows how much wobble to expect. As you deal more, the bars settle closer
-          to 2.56% and the margin-of-error lines get shorter.
+          not a pattern. The margin-of-error line shows how much wobble to expect. With more hands, the bars tend toward 2.56% and the margin-of-error lines generally get shorter.
         </li>
         <li>
           The demo deals hands in groups of 4. It looks for groups where the first 3 hands were losses (a tie breaks the

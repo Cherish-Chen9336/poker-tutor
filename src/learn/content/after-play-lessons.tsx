@@ -191,7 +191,7 @@ export function Lesson13() {
           <C c="9s" /> <C c="4h" />, the kings have K-K-K and the aces have just a pair. This decides about 16 boards in 100.
         </li>
         <li>
-          <b>The kings make a straight or a flush.</b> For example, four clubs on the board give <C c="Kc" /> a flush, and
+          <b>No king comes, but the kings make a straight or a flush.</b> For example, four clubs on the board give <C c="Kc" /> a flush, and
           the aces have no club. This decides about 2.6 boards in 100.
         </li>
         <li>
@@ -241,8 +241,7 @@ export function Lesson14() {
       <h2>Betting too much is worse than betting too little</h2>
       <p>
         Take a typical run of 100 bets in the 55% example: 55 wins and 45 losses. Each win multiplies your bankroll by (1 +
-        the fraction you bet), and each loss by (1 − that fraction). The order doesn't matter, because multiplying gives the
-        same answer in any order. Starting with 100:
+        the fraction you bet), and each loss by (1 − that fraction). The order doesn't change the final balance: multiplying gives the same answer in any order. Starting with 100:
       </p>
       <div className="table-wrap">
         <table className="moves">

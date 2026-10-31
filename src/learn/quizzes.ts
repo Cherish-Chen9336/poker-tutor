@@ -171,7 +171,7 @@ export const QUIZZES: Record<number, Question[]> = {
     },
     {
       id: "L5-Q3",
-      prompt: "On the flop, your opponent bets 20. Which moves can you make?",
+      prompt: "On the flop, both players have 100 chips. Your opponent bets 20. Which moves can you make?",
       choices: ["Check or bet", "Fold, call 20, or raise to at least 40", "Only call"],
       answer: 1,
       why: "Facing a bet, you can't check. A raise must add at least the size of the bet (20), so the smallest raise is to 40.",
@@ -201,7 +201,7 @@ export const QUIZZES: Record<number, Question[]> = {
   6: [
     {
       id: "L6-Q1",
-      prompt: "You have 30 chips. Your opponent bets 100. What can you do?",
+      prompt: "Heads-up, you have 30 chips. Your opponent bets 100. What can you do?",
       choices: ["Only fold, because you can't afford it", "Fold, or call all-in for 30", "Call 100 by borrowing chips"],
       answer: 1,
       why: "You can always call all-in for what you have. Your opponent's extra 70 goes back to them.",
@@ -295,7 +295,7 @@ export const QUIZZES: Record<number, Question[]> = {
   9: [
     {
       id: "L9-Q1",
-      prompt: "The pot is 60 (including the bet), and you must call 20. What chance of winning do you need to break even?",
+      prompt: "The pot is 60 (including the bet). You must call 20, and your call ends the betting. What chance of winning do you need to break even?",
       choices: ["33%", "25%", "20%"],
       answer: 1,
       why: "20 \u00f7 (60 + 20) = 20 \u00f7 80 = 25%.",
@@ -337,10 +337,10 @@ export const QUIZZES: Record<number, Question[]> = {
     },
     {
       id: "L10-Q2",
-      prompt: "The simulation shows premium hands at 3.1% after losing streaks, compared with 2.56% overall. What does that mean?",
+      prompt: "After losing streaks, 31 of 1,000 hands are premium: 3.1% (95% range: 2.2% to 4.4%), compared with the true chance of 2.56%. What does that mean?",
       choices: ["Losing streaks bring better cards", "Probably random wobble; check the margin of error", "The shuffle is broken"],
       answer: 1,
-      why: "A small sample always differs a little from the true chance. With more hands, it gets closer to 2.56%.",
+      why: "The range includes 2.56%, so this difference fits ordinary random wobble.",
       checkedBy: "review",
     },
     {
@@ -371,10 +371,10 @@ export const QUIZZES: Record<number, Question[]> = {
     },
     {
       id: "L11-Q3",
-      prompt: "Your opponent never folds. Should you bluff?",
+      prompt: "In this lesson's game, your opponent never folds. Should you bluff?",
       choices: ["Yes, at least 1 time in 3", "No; bet your good hands instead"],
       answer: 1,
-      why: "A bluff only wins when the opponent folds. Against someone who always calls, every bluff loses.",
+      why: "In this game a bluff always loses when called, so against someone who never folds, every bluff loses 50.",
       checkedBy: "review",
     },
   ],
@@ -426,9 +426,9 @@ export const QUIZZES: Record<number, Question[]> = {
     {
       id: "L14-Q2",
       prompt: "In the 55% example, what happens if you always bet twice the Kelly fraction (20%)?",
-      choices: ["You grow twice as fast", "You don't grow; over a long run you slowly lose", "You can't lose"],
+      choices: ["You grow twice as fast", "A typical run doesn't grow; over a long run it slowly shrinks", "You can't lose"],
       answer: 1,
-      why: "Betting too much makes the losses hurt more than the wins help. At twice Kelly, growth per bet is slightly below zero: after 100 bets you're about where you started, and after many more you slowly shrink.",
+      why: "Betting too much makes the losses hurt more than the wins help. At twice Kelly, growth per bet is slightly below zero: after 100 bets you're about where you started, and after many more you slowly shrink. A few lucky runs pull the average up, but a typical run shrinks.",
       checkedBy: "math",
     },
     {
@@ -451,10 +451,10 @@ export const QUIZZES: Record<number, Question[]> = {
     },
     {
       id: "L15-Q2",
-      prompt: "Six players, everyone still in after the flop. Who acts first?",
+      prompt: "Six players can all still act after the flop. Who acts first?",
       choices: ["The small blind", "Under the gun", "The button"],
       answer: 0,
-      why: "After the flop, the first player still in the hand left of the button acts first. The button acts last.",
+      why: "After the flop, the first player left of the button who can act goes first. The button acts last.",
       checkedBy: "table",
     },
     {

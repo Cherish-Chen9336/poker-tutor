@@ -209,7 +209,8 @@ const checks: Record<string, () => void> = {
     expectAnswer("L5-Q2", 1);
   },
   "L5-Q3": () => {
-    const t = table([200, 200]);
+    // Both players have 100 chips on the flop (2 each went in before it).
+    const t = table([102, 102]);
     play(t, [[0, call], [1, check], [1, { type: "bet", to: 20 }]]);
     const moves = t.legalMoves(0);
     expect(moves?.check).toBe(false);
@@ -354,6 +355,8 @@ const checks: Record<string, () => void> = {
     expect(growth).toBeLessThan(0);
     expect(Math.round(100 * 1.2 ** 55 * 0.8 ** 45)).toBe(99); // about where it started after 100 bets
     expect(Math.round(100 * Math.exp(10_000 * growth))).toBe(25); // about 25 after 10,000 bets
+    // That's the typical run. The average over all runs still grows, pulled up by a few lucky ones.
+    expect(0.55 * 1.2 + 0.45 * 0.8).toBeCloseTo(1.02);
     expectAnswer("L14-Q2", 1);
   },
   "L15-Q1": () => {

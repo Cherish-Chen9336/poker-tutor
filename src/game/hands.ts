@@ -76,8 +76,9 @@ export function oneCardOdds(a: string[], b: string[], board: string[]): Odds {
  * Two known hands all-in before the flop: counts every possible 5-card board
  * (1,712,304 of them) by result for hand `a`.
  */
-export function allBoardsOdds(a: string[], b: string[]): { wins: number; ties: number; losses: number; total: number } {
-  const used = new Set([...a, ...b]);
+export function allBoardsOdds(a: string[], b: string[], exclude: string[] = []): { wins: number; ties: number; losses: number; total: number } {
+  // `exclude`: cards that may not appear on the board (e.g. to count only boards without a king).
+  const used = new Set([...a, ...b, ...exclude]);
   const rest = getCardCodes([..."23456789TJQKA"].flatMap((r) => [..."shdc"].map((s) => r + s)).filter((c) => !used.has(c)));
   const [a1, a2] = getCardCodes(a);
   const [b1, b2] = getCardCodes(b);

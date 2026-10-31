@@ -22,7 +22,7 @@ export function Lesson15() {
         <li>
           The <T>cutoff</T> is the seat just before the button, and the <T>hijack</T> is the one before that.
         </li>
-        <li>After the flop, the order counts only players still in the hand. If the small blind folded, the big blind acts first.</li>
+        <li>After the flop, start left of the button and skip anyone who folded or is all-in.</li>
         <li>
           The names stay with the seats for the whole hand, even after other players fold. They move one seat to the left
           with the button for the next hand.
@@ -35,8 +35,7 @@ export function Lesson15() {
           hand. A common guideline is to play only your stronger starting hands from early seats.
         </li>
         <li>
-          <b>Acting last is easier.</b> On the button, you've seen what everyone else did before you choose, and you act
-          last on every round after the flop. A common guideline is to play more hands from late seats.
+          <b>Acting last is easier.</b> On the button, you act last after the flop, so you see everyone else's choices first. A common guideline is to play more hands from late seats.
         </li>
         <li>
           <b>The cards don't change; the information does.</b> Position doesn't make your cards better. It lets you decide
@@ -62,8 +61,7 @@ export function Lesson16() {
     <>
       <p>
         When a player goes all-in for less than others bet, they can only win as much from each opponent as they put in
-        themselves (Lesson 6). With three or more players, the chips beyond that go into a <T>side pot</T> that the all-in
-        player can't win.
+        themselves (Lesson 6). With three or more players, the others' matched extra chips form a <T>side pot</T> the all-in player can't win. Unmatched chips go back.
       </p>
       <h2>An example</h2>
       <p>Three players are all-in before the flop: A has 30 chips, B has 80, and C has 100.</p>
@@ -126,8 +124,7 @@ export function Lesson16() {
           they can't win any of them.
         </li>
         <li>
-          <b>Ties are settled pot by pot.</b> Tied hands share each pot they can win. If a pot can't be split evenly, the
-          leftover chip goes to the tied player sitting first to the left of the button.
+          <b>Ties are settled pot by pot.</b> Tied hands share each pot they can win. Any leftover chips go one at a time to the tied players, starting left of the button.
         </li>
         <li>
           <b>One all-in doesn't stop the others.</b> Players who still have chips can keep betting against each other, and

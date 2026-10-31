@@ -124,6 +124,14 @@ describe("lesson text claims", () => {
     // A king alone doesn't guarantee it: if an ace also comes, the aces' three of a kind wins.
     stated(Lesson13, "usually beat the pair of aces, unless the aces improve too, for example when an ace also comes.");
     expect(compareHands(["Kc", "Kd"], ["Ah", "As"], ["Kh", "Ac", "7c", "2d", "9s"])).toBe("b");
+    // The two cases don't overlap: boards with a king, and boards without one where the kings still win.
+    stated(Lesson13, "No king comes, but the kings make a straight or a flush.");
+    const noKing = allBoardsOdds(["Ah", "As"], ["Kc", "Kd"], ["Kh", "Ks"]);
+    expect(noKing.total).toBe(1_370_754); // boards from the 46 unseen cards other than the two kings
+    const share = (n: number) => ((n / odds.total) * 100).toFixed(1);
+    expect([share(odds.losses - noKing.losses), share(noKing.losses)]).toEqual(["16.0", "2.6"]);
+    stated(Lesson13, "This decides about 16 boards in 100.");
+    stated(Lesson13, "This decides about 2.6 boards in 100.");
   });
 
   it("lesson 14: Kelly's table and the twice-Kelly drag", () => {
