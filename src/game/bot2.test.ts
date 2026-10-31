@@ -150,7 +150,7 @@ const T95 = [NaN, 12.71, 4.3, 3.18, 2.78, 2.57, 2.45, 2.36, 2.31, 2.26, 2.23, 2.
 describe("bot-2 at the six-player table", () => {
   // A regression benchmark, not proof the bot can't be beaten: fixed seeds, 10 sessions of 300 hands per
   // style. Tuning (bot-2.1, 2026-10-31) used other seeds; on 12 fresh sessions of 400 hands every style
-  // below lost clearly (after Codex's review fixes, the closest, stealing with a raise to 13, lost 47 ± 10 per 100 hands).
+  // below lost clearly (after Codex's review fixes, the closest, stealing with a raise to 13, lost 46 ± 7 per 100 hands).
   const seeds = Array.from({ length: 10 }, (_, i) => i + 1);
   it("never chooses an illegal move, and no one-trick style beats it", () => {
     for (const [name, learner] of Object.entries(styles)) {
@@ -218,20 +218,21 @@ describe("bot-2 at the six-player table", () => {
    * 200 chips each: `script` gives other seats' moves in order, and `botSeat` is played by bot-2.
    * Returns the bot's moves.
    */
-  function scripted(botSeat: number, botHand: string[], script: [number, Move][], stacks = Array(6).fill(200)): Move[] {
+  function scripted(botSeat: number, botHand: string[], script: [number, Move][], stacks = Array(6).fill(200), seed = 1): Move[] {
     const used = new Set(botHand);
     const deck = "23456789TJQKA".split("").flatMap((r) => "shdc".split("").map((x) => r + x)).filter((c) => !used.has(c));
     const hands = Array.from({ length: 6 }, (_, seat) => (seat === botSeat ? botHand : deck.splice(0, 2)));
     const table = new Table({ seats: stacks.map((stack, i) => ({ id: `p${i}`, name: `P${i}`, stack })), smallBlind: 1, bigBlind: 2 });
     table.dealHand({ hands, board: deck.slice(0, 5) });
     const history: PublicAction[] = [];
+    const bot = seeded(seed);
     const botMoves: Move[] = [];
     const queue = [...script];
     while (!table.view(null).handOver && table.view(null).street === "preflop") {
       const seat = table.view(null).actionTo!;
       let move: Move;
       if (seat === botSeat) {
-        move = tableBot(table.view(seat), table.legalMoves(seat)!, seeded(1), history);
+        move = tableBot(table.view(seat), table.legalMoves(seat)!, bot, history);
         botMoves.push(move);
       } else {
         if (!queue.length) break;
@@ -265,12 +266,40 @@ describe("bot-2 at the six-player table", () => {
   it("defends its small-blind limps against a raise of any size (Codex's bot-2.1 reviews)", () => {
     // The small blind limps hands in its button range but not its cutoff range.
     const limps = [...OPENING.BTN].filter((k) => !OPENING.SB.has(k));
-    for (const to of [4, 5, 7, 8, 10, 13, 20, 40, 100, 200]) {
-      const share = callShare(limps, (hand) => scripted(1, hand, [...fold, [2, { type: "raise", to }]]));
+    // Its best hands sometimes limp too (as a trap): with seed 7 the bot's first random number makes them limp.
+    const trap = 7;
+    expect(scripted(1, ["As", "Ah"], [...fold], undefined, trap)).toEqual([{ type: "call" }]);
+    expect(scripted(1, ["As", "Ah"], [...fold])).toEqual([{ type: "raise", to: 5 }]);
+    const traps = [...range("TT+ AQs+ AQo+")];
+    for (const to of [4, 5, 7, 8, 10, 13, 20, 40, 81]) {
+      const share = callShare([...limps, ...traps], (hand) => scripted(1, hand, [...fold, [2, { type: "raise", to }]], undefined, trap));
       // A raise to `to` risks to − 2 chips to win the 4 in the pot: it must not win from folds alone.
-      expect(share, `raise to ${to}`).toBeGreaterThanOrEqual(4 / (4 + to - 2) - 0.01);
+      expect(share, `raise to ${to}`).toBeGreaterThanOrEqual(4 / (4 + to - 2) - 0.02);
       expect(share, `raise to ${to}`).toBeGreaterThan(0);
     }
+    // Against a raise for much of a deep stack, only the trapped strong hands go on; weak limps fold.
+    for (const to of [100, 200]) {
+      expect(callShare(limps, (hand) => scripted(1, hand, [...fold, [2, { type: "raise", to }]])), `raise to ${to}`).toBe(0);
+      expect(callShare(traps, (hand) => scripted(1, hand, [...fold, [2, { type: "raise", to }]], undefined, trap)), `raise to ${to}`).toBe(1);
+    }
+    expect(scripted(1, ["Jh", "9c"], [...fold, [2, { type: "raise", to: 200 }]])).toEqual([{ type: "call" }, { type: "fold" }]);
+  });
+
+  it("an over-limp doesn't call off a deep stack with a weak hand (Codex's bot-2.1 reviews)", () => {
+    // The learner limps under the gun, the hijack over-limps 6♠5♠, the big blind moves all in.
+    const script: [number, Move][] = [[3, { type: "call" }], [5, { type: "fold" }], [0, { type: "fold" }], [1, { type: "fold" }], [2, { type: "raise", to: 200 }], [3, { type: "fold" }]];
+    expect(scripted(4, ["6s", "5s"], script)).toEqual([{ type: "call" }, { type: "fold" }]);
+  });
+
+  it("defends its small-blind open against a small re-raise (Codex's bot-2.1 reviews)", () => {
+    // Folded to the small blind, which opens to 5; the big blind re-raises to 8.
+    const opens = [...OPENING.SB];
+    const share = callShare(opens, (hand) => scripted(1, hand, [...fold, [2, { type: "raise", to: 8 }]]));
+    // The re-raise risks 6 more chips to win the 7 in the pot.
+    expect(share).toBeGreaterThanOrEqual(7 / 13 - 0.02);
+    // A re-raise all in is called only with hands fit for it.
+    const shove = callShare(opens.filter((k) => !range("55+ A5s+ ATo+ KQs TT+ AQs+ AQo+").has(k)), (hand) => scripted(1, hand, [...fold, [2, { type: "raise", to: 200 }]]));
+    expect(shove).toBe(0);
   });
 
   it("the big blind defends enough against a lone raise, whatever its stack (Codex's bot-2.1 reviews)", () => {

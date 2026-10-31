@@ -80,6 +80,7 @@ const SHOVE_EARLY = range("88+ AJs+ AQo+");
 const SHOVE_LATE = range("55+ A5s+ ATo+ KQs");
 const CALL_SHOVE_ONE = range("TT+ AQs+ AQo+");
 const CALL_SHOVE_MANY = range("QQ+ AKs AKo");
+const ALL_IN_FIT = union(SHOVE_LATE, CALL_SHOVE_ONE); // hands the bot will put a deep stack in with
 
 /** Every starting hand, as keys ("AA", "AKs", "AKo", …). */
 const ALL = new Set([...RANKS].flatMap((a, i) => [...RANKS].slice(0, i + 1).flatMap((b) => (a === b ? [a + b] : [a + b + "s", a + b + "o"]))));
@@ -96,19 +97,22 @@ function chen(key: string): number {
 }
 const BY_STRENGTH = [...ALL].sort((a, b) => chen(b) - chen(a) || combosOf(a) - combosOf(b) || RANKS.indexOf(b[0]) - RANKS.indexOf(a[0]) || RANKS.indexOf(b[1]) - RANKS.indexOf(a[1]));
 
-/** The strongest hands of `from` that make up at least `share` of its combinations. */
-function strongest(from: Set<string>, share: number): Set<string> {
-  const total = [...from].reduce((sum, k) => sum + combosOf(k), 0);
+/**
+ * The strongest hands of `from` making up about `wanted` combinations. A hand class is added only if that
+ * lands nearer the target than stopping, so a small range isn't rounded up to a whole extra class.
+ */
+function strongest(from: Set<string>, wanted: number): Set<string> {
   const kept = new Set<string>();
   let count = 0;
   for (const key of BY_STRENGTH) {
-    if (count >= share * total) break;
     if (!from.has(key)) continue;
+    if (count + combosOf(key) / 2 > wanted) break;
     kept.add(key);
     count += combosOf(key);
   }
   return kept;
 }
+const combosIn = (keys: Set<string>) => [...keys].reduce((sum, k) => sum + combosOf(k), 0);
 
 /** Order of acting after the flop: the small blind first, the button last. */
 function postflopOrder(view: TableView, seat: number): number {
@@ -129,8 +133,8 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
 
   // When the bot is the only player left who can stop a lone raise, it continues with at least enough of
   // the hands it could hold here that a raise with any two cards can't profit just from folds: the raiser
-  // risks `added` to win `before`, so the bot keeps the strongest before / (before + added) of them.
-  const minimumDefense = (couldHold: Set<string>): Set<string> => {
+  // risks `added` to win `before`, so the bot keeps the strongest before / (before + at risk) of them.
+  const minimumDefense = (couldHold: Set<string>, bluffEquity = 0): Set<string> => {
     if (!lastRaise || callersOfLast > 0) return new Set();
     const raiserSeat = view.seats[lastRaise.seat]!;
     const inFront = raiserSeat.betThisStreet; // the raise itself, at most the raiser's chips
@@ -143,7 +147,14 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
     const stillToAct = view.seats.filter((x) => x && x.seat !== seat && x.seat !== lastRaise.seat && x.status === "active" && x.betThisStreet < inFront && !actions.some((a) => a.seat === x.seat && a.move.type === "fold"));
     // Someone else still to act shares the job; then the bot keeps its usual ranges.
     if (stillToAct.length > 0 || added <= 0) return new Set();
-    return strongest(couldHold, before / (before + added));
+    // `bluffEquity`: how often a called bluff still wins, so it really risks only `added` minus that share
+    // of the final pot (at least a tenth of `added`).
+    const atRisk = Math.max(0.1 * added, added - bluffEquity * (before + 2 * added));
+    const wanted = (combosIn(couldHold) * before) / (before + atRisk);
+    // A call for much of a deep stack is made only with hands fit to go all in, even if that defends less:
+    // calling off a deep stack with weak hands would cost more than the folds it prevents.
+    const deepAndCommitting = added >= 0.4 * (me.stack + me.betThisStreet) && effective > 20;
+    return strongest(deepAndCommitting ? new Set([...couldHold].filter((k) => ALL_IN_FIT.has(k))) : couldHold, wanted);
   };
 
   // Stacks against the biggest opponent still in the hand.
@@ -170,6 +181,8 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
       const raiseWith = sbOnly ? OPENING.CO : ISOLATE;
       return limpers > 0 && raiseWith.has(key) ? aggress(legal, 3 * bb + limpers * bb, { type: "check" }) : { type: "check" };
     }
+    // The small blind sometimes just completes with its best hands too, so its limps aren't all weak.
+    if (position === "SB" && limpers === 0 && CALL_SHOVE_ONE.has(key) && random() < 0.5) return callOrCheck;
     if (OPENING[position]?.has(key)) return aggress(legal, limpers > 0 ? 3 * bb + limpers * bb : Math.round(2.5 * bb), callOrCheck);
     // Just calling ("limping"), as casual tables often do: the small blind completes with more hands
     // when everyone folded to it, and others join a pot that someone already limped into.
@@ -196,7 +209,7 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
     // hands it limps with (all of them against a small raise).
     const limped = actions.some((a, i) => a.seat === seat && a.move.type === "call" && i < actions.indexOf(raises[0]));
     if (limped && callersOfLast === 0) {
-      const limpRange = new Set([...(position === "SB" ? OPENING.BTN : FLAT_MULTIWAY)].filter((k) => !OPENING[position]?.has(k)));
+      const limpRange = position === "SB" ? union(new Set([...OPENING.BTN].filter((k) => !OPENING.SB.has(k))), CALL_SHOVE_ONE) : new Set([...FLAT_MULTIWAY].filter((k) => !OPENING[position]?.has(k)));
       const defend = size <= 3.5 ? limpRange : union(minimumDefense(limpRange), CALL_SHOVE_ONE);
       return defend.has(key) ? callOrCheck : { type: "fold" };
     }
@@ -219,7 +232,18 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
   if (raises.length === 2) {
     if (FOUR_BET.has(key)) return aggress(legal, reRaiseTo, callOrCheck);
     const canFlat = inPosition && lastRaiseTo <= 10 * bb && effective >= 40;
-    return canFlat && FLAT_THREE_BET.has(key) ? callOrCheck : { type: "fold" };
+    if (canFlat && FLAT_THREE_BET.has(key)) return callOrCheck;
+    // Re-raised after opening: keep at least the price-based share of the opening range, so a small
+    // re-raise with any cards doesn't win too often (Codex's bot-2.1 review: a re-raise to 8 against
+    // the small blind's open to 5 used to take the pot 91% of the time).
+    const opened = raises[0].seat === seat;
+    if (!opened) return { type: "fold" };
+    // A small re-raise (the call needs at most a quarter of the final pot) is called with the whole opening range.
+    const cheap = callersOfLast === 0 && callPrice(view, seat)!.breakEven <= 0.25;
+    const openRange = OPENING[position] ?? OPENING.BTN;
+    // A called bluff still wins sometimes (random cards keep about 30% equity against an opening range, less
+    // after the opener bets); count 20%.
+    return (cheap ? openRange : minimumDefense(openRange, 0.2)).has(key) ? callOrCheck : { type: "fold" };
   }
 
   // Facing a third raise or more: only the best hands go on, all-in.
