@@ -779,18 +779,9 @@ These two lessons come with the 6-player table in Play.
 
 ## Lesson 15: Position at a six-player table
 
-With six players, each seat has a name. They're counted from the button:
+With six players, each seat has a name, counted clockwise from the button. Switch between "Before the flop" and "After the flop" to see when each seat acts:
 
-| Seat | Name | Before the flop | After the flop |
-|---|---|---|---|
-| Left of the button | **Small blind (SB)** | acts 5th | acts 1st |
-| Next | **Big blind (BB)** | acts last (6th) | acts 2nd |
-| Next | **Under the gun (UTG)** | acts **first** | acts 3rd |
-| Next | **Hijack (HJ)** | acts 2nd | acts 4th |
-| Next | **Cutoff (CO)** | acts 3rd | acts 5th |
-| The dealer | **Button (BTN)** | acts 4th | acts **last** |
-
-[Diagram: the six-seat table with each seat's name and its place in the order, before and after the flop.]
+[Diagram: the six-seat table with each seat's short and full name, the dealer button, an arrow showing play moves clockwise, and each seat's turn number before or after the flop. Before the flop: UTG, HJ, CO, BTN, SB, BB. After the flop: SB, BB, UTG, HJ, CO, BTN.]
 
 - **"Under the gun"** is the first player to act before the flop. The name comes from feeling the pressure of acting first.
 - The **cutoff** is the seat just before the button, and the **hijack** is the one before that.

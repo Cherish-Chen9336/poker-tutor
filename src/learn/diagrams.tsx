@@ -123,6 +123,10 @@ export function SeatMap() {
   };
   const SHORT: Record<string, string> = { "Small blind": "SB", "Big blind": "BB", "Under the gun": "UTG", Hijack: "HJ", Cutoff: "CO" };
   const short = (label: string) => (label.startsWith("Button") ? "BTN" : (SHORT[label] ?? label));
+  // An arrow along the bottom of the felt, right to left: play moves clockwise ("to the left").
+  const arc = (deg: number) => ({ x: cx + 118 * Math.cos((deg * Math.PI) / 180), y: cy + 56 * Math.sin((deg * Math.PI) / 180) });
+  const [arcFrom, arcTo] = [arc(62), arc(118)];
+  const arrowId = `${id.replace(/[^\w-]/g, "")}-arrow`; // useId's colons would break url(#…)
   const spoken = order.map((seat) => layout.labels[seat]).join(", then ");
 
   return (
@@ -143,27 +147,42 @@ export function SeatMap() {
           ))}
         </div>
       </div>
-      <svg viewBox="0 -30 400 320" role="img" aria-labelledby={id}>
+      <svg viewBox="0 -50 400 350" role="img" aria-labelledby={id}>
+        <defs>
+          <marker id={arrowId} viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" className="seat-arrow-head" />
+          </marker>
+        </defs>
         <title id={id}>{`${players === 6 ? "6 players" : "Heads-up"}, ${street === "preflop" ? "before the flop" : "after the flop"}: ${spoken}.`}</title>
         <ellipse cx={cx} cy={cy} rx="150" ry="86" className="felt-rail" />
         <ellipse cx={cx} cy={cy} rx="138" ry="75" className="felt" />
         <text x={cx} y={cy - 6} className="felt-text">Order of play</text>
         <text x={cx} y={cy + 14} className="felt-sub">{street === "preflop" ? "before the flop" : "flop, turn, river"}</text>
+        <path d={`M${arcFrom.x} ${arcFrom.y} A118 56 0 0 1 ${arcTo.x} ${arcTo.y}`} className="seat-arrow" markerEnd={`url(#${arrowId})`} />
+        <text x={cx} y={cy + 48} className="felt-hint">clockwise</text>
         {layout.labels.map((label, seat) => {
           const { x, y } = position(seat);
           const turn = order.indexOf(seat) + 1;
+          const below = y > cy;
           return (
             <g key={seat} transform={`translate(${x} ${y})`}>
               <circle r="21" className={seat === 0 ? "seat-dot btn" : "seat-dot"} />
               <text y="5" className="seat-num">{turn}</text>
-              <text y={y > cy ? 36 : -28} className="seat-label">{short(label)}</text>
+              <text y={below ? 38 : -30} className="seat-label">{short(label)}</text>
+              <text y={below ? 58 : -51} className="seat-name">{label}</text>
+              {seat === 0 && (
+                <g transform="translate(25 -17)">
+                  <circle r="10" className="seat-dealer" />
+                  <text y="4" className="seat-dealer-text">D</text>
+                </g>
+              )}
             </g>
           );
         })}
       </svg>
       <figcaption>
-        Numbers show who acts 1st, 2nd, 3rd… <b>Order:</b> {spoken}. BTN is the button, SB the small blind, BB the big
-        blind{players === 6 ? ", UTG under the gun, HJ the hijack, CO the cutoff" : ""}.
+        Numbers show who acts 1st, 2nd, 3rd…; switch the betting round to compare. <b>Order:</b> {spoken}. The seats are
+        named clockwise from the button (marked D).
       </figcaption>
     </figure>
   );

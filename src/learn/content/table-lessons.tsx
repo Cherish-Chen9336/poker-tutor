@@ -6,42 +6,13 @@ function T({ children }: { children: ReactNode }) {
   return <b className="term">{children}</b>;
 }
 
-const SEATS: [string, string, string, string][] = [
-  ["Left of the button", "Small blind (SB)", "acts 5th", "acts 1st"],
-  ["Next", "Big blind (BB)", "acts last (6th)", "acts 2nd"],
-  ["Next", "Under the gun (UTG)", "acts first", "acts 3rd"],
-  ["Next", "Hijack (HJ)", "acts 2nd", "acts 4th"],
-  ["Next", "Cutoff (CO)", "acts 3rd", "acts 5th"],
-  ["The dealer", "Button (BTN)", "acts 4th", "acts last"],
-];
-
 export function Lesson15() {
   return (
     <>
-      <p>With six players, each seat has a name. They're counted from the button:</p>
-      <div className="table-wrap">
-        <table className="moves">
-          <thead>
-            <tr>
-              <th scope="col">Seat</th>
-              <th scope="col">Name</th>
-              <th scope="col">Before the flop</th>
-              <th scope="col">After the flop</th>
-            </tr>
-          </thead>
-          <tbody>
-            {SEATS.map(([seat, name, before, after]) => (
-              <tr key={name}>
-                <td>{seat}</td>
-                <th scope="row">{name}</th>
-                <td>{before}</td>
-                <td>{after}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p>Pick "6 players" to see the order on the table:</p>
+      <p>
+        With six players, each seat has a name, counted clockwise from the button. Switch between "Before the flop" and
+        "After the flop" to see when each seat acts:
+      </p>
       <SeatMap />
       <ul>
         <li>
