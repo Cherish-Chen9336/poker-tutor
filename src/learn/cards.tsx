@@ -56,6 +56,6 @@ export function C({ c }: { c: string }) {
 /** Renders text with card tokens like {Ah} as inline cards. */
 export function CardText({ text }: { text: string }): ReactNode {
   return text.split(/(\{[2-9TJQKA][shdc]\})/).map((part, i) =>
-    /^\{..\}$/.test(part) ? <C key={i} c={part.slice(1, 3)} /> : <Fragment key={i}>{part}</Fragment>,
+    /^\{[2-9TJQKA][shdc]\}$/.test(part) ? <C key={i} c={part.slice(1, 3)} /> : <Fragment key={i}>{part}</Fragment>,
   );
 }

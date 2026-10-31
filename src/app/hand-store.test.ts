@@ -92,6 +92,11 @@ describe("saved hands", () => {
     expect(isHandRecord({ ...good, final: { ...good.final!, winners: [{ seat: 0, amount: 4, bestHand: null, description: 123 as never }] } })).toBe(false);
     expect(isHandRecord({ ...good, moves: [{ ...good.moves[0], legal: { ...good.moves[0].legal!, check: "false" as never } }] })).toBe(false);
     expect(isHandRecord({ ...good, moves: [{ ...good.moves[0], legal: null }] })).toBe(false); // the learner's moves always have legal moves
+    // Codex's third round: seat numbers must be 0 or 1 and match their position.
+    const seats = good.moves[0].view.seats;
+    expect(isHandRecord(withView({ seats: [{ ...seats[0]!, seat: 99 }, seats[1]] }))).toBe(false);
+    expect(isHandRecord(withView({ buttonSeat: 99 }))).toBe(false);
+    expect(isHandRecord(withView({ pots: [{ amount: 4, eligibleSeats: [0, 7] }] }))).toBe(false);
   });
 
   it("drops a single record too big to fit, and trims when loading", () => {

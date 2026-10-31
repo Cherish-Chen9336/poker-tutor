@@ -28,10 +28,13 @@ const STREETS = ["preflop", "flop", "turn", "river", "showdown"];
 const MOVES = ["fold", "check", "call", "bet", "raise"];
 const isNumber = (v: unknown) => typeof v === "number" && Number.isFinite(v);
 
-function isSeat(value: unknown): boolean {
+const isSeatIndex = (v: unknown) => v === 0 || v === 1;
+const isSeatOrNull = (v: unknown) => v === null || isSeatIndex(v);
+
+function isSeat(value: unknown, index: number): boolean {
   const s = value as { seat?: unknown; stack?: unknown; betThisStreet?: unknown; status?: unknown; cards?: unknown; name?: unknown };
   return (
-    typeof s === "object" && s !== null && isNumber(s.seat) && isNumber(s.stack) && isNumber(s.betThisStreet) &&
+    typeof s === "object" && s !== null && s.seat === index && isNumber(s.stack) && isNumber(s.betThisStreet) &&
     typeof s.name === "string" && STATUSES.includes(s.status as string) &&
     (s.cards === null || (Array.isArray(s.cards) && s.cards.length === 2 && s.cards.every((c) => c === null || (typeof c === "string" && CARD.test(c)))))
   );
@@ -65,10 +68,15 @@ function isView(value: unknown): boolean {
   const v = value as Record<string, unknown>;
   return (
     typeof v === "object" && v !== null && v.viewerSeat === 0 && STREETS.includes(v.street as string) &&
-    Array.isArray(v.seats) && v.seats.length === 2 && v.seats.every(isSeat) &&
+    Array.isArray(v.seats) && v.seats.length === 2 && v.seats.every((seat, i) => isSeat(seat, i)) &&
     Array.isArray(v.board) && v.board.length <= 5 && v.board.every((c) => typeof c === "string" && CARD.test(c)) &&
-    Array.isArray(v.pots) && v.pots.every((p) => typeof p === "object" && p !== null && isNumber((p as { amount?: unknown }).amount) && Array.isArray((p as { eligibleSeats?: unknown }).eligibleSeats)) &&
-    (v.buttonSeat === null || isNumber(v.buttonSeat)) && isNumber(v.smallBlind) && isNumber(v.bigBlind) && typeof v.handOver === "boolean" &&
+    Array.isArray(v.pots) &&
+    v.pots.every((p) => {
+      const pot = p as { amount?: unknown; eligibleSeats?: unknown };
+      return typeof p === "object" && p !== null && isNumber(pot.amount) && Array.isArray(pot.eligibleSeats) && pot.eligibleSeats.every(isSeatIndex);
+    }) &&
+    isSeatOrNull(v.buttonSeat) && isSeatOrNull(v.bigBlindSeat) && isSeatOrNull(v.actionTo) &&
+    isNumber(v.smallBlind) && isNumber(v.bigBlind) && typeof v.handOver === "boolean" &&
     (v.winners === null || (Array.isArray(v.winners) && v.winners.every(isWinner)))
   );
 }
