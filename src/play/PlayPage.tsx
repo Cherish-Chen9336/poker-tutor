@@ -196,7 +196,10 @@ export default function PlayPage() {
     const lines = match.current ? handLog(match.current) : [];
     setAnnouncement(spokenText(lines.slice(linesBefore).join(" ")));
     const record = match.current;
-    if (match.handOver && record && countFinished(size, record)) addHand(record); // saved for the Review screen
+    if (match.handOver && record && countFinished(size, record)) {
+      // Saved for the Review screen; a hand too long to store is reported, not lost silently.
+      if (!addHand(record).kept) setNotice("This hand was too long to save for Review.");
+    }
     setFocusTick((n) => n + 1);
     rerender();
   }

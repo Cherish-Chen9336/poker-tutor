@@ -35,7 +35,16 @@ const random = secure();
 // A quick first estimate (about ±2 points), then a better one (about ±1).
 const STAGES = [2_500, 10_000];
 
-self.onmessage = (event: MessageEvent<EquityJob>) => {
+/** Stops every job up to `id` (sent when the learner moves on or leaves Play). */
+export interface EquityCancel {
+  cancel: number;
+}
+
+self.onmessage = (event: MessageEvent<EquityJob | EquityCancel>) => {
+  if ("cancel" in event.data) {
+    latest = Math.max(latest, event.data.cancel + 1);
+    return;
+  }
   const job = event.data;
   latest = Math.max(latest, job.id);
   let stage = 0;

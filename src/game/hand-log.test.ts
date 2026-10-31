@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { practiceBot } from "./bot";
-import { handLog } from "./hand-log";
-import { BOT_SEAT, Match, SIX_SEAT_NAMES } from "./match";
+import { handLog, moveSentence } from "./hand-log";
+import { BOT_SEAT, Match, SIX_SEAT_NAMES, type HandRecord } from "./match";
+import { Table } from "./table";
+import type { Move } from "./types";
 
 function seeded(seed: number): () => number {
   let a = seed >>> 0;
@@ -90,5 +92,40 @@ describe("hand log", () => {
     }
     expect(sawTopUp).toBe(true);
     expect(sawSidePot).toBe(true);
+  });
+
+  /** Plays fixed moves on a fixed deal and records them like a Match does. */
+  function recorded(stacks: number[], hands: string[][], board: string[], moves: [number, Move][]): HandRecord {
+    const table = new Table({ seats: stacks.map((stack, i) => ({ id: `p${i}`, name: i === 0 ? "You" : `Bot${i}`, stack })), smallBlind: 1, bigBlind: 2 });
+    table.dealHand({ hands, board });
+    const record: HandRecord = {
+      version: 2, botVersion: "test", learnerSeat: 0,
+      seats: stacks.map((_, seat) => ({ seat, name: seat === 0 ? "You" : `Bot${seat}`, learner: seat === 0 })),
+      matchNumber: 1, handNumber: 1, startStacks: stacks, toppedUp: [], moves: [], final: null, net: null,
+    };
+    for (const [seat, move] of moves) {
+      const view = table.view(0);
+      const legal = seat === 0 ? table.legalMoves(0) : null;
+      expect(table.move(seat, move).ok).toBe(true);
+      record.moves.push({ actorSeat: seat, move, view, after: table.view(0), legal });
+    }
+    record.final = table.view(0);
+    record.net = table.netResults()[0];
+    return record;
+  }
+
+  it("logs a call with the engine's amount when the big blind is short", () => {
+    // Seat 2, the big blind, has only 1 chip; the button (seat 0) still owes the full 2.
+    const record = recorded([200, 200, 1], [["As", "Kd"], ["7c", "2d"], ["9h", "9s"]], ["2s", "5h", "Td", "Js", "3c"], [[0, { type: "call" }]]);
+    expect(moveSentence(record, 0)).toBe("You call 2.");
+    expect(record.moves[0].view.seats[0]!.stack - record.moves[0].after.seats[0]!.stack).toBe(2);
+  });
+
+  it("keeps a winning all-in call marked all-in", () => {
+    // Heads-up: the bot raises; you (40 chips, aces) call all-in and win.
+    const record = recorded([40, 200], [["As", "Ad"], ["7c", "2d"]], ["2s", "5h", "Td", "Js", "3c"], [[0, { type: "call" }], [1, { type: "raise", to: 100 }], [0, { type: "call" }]]);
+    expect(record.final!.handOver).toBe(true);
+    expect(record.net).toBeGreaterThan(0);
+    expect(moveSentence(record, 2)).toBe("You call 38 (all-in).");
   });
 });

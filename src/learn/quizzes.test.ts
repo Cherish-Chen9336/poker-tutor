@@ -371,6 +371,28 @@ const checks: Record<string, () => void> = {
     expect(view.actionTo).toBe((view.buttonSeat! + 1) % 6); // the small blind
     expectAnswer("L15-Q2", 0);
   },
+  "L15-Q3": () => {
+    // The answer's facts: under the gun has 5 players after it before the flop, and acts
+    // third after the flop (behind both blinds), so 3 players (HJ, CO, BTN) still act after it then.
+    const t = table([200, 200, 200, 200, 200, 200]);
+    const utg = (t.view(null).buttonSeat! + 3) % 6;
+    const preflop: number[] = [];
+    while (t.view(null).street === "preflop") {
+      const seat = t.view(null).actionTo!;
+      preflop.push(seat);
+      play(t, [[seat, t.legalMoves(seat)!.check ? check : call]]);
+    }
+    expect(preflop.indexOf(utg)).toBe(0);
+    expect(preflop.length - 1 - preflop.indexOf(utg)).toBe(5);
+    const flop: number[] = [];
+    while (t.view(null).street === "flop") {
+      const seat = t.view(null).actionTo!;
+      flop.push(seat);
+      play(t, [[seat, check]]);
+    }
+    expect(flop.indexOf(utg)).toBe(2); // third
+    expectAnswer("L15-Q3", 1);
+  },
   "L16-Q1": () => {
     const view = sidePotExample().view(null);
     expect(view.potResults?.[0]).toMatchObject({ amount: 90, eligibleSeats: [0, 1, 2] });

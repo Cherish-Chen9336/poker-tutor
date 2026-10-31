@@ -35,7 +35,7 @@ describe("coach", () => {
     expect(text(view(["Kd", "As"], [], { bets: [1, 2] }))).toEqual([
       "You have the button: you act first before the flop, and last on every later round.",
       "Your cards: {As} {Kd}: ace-king, different suits.",
-      "Calling costs 1 to win a pot of 4. If the betting ended here, you'd need to win 25.0% of the time to break even, counting a tie as half a win. More betting may follow, which changes this math. We haven't estimated your chance of winning.",
+      "Calling costs 1 to win a pot of 4. If the betting ended here, you'd need to win at least 25.0% of the pot on average to break even (a tie earns your share of it). More betting may follow, which changes this math. We haven't estimated your chance of winning.",
     ]);
     expect(text(view(["7c", "7h"], [], { button: 1, bets: [2, 2] }))[1]).toBe("Your cards: {7c} {7h}: a pocket pair of 7s.");
   });
@@ -55,7 +55,7 @@ describe("coach", () => {
 
   it("gives the break-even price when the call ends the betting, without estimating a chance", () => {
     const river = text(view(["Ac", "Qd"], ["As", "9h", "4c", "2d", "7s"], { pot: 60, bets: [0, 20] }));
-    expect(river.at(-1)).toBe("Calling costs 20 to win a pot of 100. If the betting ended here, you'd need to win 20.0% of the time to break even, counting a tie as half a win. We haven't estimated your chance of winning.");
+    expect(river.at(-1)).toBe("Calling costs 20 to win a pot of 100. If the betting ended here, you'd need to win at least 20.0% of the pot on average to break even (a tie earns your share of it). We haven't estimated your chance of winning.");
   });
 
   it("never tells the learner what to do, and gives no other percentages", () => {
@@ -105,19 +105,19 @@ describe("coach", () => {
     it("names the seat and how many act after you before the flop", () => {
       // Button in seat 3: seat 0 is 3 seats left of the button, under the gun.
       expect(text(six({ button: 3, bets: [0, 0, 0, 0, 1, 2] }))[0]).toBe(
-        "You're under the gun (UTG): 5 players act after you before the flop, and third on later rounds if everyone stays in.",
+        "You're under the gun (UTG). In the first round of betting, 5 players act after you; you act third on later rounds if everyone stays in.",
       );
       expect(text(six({ button: 0, bets: [0, 1, 2, 0, 0, 0], folded: [3, 4] }))[0]).toBe(
-        "You're on the button (BTN): 2 players act after you before the flop, and last on every later round.",
+        "You're on the button (BTN). In the first round of betting, 2 players act after you; you act last on every later round.",
       );
-      expect(text(six({ button: 4, bets: [2, 0, 0, 0, 0, 1] }))[0]).toBe("You're the big blind (BB): you act last before the flop, and second on later rounds if everyone stays in.");
+      expect(text(six({ button: 4, bets: [2, 0, 0, 0, 0, 1] }))[0]).toBe("You're the big blind (BB). In the first round of betting, you act last; you act second on later rounds if everyone stays in.");
     });
 
     it("says where you act among the players still in after the flop", () => {
       const flop = ["9c", "5d", "2s"];
       expect(text(six({ button: 0, board: flop, pot: 12, folded: [3, 4, 5] }))[0]).toBe("You act last this round (in position). 2 opponents are still in.");
       expect(text(six({ button: 5, board: flop, pot: 12, folded: [2, 3] }))[0]).toBe("You act first this round. 3 opponents are still in.");
-      expect(text(six({ button: 4, board: flop, pot: 12, folded: [1, 2] }))[0]).toBe("You act second of 4 this round. 3 opponents are still in.");
+      expect(text(six({ button: 4, board: flop, pot: 12, folded: [1, 2] }))[0]).toBe("You act second of the 4 players who can still bet. 3 opponents are still in.");
     });
 
     it("knows a river call doesn't end the betting while someone else can still act", () => {

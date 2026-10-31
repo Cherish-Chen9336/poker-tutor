@@ -58,7 +58,7 @@ describe("equity against random hands", () => {
 });
 
 describe("which estimates the coach asks for", () => {
-  const seats = (statuses: string[]) => statuses.map((status, seat) => ({ seat, status }));
+  const seats = (statuses: string[], bets: number[] = []) => statuses.map((status, seat) => ({ seat, status, betThisStreet: bets[seat] ?? 0 }));
 
   it("asks once when there's one pot", () => {
     expect(equityRequests({ seats: seats(["active", "active", "folded", "active"]), pots: [{ eligibleSeats: [0, 1, 3] }] }, 0)).toEqual([
@@ -76,5 +76,20 @@ describe("which estimates the coach asks for", () => {
       { label: "the main pot", opponents: 3 },
       { label: "side pot 1", opponents: 2 },
     ]);
+  });
+
+  it("adds the side pot formed by this round's bets (Codex's Step 6 audit)", () => {
+    // Seat 1 went all-in on an earlier round; seats 0, 2, 3 are betting on the flop.
+    const view = { seats: seats(["active", "all-in", "active", "active"], [0, 0, 10, 0]), pots: [{ eligibleSeats: [0, 1, 2, 3] }] };
+    expect(equityRequests(view, 0)).toEqual([
+      { label: "the main pot", opponents: 3 },
+      { label: "this round's bets", opponents: 2 },
+    ]);
+    // No bets yet this round: only the collected pot.
+    const quiet = { seats: seats(["active", "all-in", "active", "active"]), pots: [{ eligibleSeats: [0, 1, 2, 3] }] };
+    expect(equityRequests(quiet, 0)).toEqual([{ label: "the pot", opponents: 3 }]);
+    // Before the flop, nothing collected yet: everyone still in.
+    const preflop = { seats: seats(["active", "active", "folded", "active"], [0, 1, 0, 2]), pots: [] };
+    expect(equityRequests(preflop, 0)).toEqual([{ label: "the pot", opponents: 2 }]);
   });
 });

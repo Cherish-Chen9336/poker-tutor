@@ -515,7 +515,7 @@ The bot has the button, so you're the big blind. **Your cards:** A♦ 4♣
 
 Same cards, different prices, different answers. The price matters as much as your hand.
 
-**Ties count as half.** If a river card would split the pot, count it as half a win.
+**Ties count as half** when two players tie: if a river card would split the pot between you and one opponent, count it as half a win. (With more players, a tie pays your share: a third in a three-way tie.)
 
 **A shortcut: the rule of 2 and 4.** Count your outs. With one card to come, multiply by 2. With two cards to come and no more betting (for example, someone is all-in on the flop), multiply by 4. It's only an estimate. For a flush draw on the flop (9 outs, 47 unseen cards, and every out a winner), 9 × 4 = 36%, while the exact chance is 35.0%. With many outs it overestimates more: 15 × 4 = 60%, but the exact chance is 54.1%.
 
@@ -822,10 +822,10 @@ With six players, each seat has a name. They're counted from the button:
 
 **L15-Q3.** Why do many players play fewer hands from under the gun than from the button?
 - A. The cards are worse in early seats
-- B. **Five players still act after them, and they act first after the flop too** ✓
+- B. **Five players still act after them before the flop, and most of them act after them later too** ✓
 - C. Under the gun pays a bigger blind
 - *Why:* Early seats decide with the least information. The cards are random in every seat.
-- *Checked by:* review
+- *Checked by:* table
 
 ---
 

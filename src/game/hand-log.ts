@@ -2,6 +2,7 @@
 // Card codes appear as tokens like {Ad}, which screens show as cards.
 import type { HandRecord, RecordedMove, SeatInfo } from "./match";
 import { YOU_SEAT } from "./match";
+import { callPrice } from "./pot-math";
 import type { Move, TableView } from "./types";
 
 const STREET_NAMES: Record<string, string> = { flop: "Flop", turn: "Turn", river: "River" };
@@ -22,10 +23,9 @@ export function describeMove(move: Move, callAmount: number | null): string {
   }
 }
 
+/** What a call cost: the same arithmetic as the coach and the engine (a short big blind still makes callers owe the full blind). */
 function callAmountFor(view: TableView, seat: number): number {
-  const me = view.seats[seat]!;
-  const highest = Math.max(0, ...view.seats.map((s) => s?.betThisStreet ?? 0));
-  return Math.min(highest - me.betThisStreet, me.stack);
+  return callPrice(view, seat)?.toCall ?? 0;
 }
 
 const HEADS_UP_SEATS: SeatInfo[] = [
@@ -48,7 +48,11 @@ function says(seats: SeatInfo[], seat: number, words: string): string {
 
 function moveLine(seats: SeatInfo[], step: RecordedMove): string {
   const words = describeMove(step.move, step.move.type === "call" ? callAmountFor(step.view, step.actorSeat) : null);
-  const allIn = step.move.type !== "fold" && step.move.type !== "check" && step.after.seats[step.actorSeat]?.stack === 0;
+  // All-in means the move used every chip the player had before it (judged before any payout).
+  const before = step.view.seats[step.actorSeat];
+  const added =
+    step.move.type === "call" ? callAmountFor(step.view, step.actorSeat) : "to" in step.move ? step.move.to - (before?.betThisStreet ?? 0) : 0;
+  const allIn = !!before && added > 0 && added >= before.stack;
   return `${says(seats, step.actorSeat, words)}${allIn ? " (all-in)" : ""}.`;
 }
 

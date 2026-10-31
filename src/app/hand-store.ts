@@ -17,7 +17,7 @@ export function loadHands(storage: Storage | null): HandRecord[] {
     if (!raw) return [];
     const data = JSON.parse(raw) as { version?: unknown; hands?: unknown };
     if ((data?.version !== 1 && data?.version !== VERSION) || !Array.isArray(data.hands)) return [];
-    return trimHands(data.hands.map(upgrade).filter(isHandRecord));
+    return trimHands(data.hands.map(upgrade).map(expand).filter(isHandRecord));
   } catch {
     return [];
   }
@@ -50,14 +50,18 @@ function isWinner(value: unknown, n: number): boolean {
   );
 }
 
+const isChips = (v: unknown) => Number.isInteger(v) && (v as number) >= 0;
+
+/** A settled pot: whole chip amounts, winners who could win it (each once), and payouts that add up. */
 function isPotResult(value: unknown, n: number): boolean {
   const p = value as { amount?: unknown; eligibleSeats?: unknown; winners?: unknown };
-  return (
-    typeof p === "object" && p !== null && isNumber(p.amount) &&
-    Array.isArray(p.eligibleSeats) && p.eligibleSeats.every((seat) => isIndex(seat, n)) &&
-    Array.isArray(p.winners) && p.winners.length > 0 &&
-    p.winners.every((w) => typeof w === "object" && w !== null && isIndex((w as { seat?: unknown }).seat, n) && isNumber((w as { amount?: unknown }).amount))
-  );
+  if (typeof p !== "object" || p === null || !isChips(p.amount) || !Array.isArray(p.eligibleSeats) || !Array.isArray(p.winners)) return false;
+  const eligible = p.eligibleSeats;
+  if (!eligible.every((seat) => isIndex(seat, n)) || new Set(eligible).size !== eligible.length) return false;
+  const winners = p.winners as { seat?: unknown; amount?: unknown }[];
+  if (winners.length === 0 || !winners.every((w) => typeof w === "object" && w !== null && eligible.includes(w.seat) && isChips(w.amount))) return false;
+  if (new Set(winners.map((w) => w.seat)).size !== winners.length) return false;
+  return winners.reduce((sum, w) => sum + (w.amount as number), 0) === p.amount;
 }
 
 function isRange(value: unknown): boolean {
@@ -151,12 +155,39 @@ export function upgrade(value: unknown): unknown {
   };
 }
 
+/**
+ * Saves space: a move's "after" view is almost always the next move's "before"
+ * view, so it's stored once and marked "next". `expand` restores it on load.
+ */
+export function compact(record: HandRecord): unknown {
+  return {
+    ...record,
+    moves: record.moves.map((m, i) => {
+      const next = record.moves[i + 1];
+      return next && JSON.stringify(m.after) === JSON.stringify(next.view) ? { ...m, after: "next" } : m;
+    }),
+  };
+}
+
+export function expand(value: unknown): unknown {
+  const r = value as { moves?: unknown };
+  if (typeof r !== "object" || r === null || !Array.isArray(r.moves)) return value;
+  const moves = r.moves as { after?: unknown; view?: unknown }[];
+  return {
+    ...r,
+    moves: moves.map((m, i) =>
+      typeof m === "object" && m !== null && m.after === "next" ? { ...m, after: (moves[i + 1] as { view?: unknown } | undefined)?.view } : m,
+    ),
+  };
+}
+
 /** Keeps the newest hands that fit both limits. */
 export function trimHands(hands: HandRecord[]): HandRecord[] {
   const size = (value: unknown) => JSON.stringify(value).length * 2; // stored as UTF-16, about 2 bytes per character
+  const stored = (hand: HandRecord) => size(compact(hand));
   // A single record too big to fit is dropped rather than allowed to fill the space.
-  let kept = hands.filter((hand) => size(hand) <= MAX_BYTES / 4).slice(-MAX_HANDS);
-  while (kept.length > 1 && size({ version: VERSION, hands: kept }) > MAX_BYTES) kept = kept.slice(1);
+  let kept = hands.filter((hand) => stored(hand) <= MAX_BYTES / 4).slice(-MAX_HANDS);
+  while (kept.length > 1 && size({ version: VERSION, hands: kept.map(compact) }) > MAX_BYTES) kept = kept.slice(1);
   return kept;
 }
 
@@ -165,7 +196,7 @@ export function saveHands(storage: Storage | null, hands: HandRecord[]): boolean
   if (!storage) return false;
   try {
     if (hands.length === 0) storage.removeItem(KEY);
-    else storage.setItem(KEY, JSON.stringify({ version: VERSION, hands }));
+    else storage.setItem(KEY, JSON.stringify({ version: VERSION, hands: hands.map(compact) }));
     return true;
   } catch {
     return false;
@@ -211,7 +242,8 @@ export function useHands() {
   const addHand = useCallback((record: HandRecord) => {
     const stamped: HandRecord = { ...record, id: `${Date.now().toString(36)}-${(counter++).toString(36)}`, playedAt: new Date().toISOString() };
     update([...currentHands(), stamped]);
-    return stamped;
+    // A hand too big to store even compacted is left out; say so instead of losing it silently.
+    return { record: stamped, kept: currentHands().includes(stamped) };
   }, []);
   const clear = useCallback(() => update([]), []);
   return { hands: state, saved, addHand, clear };

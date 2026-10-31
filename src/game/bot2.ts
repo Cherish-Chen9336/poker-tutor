@@ -120,19 +120,19 @@ function preflop(view: TableView, legal: LegalMoves, seat: number, key: string, 
     const late = raiserPosition === "CO" || raiserPosition === "BTN" || raiserPosition === "SB";
     const reRaise = late ? REBUY_LATE : REBUY_EARLY;
     if (reRaise.has(key)) return aggress(legal, reRaiseTo, callOrCheck);
-    const big = lastRaiseTo > 3 * bb;
-    if (big) return FLAT_BIG.has(key) && callersOfLast === 0 ? callOrCheck : { type: "fold" };
+    // Defense shrinks gradually as the raise grows (no sudden cliff a raiser could aim just past).
+    const size = lastRaiseTo / bb;
     // Against a late open with nobody else in yet, sometimes re-raise as a bluff (at random, so it can't be read).
-    if (late && callersOfLast === 0 && LIGHT_REBUY.has(key) && random() < 0.5) return aggress(legal, reRaiseTo, { type: "fold" });
-    // With callers already in, drop the smallest pairs.
-    const flat = callersOfLast > 0 ? range("99-TT AJs-AQs KQs") : late ? FLAT_VS_LATE : FLAT;
-    if (inPosition && flat.has(key)) return callOrCheck;
+    if (late && size <= 6 && callersOfLast === 0 && LIGHT_REBUY.has(key) && random() < 0.5) return aggress(legal, reRaiseTo, { type: "fold" });
     if (position === "BB") {
-      // The big blind already has chips in, so it defends widest: against a late open, its button range.
-      const defend = late && callersOfLast === 0 ? OPENING.BTN : union(flat, BB_DEFEND);
-      if (defend.has(key)) return callOrCheck;
+      // The big blind already has chips in, so it defends widest, by the price rather than the raiser's seat.
+      const defend = size <= 3 && callersOfLast === 0 ? OPENING.BTN : size <= 6 ? OPENING.CO : union(FLAT, BB_DEFEND);
+      return defend.has(key) ? callOrCheck : { type: "fold" };
     }
-    return { type: "fold" };
+    if (size > 6) return FLAT_BIG.has(key) && callersOfLast === 0 && inPosition ? callOrCheck : { type: "fold" };
+    // With callers already in, drop the smallest pairs.
+    const flat = callersOfLast > 0 ? range("99-TT AJs-AQs KQs") : late || size > 3 ? FLAT_VS_LATE : FLAT;
+    return inPosition && flat.has(key) ? callOrCheck : { type: "fold" };
   }
 
   if (raises.length === 2) {

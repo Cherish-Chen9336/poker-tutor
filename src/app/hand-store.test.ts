@@ -3,7 +3,7 @@ import type { HandRecord, RecordedMove } from "../game/match";
 import type { TableView } from "../game/types";
 import { practiceBot } from "../game/bot";
 import { Match } from "../game/match";
-import { isHandRecord, upgrade, loadHands, MAX_BYTES, MAX_HANDS, saveHands, trimHands } from "./hand-store";
+import { compact, expand, isHandRecord, upgrade, loadHands, MAX_BYTES, MAX_HANDS, saveHands, trimHands } from "./hand-store";
 
 function memoryStorage(fail = false): Storage {
   const data = new Map<string, string>();
@@ -161,5 +161,34 @@ describe("saved hands", () => {
       expect(isHandRecord({ ...saved, moves: saved.moves.map((m: { actorSeat: number }) => ({ ...m, actorSeat: 9 })) })).toBe(saved.moves.length === 0);
     }
     expect(toppedUp).toBeGreaterThan(0);
+  });
+
+  it("rejects pot results whose payouts don't add up (Codex's Step 6 audit)", () => {
+    const good = record(1);
+    const withPots = (potResults: unknown) => ({ ...good, final: { ...good.final!, potResults } });
+    expect(isHandRecord(withPots([{ amount: 4, eligibleSeats: [0, 1], winners: [{ seat: 0, amount: 4 }] }]))).toBe(true);
+    expect(isHandRecord(withPots([{ amount: 1, eligibleSeats: [0, 1], winners: [{ seat: 1, amount: 999 }] }]))).toBe(false);
+    expect(isHandRecord(withPots([{ amount: 4, eligibleSeats: [0], winners: [{ seat: 1, amount: 4 }] }]))).toBe(false); // not eligible
+    expect(isHandRecord(withPots([{ amount: 4, eligibleSeats: [0, 1], winners: [{ seat: 0, amount: 2 }, { seat: 0, amount: 2 }] }]))).toBe(false); // twice
+    expect(isHandRecord(withPots([{ amount: 4, eligibleSeats: [0, 1], winners: [{ seat: 0, amount: 4.5 }] }]))).toBe(false);
+  });
+
+  it("stores a long legal six-player hand within the limits (Codex's Step 6 audit)", () => {
+    // Deep stacks and minimum raises: over 200 moves.
+    const minRaise = (_v: unknown, legal: { check: boolean; raise: { min: number; max: number } | null }) =>
+      legal.raise && legal.raise.min < legal.raise.max ? { type: "raise" as const, to: legal.raise.min } : legal.check ? { type: "check" as const } : { type: "call" as const };
+    const match = new Match({ bot: minRaise, players: 6, startingStack: 400, random: () => 0.4, botRandom: () => 0.4 });
+    match.dealNext();
+    while (!match.handOver) match.act(minRaise(null, match.legalMoves()!));
+    const long = { ...match.current!, id: "long" };
+    expect(long.moves.length).toBeGreaterThan(200);
+    expect(JSON.stringify(long).length * 2).toBeGreaterThan(MAX_BYTES / 4); // too big uncompacted
+    expect(JSON.stringify(compact(long)).length * 2).toBeLessThan(MAX_BYTES / 4);
+    expect(expand(JSON.parse(JSON.stringify(compact(long))))).toEqual(JSON.parse(JSON.stringify(long)));
+    expect(trimHands([long])).toHaveLength(1);
+    // Round trip through storage.
+    const storage = memoryStorage();
+    expect(saveHands(storage, [long])).toBe(true);
+    expect(loadHands(storage)).toEqual([JSON.parse(JSON.stringify(long))]);
   });
 });

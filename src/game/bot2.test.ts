@@ -48,12 +48,18 @@ const styles: Record<string, Learner> = {
     return to !== null && legal.bet ? { type: "bet", to } : to !== null && legal.raise ? { type: "raise", to } : checkCall(legal, view, null!);
   },
   "all-in every hand": (legal) => (legal.raise ? { type: "raise", to: legal.raise.max } : legal.bet ? { type: "bet", to: legal.bet.max } : checkCall(legal, null!, null!)),
-  "steal the blinds": (legal, view) => {
-    // Raise when nobody has raised yet before the flop; otherwise fold to any bet, check when free.
-    const unopened = view.street === "preflop" && Math.max(...view.seats.map((s) => s!.betThisStreet)) <= view.bigBlind;
-    if (unopened && legal.raise) return { type: "raise", to: Math.min(legal.raise.max, 3 * view.bigBlind) };
-    return legal.check ? { type: "check" } : { type: "fold" };
-  },
+  // Raise when nobody has raised yet before the flop; otherwise fold to any bet, check when free.
+  // Several sizes: a defense that suddenly narrows above one size could be beaten just past it.
+  ...Object.fromEntries(
+    [5, 7, 10, 16].map((to) => [
+      `steal the blinds, raising to ${to}`,
+      ((legal, view) => {
+        const unopened = view.street === "preflop" && Math.max(...view.seats.map((s) => s!.betThisStreet)) <= view.bigBlind;
+        if (unopened && legal.raise) return { type: "raise", to: Math.min(legal.raise.max, Math.max(legal.raise.min, to)) };
+        return legal.check ? { type: "check" } : { type: "fold" };
+      }) as Learner,
+    ]),
+  ),
 };
 
 /** The learner's results against five copies of bot-2, in big blinds per 100 hands, with a 95% margin. */
@@ -75,15 +81,16 @@ function benchmark(learner: Learner, seeds: number, hands: number) {
 }
 
 describe("bot-2 at the six-player table", () => {
-  // A regression benchmark, not proof the bot can't be beaten (fixed seeds, 3,200 hands per
-  // style; a larger run of 12,000 hands gave stealing +1 ± 3 big blinds per 100 hands).
+  // A regression benchmark, not proof the bot can't be beaten (fixed seeds, 3,200 hands per style).
+  // Tuning used other seeds; a fresh-seed check gave every steal size a loss (−7 to −42 per 100 hands).
   it("never chooses an illegal move, and no one-trick style clearly beats it", () => {
     for (const [name, learner] of Object.entries(styles)) {
       const { per100, margin } = benchmark(learner, 8, 400);
       // Not even the low end of the 95% range is a profit.
       expect(per100 - margin, `${name}: ${per100.toFixed(0)} ± ${margin.toFixed(0)}`).toBeLessThan(0);
-      // Stealing the blinds used to win about 29 per 100 hands; the others lose clearly.
-      if (name !== "steal the blinds") expect(per100 + margin, name).toBeLessThan(0);
+      // Stealing used to win (about +29 per 100 hands raising to 6, then +32 raising to 7 until the defense
+      // stopped narrowing suddenly above 3 big blinds); the other styles lose clearly.
+      if (!name.startsWith("steal")) expect(per100 + margin, name).toBeLessThan(0);
     }
   }, 60_000); // 16,000 hands take a few seconds
 

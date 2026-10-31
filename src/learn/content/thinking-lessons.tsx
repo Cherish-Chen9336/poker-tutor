@@ -87,7 +87,8 @@ export function Lesson9() {
       <p>Same cards, different prices, different answers. The price matters as much as your hand. Try other amounts:</p>
       <PotOddsCalculator />
       <p>
-        <b>Ties count as half.</b> If a river card would split the pot, count it as half a win.
+        <b>Ties count as half</b> when two players tie: if a river card would split the pot between you and one opponent,
+        count it as half a win. (With more players, a tie pays your share: a third in a three-way tie.)
       </p>
       <h2>A shortcut: the rule of 2 and 4</h2>
       <p>

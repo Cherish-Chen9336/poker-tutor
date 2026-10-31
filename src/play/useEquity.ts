@@ -2,13 +2,26 @@
 // answers for the current situation (older ones are ignored).
 import { useEffect, useState } from "react";
 import type { Equity, EquityRequest } from "../game/equity";
-import type { EquityJob, EquityReply } from "../game/equity.worker";
+import type { EquityCancel, EquityJob, EquityReply } from "../game/equity.worker";
 
 let worker: Worker | null = null;
 let nextId = 0;
+let idleTimer: ReturnType<typeof setTimeout> | null = null;
 const listeners = new Set<(reply: EquityReply) => void>();
 
+/** Shuts the worker down after a while with nobody waiting for answers (it restarts when needed). */
+function releaseWhenIdle() {
+  if (idleTimer) clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    if (listeners.size === 0 && worker) {
+      worker.terminate();
+      worker = null;
+    }
+  }, 30_000);
+}
+
 function getWorker(): Worker {
+  if (idleTimer) clearTimeout(idleTimer);
   if (!worker) {
     worker = new Worker(new URL("../game/equity.worker.ts", import.meta.url), { type: "module" });
     worker.onmessage = (event: MessageEvent<EquityReply>) => listeners.forEach((listener) => listener(event.data));
@@ -38,6 +51,9 @@ export function useEquity(hole: string[] | null, board: string[], requests: Equi
     for (const opponents of counts) getWorker().postMessage({ id, hole: jobHole, board: jobBoard, opponents } satisfies EquityJob);
     return () => {
       listeners.delete(listener);
+      // Stop work for this situation: the learner moved on, switched hints off, or left Play.
+      worker?.postMessage({ cancel: id } satisfies EquityCancel);
+      if (listeners.size === 0) releaseWhenIdle();
     };
   }, [key]);
 

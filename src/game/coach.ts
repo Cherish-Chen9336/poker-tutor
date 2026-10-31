@@ -96,22 +96,25 @@ export function coachLines(view: TableView): CoachLine[] {
       });
     }
   } else if (preflop) {
+    // Describes the order of the first round of betting only: after a raise,
+    // players who already acted get another turn.
     const position = positionOf(view, seat);
-    // Before the flop the order is under the gun first … the big blind last.
     const preflopOrder = (s: number) => (s - (view.buttonSeat ?? 0) - 3 + 2 * n) % n;
     const behind = view.seats.filter((s) => s && s.status !== "folded" && preflopOrder(s.seat) > preflopOrder(seat)).length;
-    const later = postflopRank(view, seat) === n ? "and last on every later round" : `and ${ordinal(postflopRank(view, seat))} on later rounds if everyone stays in`;
+    const later = postflopRank(view, seat) === n ? "you act last on every later round" : `you act ${ordinal(postflopRank(view, seat))} on later rounds if everyone stays in`;
     lines.push({
       topic: "position",
-      text: `You're ${SEAT_PHRASE[position]} (${position}): ${
-        behind === 0 ? "you act last before the flop" : `${behind} ${behind === 1 ? "player acts" : "players act"} after you before the flop`
-      }, ${later}.`,
+      text: `You're ${SEAT_PHRASE[position]} (${position}). In the first round of betting, ${
+        behind === 0 ? "you act last" : `${behind} ${behind === 1 ? "player acts" : "players act"} after you`
+      }; ${later}.`,
     });
   } else {
-    const order = live.map((s) => s!.seat).sort((a, b) => postflopRank(view, a) - postflopRank(view, b));
-    const mine = order.indexOf(seat) + 1;
+    // Only players with chips left take turns; all-in players are still in the hand but don't act.
+    const actors = live.filter((s) => s!.status === "active" && s!.stack > 0).map((s) => s!.seat).sort((a, b) => postflopRank(view, a) - postflopRank(view, b));
+    const mine = actors.indexOf(seat) + 1;
     const others = live.length - 1;
-    const where = mine === live.length ? "You act last this round (in position)" : mine === 1 ? "You act first this round" : `You act ${ordinal(mine)} of ${live.length} this round`;
+    const where =
+      mine === actors.length ? "You act last this round (in position)" : mine === 1 ? "You act first this round" : `You act ${ordinal(mine)} of the ${actors.length} players who can still bet`;
     lines.push({ topic: "position", text: `${where}. ${others} ${others === 1 ? "opponent is" : "opponents are"} still in.` });
   }
 
@@ -145,7 +148,8 @@ export function coachLines(view: TableView): CoachLine[] {
     lines.push({ topic: "price", text: "Nothing to call: you can check for free." });
   } else {
     const pct = (price.breakEven * 100).toFixed(1);
-    const allIn = price.toCall >= me.stack ? " Calling puts you all-in." : "";
+    const allIn = price.toCall >= me.stack ? " Calling puts you all-in: you'd put in nothing more, though others may keep betting into a side pot you can't win." : "";
+    const sidePots = view.pots.length > 1 ? " With side pots, this lumps together the pots you can win." : "";
     // The call ends the betting only if nobody else can still bet after it: everyone
     // else still in is all-in, or (on the river) has already matched the bet.
     const highest = Math.max(...view.seats.map((s) => s?.betThisStreet ?? 0));
@@ -159,7 +163,7 @@ export function coachLines(view: TableView): CoachLine[] {
       : "More betting may follow, which changes this math. We haven't estimated your chance of winning.";
     lines.push({
       topic: "price",
-      text: `Calling costs ${price.toCall} to win a pot of ${price.potIfCalled}. If the betting ended here, you'd need to win ${pct}% of the time to break even, counting a tie as half a win.${allIn} ${caveat}`,
+      text: `Calling costs ${price.toCall} to win a pot of ${price.potIfCalled}. If the betting ended here, you'd need to win at least ${pct}% of the pot on average to break even (a tie earns your share of it).${allIn}${sidePots} ${caveat}`,
     });
   }
   return lines;

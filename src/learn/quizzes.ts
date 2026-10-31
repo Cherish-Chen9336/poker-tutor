@@ -460,10 +460,10 @@ export const QUIZZES: Record<number, Question[]> = {
     {
       id: "L15-Q3",
       prompt: "Why do many players play fewer hands from under the gun than from the button?",
-      choices: ["The cards are worse in early seats", "Five players still act after them, and they act first after the flop too", "Under the gun pays a bigger blind"],
+      choices: ["The cards are worse in early seats", "Five players still act after them before the flop, and most of them act after them later too", "Under the gun pays a bigger blind"],
       answer: 1,
       why: "Early seats decide with the least information. The cards are random in every seat.",
-      checkedBy: "review",
+      checkedBy: "table",
     },
   ],
   16: [

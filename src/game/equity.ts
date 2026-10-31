@@ -108,16 +108,22 @@ export interface EquityRequest {
  * opponents can win it too. Pots with the same number of opponents share one
  * estimate (against random hands, only the count matters).
  */
-export function equityRequests(view: { seats: ({ seat: number; status: string } | null)[]; pots: { eligibleSeats: number[] }[] }, learner: number): EquityRequest[] {
-  const live = view.seats.filter((s) => s && s.status !== "folded" && s.status !== "out").length;
+export function equityRequests(
+  view: { seats: ({ seat: number; status: string; betThisStreet: number } | null)[]; pots: { eligibleSeats: number[] }[] },
+  learner: number,
+): EquityRequest[] {
+  const live = view.seats.filter((s): s is NonNullable<typeof s> => !!s && s.status !== "folded" && s.status !== "out");
+  const highest = Math.max(0, ...view.seats.map((s) => s?.betThisStreet ?? 0));
+  // Bets on this round (including the learner's call) go to a pot that only players who can
+  // match them can win: an all-in player who put in less this round can't win that part.
+  const current = live.filter((s) => s.status !== "all-in" || s.betThisStreet >= highest || highest === 0).length - 1;
   const mine = view.pots.filter((pot) => pot.eligibleSeats.includes(learner));
-  if (mine.length <= 1) return [{ label: "the pot", opponents: live - 1 }];
   const requests: EquityRequest[] = [];
-  mine.forEach((pot, i) => {
-    const opponents = pot.eligibleSeats.length - 1;
-    if (!requests.some((r) => r.opponents === opponents)) requests.push({ label: i === 0 ? "the main pot" : `side pot ${i}`, opponents });
-  });
-  // Bets on this street go to the pot that everyone still in can win.
-  if (!requests.some((r) => r.opponents === live - 1)) requests.push({ label: "the newest pot", opponents: live - 1 });
+  const add = (label: string, opponents: number) => {
+    if (opponents > 0 && !requests.some((r) => r.opponents === opponents)) requests.push({ label, opponents });
+  };
+  mine.forEach((pot, i) => add(i === 0 ? "the main pot" : `side pot ${i}`, pot.eligibleSeats.length - 1));
+  if (highest > 0 || mine.length === 0) add(mine.length === 0 ? "the pot" : "this round's bets", current);
+  if (requests.length === 1) requests[0] = { ...requests[0], label: "the pot" };
   return requests;
 }

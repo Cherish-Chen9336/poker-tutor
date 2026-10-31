@@ -10,12 +10,13 @@ function Back() {
   return <span className="pc sm back" role="img" aria-label="Face-down card" />;
 }
 
-/** While betting goes on and there's more than one pot: each pot and how many players can win it. */
-function pots(view: TableView): string[] {
+/** While betting goes on and there's more than one pot: each pot and who can win it. */
+function pots(view: TableView, youSeat: number, names: string[]): string[] {
   if (view.handOver || view.pots.length <= 1) return [];
   return view.pots.map((pot, i) => {
     const name = i === 0 ? "Main pot" : view.pots.length > 2 ? `Side pot ${i}` : "Side pot";
-    return `${name} ${pot.amount} · ${pot.eligibleSeats.length} players`;
+    const who = pot.eligibleSeats.map((seat) => (seat === youSeat ? "You" : names[seat])).join(", ");
+    return `${name} ${pot.amount}: ${who}`;
   });
 }
 
@@ -37,7 +38,11 @@ function Seat({ seat, view, youSeat, names }: { seat: SeatView; view: TableView;
     .filter(Boolean)
     .join(", ");
   return (
-    <div className={`rt-seat p${(seat.seat - youSeat + view.seats.length) % view.seats.length} ${you ? "you" : ""} ${status} ${acting ? "acting" : ""} ${won ? "winner" : ""}`} aria-label={label}>
+    <div
+      role="group"
+      aria-label={label}
+      className={`rt-seat p${(seat.seat - youSeat + view.seats.length) % view.seats.length} ${you ? "you" : ""} ${status} ${acting ? "acting" : ""} ${won ? "winner" : ""}`}
+    >
       <div className="rt-hand" aria-hidden={!seat.cards?.some(Boolean)}>
         {seat.status === "folded"
           ? null
@@ -70,7 +75,7 @@ export function RoundTable({ view, youSeat, names }: { view: TableView; youSeat:
             )}
           </span>
           <span className="gpot mono">{potLabel(view, youSeat, names)}</span>
-          {pots(view).map((p) => (
+          {pots(view, youSeat, names).map((p) => (
             <span key={p} className="rt-sidepot mono">
               {p}
             </span>
