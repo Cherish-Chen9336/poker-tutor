@@ -19,7 +19,7 @@ export interface ReviewRecord {
 
 export const REVIEWS: ReviewRecord[] = [
   { unit: "messages", locale: "zh-Hans", glossaryVersion: 2, source: "024c0b3356ea1a10", translation: "8952e07769d1ade6", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, simplified after owner feedback, verified on the working tree after 1435d88)", date: "2026-11-02" },
-  { unit: "messages", locale: "ja", glossaryVersion: 2, source: "024c0b3356ea1a10", translation: "f29bd10007d300d5", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, at 912465d)", date: "2026-11-02" },
+  { unit: "messages", locale: "ja", glossaryVersion: 2, source: "024c0b3356ea1a10", translation: "6743386b77e58e59", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, simplified after owner feedback, verified on the working tree after 8e2b19f)", date: "2026-11-02" },
   { unit: "lesson1", locale: "zh-Hans", glossaryVersion: 2, source: "d448be4b19f541a6", translation: "0257a035689efb5e", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, simplified after owner feedback, verified on the working tree after 1435d88)", date: "2026-11-02" },
-  { unit: "lesson1", locale: "ja", glossaryVersion: 2, source: "d448be4b19f541a6", translation: "33f47cc0bf662e65", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, at 912465d)", date: "2026-11-02" },
+  { unit: "lesson1", locale: "ja", glossaryVersion: 2, source: "d448be4b19f541a6", translation: "54bae6d2879116bf", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, simplified after owner feedback, verified on the working tree after 8e2b19f)", date: "2026-11-02" },
 ];

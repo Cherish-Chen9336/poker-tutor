@@ -88,7 +88,7 @@ describe("the coach's position line, built from facts", () => {
       "你在关煞位（CO）。翻牌前从枪口位开始，依次轮到大盲位，跳过无法行动的玩家；加注后，其他仍能行动的玩家会再有一次行动机会。翻牌后，如果现在能下注的 4 人到时都能下注，你第 3 个行动，排在小盲位和大盲位之后。",
     );
     expect(phraseFact(createIntl({ locale: "ja", messages: { ...en, ...ja } }), fact)).toMatch(
-      /^あなたはカットオフ（CO）です。.*現在ベットできる4人全員がその時もベットできる場合、あなたは3番目に、スモールブラインドとビッグブラインドの後でアクションします。$/,
+      /^あなたはカットオフ（CO）です。.*今ベットできる4人全員がその時もベットできれば、スモールブラインドとビッグブラインドの後で3番目にアクションします。$/,
     );
   });
 });
@@ -121,7 +121,7 @@ describe("the coach's position line with players all-in", () => {
     expect([s.fact.rank, s.fact.count, s.fact.before]).toEqual([2, 5, ["SB"]]);
     expect(s.en).toMatch(/if all 5 players who can bet now still can, you act second, after the SB\.$/);
     expect(s.zh).toMatch(/如果现在能下注的 5 人到时都能下注，你第 2 个行动，排在小盲位之后。$/);
-    expect(s.ja).toMatch(/現在ベットできる5人全員がその時もベットできる場合、あなたは2番目に、スモールブラインドの後でアクションします。$/);
+    expect(s.ja).toMatch(/今ベットできる5人全員がその時もベットできれば、スモールブラインドの後で2番目にアクションします。$/);
   });
 
   it("after the blinds go all-in, under the gun acts first of the 4 who can still bet (Codex's table case)", () => {
@@ -137,7 +137,7 @@ describe("the coach's position line with players all-in", () => {
     expect(s.fact.count).toBe(1);
     expect(s.en).toMatch(/if you stay in, nobody can bet after this round: the remaining cards are dealt out\.$/);
     expect(s.zh).toMatch(/本轮后没人能再下注，剩余公共牌直接发完。$/);
-    expect(s.ja).toMatch(/このラウンドの後は誰もベットできず、残りのカードがそのまま配られます。$/);
+    expect(s.ja).toMatch(/このラウンド後は誰もベットできず、残りの共有カードがそのまま配られます。$/);
   });
 
   it("names one to four earlier seats, in order, in every language", () => {
