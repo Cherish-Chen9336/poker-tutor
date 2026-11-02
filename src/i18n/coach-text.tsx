@@ -3,6 +3,7 @@
 import type { IntlShape } from "react-intl";
 import type { CoachFact, CoachLine } from "../game/coach";
 import { usePage } from "./hooks";
+import type { Locale } from "./locales";
 import { en, type MessageId } from "./messages/en";
 
 /** Phrases a fact with one language's messages. */
@@ -28,8 +29,8 @@ export function phraseFact(intl: IntlShape, fact: CoachFact): string {
 
 /** A coach line in the page's language: phrased from its fact when there is one, otherwise the English text. */
 export function useCoachLine() {
-  // The reader's language, even though the Play screen around it is still English.
+  // The reader's language; lines not translated yet stay English, and say so with their `lang`.
   const { locale, intl } = usePage();
-  return (line: CoachLine): { text: string; lang: string } =>
+  return (line: CoachLine): { text: string; lang: Locale } =>
     line.fact && locale !== "en" && intl ? { text: phraseFact(intl, line.fact), lang: locale } : { text: line.text, lang: "en" };
 }

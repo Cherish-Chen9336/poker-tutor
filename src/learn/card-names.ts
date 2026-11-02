@@ -26,7 +26,7 @@ export function cardName(code: string, locale: Locale = "en"): string {
   return `${RANK_NAMES[code[0]] ?? code[0]} of ${SUITS[code[1]].name}`;
 }
 
-/** Text with card tokens like {Ah} spelled out ("ace of hearts"), for screen-reader announcements. */
-export function spokenText(text: string): string {
-  return text.replace(/\{([2-9TJQKA][shdc])\}/g, (_, code: string) => cardName(code));
+/** Text with card tokens like {Ah} spelled out ("ace of hearts", "红桃A"), for screen-reader announcements. */
+export function spokenText(text: string, locale: Locale = "en"): string {
+  return text.replace(/\{([2-9TJQKA][shdc])\}/g, (_, code: string) => cardName(code, locale));
 }

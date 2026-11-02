@@ -17,7 +17,7 @@ function PriceBars({ pot, call, need, have }: { pot: number; call: number; need:
         <span className="seg-a" style={{ flexGrow: call }} />
         <span className="seg-b" style={{ flexGrow: pot }} />
       </div>
-      <p className="price-note">{t("price.finalPot", { total: pot + call })}</p>
+      <p className="price-note">{t("price.finalPot", { total: String(pot + call) })}</p>
       {(
         [
           ["need", t("price.need"), need],

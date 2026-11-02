@@ -71,7 +71,7 @@ describe("which estimates the coach asks for", () => {
 
   it("asks once when there's one pot", () => {
     expect(equityRequests(v(["active", "active", "folded", "active"], [0, 0, 0, 0], [100, 100, 0, 100], [[0, 1, 3]]), 0)).toEqual([
-      { label: "the pot", opponents: 2 },
+      { label: "the pot", pot: { kind: "only" }, opponents: 2 },
     ]);
   });
 
@@ -79,8 +79,8 @@ describe("which estimates the coach asks for", () => {
     // Seat 1 is all-in for the main pot only; seats 0, 2, 3 contest the side pot.
     const view = v(["active", "all-in", "active", "active", "folded"], [0, 0, 0, 0, 0], [100, 0, 100, 100, 0], [[0, 1, 2, 3], [0, 2, 3]]);
     expect(equityRequests(view, 0)).toEqual([
-      { label: "the main pot", opponents: 3 },
-      { label: "side pot 1", opponents: 2 },
+      { label: "the main pot", pot: { kind: "main" }, opponents: 3 },
+      { label: "side pot 1", pot: { kind: "side", number: 1 }, opponents: 2 },
     ]);
   });
 
@@ -88,12 +88,12 @@ describe("which estimates the coach asks for", () => {
     // Seat 1 went all-in on an earlier round; seats 0, 2, 3 are betting on the flop.
     const view = v(["active", "all-in", "active", "active"], [0, 0, 10, 0], [100, 0, 90, 100], [[0, 1, 2, 3]]);
     expect(equityRequests(view, 0)).toEqual([
-      { label: "the main pot", opponents: 3 },
-      { label: "side pot 1", opponents: 2 },
+      { label: "the main pot", pot: { kind: "main" }, opponents: 3 },
+      { label: "side pot 1", pot: { kind: "side", number: 1 }, opponents: 2 },
     ]);
     // No bets yet this round: only the collected pot.
     expect(equityRequests(v(["active", "all-in", "active", "active"], [0, 0, 0, 0], [100, 0, 100, 100], [[0, 1, 2, 3]]), 0)).toEqual([
-      { label: "the pot", opponents: 3 },
+      { label: "the pot", pot: { kind: "only" }, opponents: 3 },
     ]);
   });
 
@@ -101,8 +101,8 @@ describe("which estimates the coach asks for", () => {
     // Bets [10, 20, 50, 50]: seat 1 all-in for 20, seat 2 all-in for 50, seat 3 bet 50; you call to 50.
     const view = v(["active", "all-in", "all-in", "active", "folded", "folded"], [10, 20, 50, 50, 0, 0], [190, 0, 0, 150, 0, 0]);
     expect(equityRequests(view, 0)).toEqual([
-      { label: "the main pot", opponents: 3 },
-      { label: "side pot 1", opponents: 2 },
+      { label: "the main pot", pot: { kind: "main" }, opponents: 3 },
+      { label: "side pot 1", pot: { kind: "side", number: 1 }, opponents: 2 },
     ]);
   });
 
@@ -110,14 +110,14 @@ describe("which estimates the coach asks for", () => {
     // Before the flop the big blind (seat 1) posted only 1 and is all-in: you still owe 2, so a side pot forms.
     const shortBlind = v(["active", "all-in", "active"], [0, 1, 0], [200, 0, 200], [], "preflop");
     expect(equityRequests(shortBlind, 0)).toEqual([
-      { label: "the main pot", opponents: 2 },
-      { label: "side pot 1", opponents: 1 },
+      { label: "the main pot", pot: { kind: "main" }, opponents: 2 },
+      { label: "side pot 1", pot: { kind: "side", number: 1 }, opponents: 1 },
     ]);
     // Seat 2 hasn't acted yet but has only 15 chips: it can't win more than its share of 15 each.
     const shortToAct = v(["active", "active", "active"], [0, 40, 0], [200, 160, 15]);
     expect(equityRequests(shortToAct, 0)).toEqual([
-      { label: "the main pot", opponents: 2 },
-      { label: "side pot 1", opponents: 1 },
+      { label: "the main pot", pot: { kind: "main" }, opponents: 2 },
+      { label: "side pot 1", pot: { kind: "side", number: 1 }, opponents: 1 },
     ]);
     // Three layers get three different names.
     const three = v(["active", "all-in", "all-in", "active"], [0, 10, 20, 50], [200, 0, 0, 150]);

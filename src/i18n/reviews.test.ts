@@ -17,6 +17,9 @@ import thinkingSource from "../learn/thinking.tsx?raw";
 import visualsSource from "../learn/visuals.tsx?raw";
 import yourHandsSource from "../learn/YourHands.tsx?raw";
 import coachTextSource from "./coach-text.tsx?raw";
+import { text as jaGuided } from "../learn/guided-text/ja";
+import { text as zhGuided } from "../learn/guided-text/zh-Hans";
+import guidedHandsSource from "../learn/guided-hands.ts?raw";
 import { text as jaQuiz } from "../learn/quiz-text/ja";
 import { text as zhQuiz } from "../learn/quiz-text/zh-Hans";
 import { QUIZZES } from "../learn/quizzes";
@@ -35,7 +38,26 @@ function fingerprint(text: string): string {
 
 /** Translated lesson files by language and lesson number. */
 const LESSON_FILES = import.meta.glob<string>("../learn/content/{zh-Hans,ja}/lesson*.tsx", { query: "?raw", import: "default", eager: true });
-const TRANSLATED_LESSONS = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16];
+const TRANSLATED_LESSONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+/** Code that decides which interface words the table, Play screen, and hand log show. */
+const PLAY_SOURCES = import.meta.glob<string>(
+  [
+    "../App.tsx",
+    "../game/log-facts.ts",
+    "../game/hand-log.ts",
+    "../game/equity.ts",
+    "../game/positions.ts",
+    "../game/pot-math.ts",
+    "./log-text.ts",
+    "../ui/*.ts*",
+    "../play/*.ts*",
+    "../learn/GuidedHands.tsx",
+    "../learn/guided-run.ts",
+    "../learn/guided-text.ts",
+    "!../**/*.test.*",
+  ],
+  { query: "?raw", import: "default", eager: true },
+);
 /** The English lesson components, one after another. */
 const ENGLISH_LESSONS = [rulesLessons, thinkingLessons, afterPlayLessons, tableLessons].join("\n");
 const lessonFile = (locale: string, n: number) => LESSON_FILES[`../learn/content/${locale}/lesson${n}.tsx`];
@@ -61,21 +83,26 @@ function inputs(): Inputs {
     diagramData: diagramDataSource,
     // The calculations behind facts the lessons show: equity, the streak simulation, and its random source.
     facts: handsSource + simulateSource + randomSource,
+    // The table, Play screen, and hand log: the code that chooses which words appear.
+    play: Object.values(PLAY_SOURCES).join("\n"),
   };
   for (const n of TRANSLATED_LESSONS) {
     all[`lesson${n}Doc`] = between(lessonsDoc, `## Lesson ${n}:`, `## Lesson ${n + 1}:`);
     all[`lesson${n}Page`] = between(ENGLISH_LESSONS, `export function Lesson${n}()`, "\nexport function ");
     all[`lesson${n}Quiz`] = JSON.stringify(QUIZZES[n]);
-    all[`zhLesson${n}`] = lessonFile("zh-Hans", n) + JSON.stringify(QUIZZES[n].map((q) => zhQuiz[q.id]));
-    all[`jaLesson${n}`] = lessonFile("ja", n) + JSON.stringify(QUIZZES[n].map((q) => jaQuiz[q.id]));
+    // Lesson 8's guided hands are part of its text: the English scripts and their translations.
+    const guided = (text: unknown) => (n === 8 ? JSON.stringify(text) : "");
+    if (n === 8) all[`lesson${n}Page`] += guidedHandsSource;
+    all[`zhLesson${n}`] = lessonFile("zh-Hans", n) + JSON.stringify(QUIZZES[n].map((q) => zhQuiz[q.id])) + guided(zhGuided);
+    all[`jaLesson${n}`] = lessonFile("ja", n) + JSON.stringify(QUIZZES[n].map((q) => jaQuiz[q.id])) + guided(jaGuided);
   }
   return all;
 }
 /** Which inputs are the English source and which the translation, for each unit. Shared code counts on both sides. */
 const SCOPE: Record<string, (locale: ReviewRecord["locale"]) => { source: string[]; translation: string[] }> = {
   messages: (locale) => ({
-    source: ["enMessages", "glossary", "coach", "coachText", "diagrams", "diagramData", "facts"],
-    translation: [locale === "ja" ? "jaMessages" : "zhMessages", "glossary", "cardNames", "coachText", "diagrams", "diagramData", "facts"],
+    source: ["enMessages", "glossary", "coach", "coachText", "diagrams", "diagramData", "facts", "play"],
+    translation: [locale === "ja" ? "jaMessages" : "zhMessages", "glossary", "cardNames", "coachText", "diagrams", "diagramData", "facts", "play"],
   }),
 };
 for (const n of TRANSLATED_LESSONS) {

@@ -99,8 +99,10 @@ export function estimateEquity(hole: string[], board: string[], opponents: numbe
 }
 
 export interface EquityRequest {
-  /** "the pot", "the main pot", or "side pot 1"… */
+  /** "the pot", "the main pot", or "side pot 1"… (English; `pot` says the same for other languages) */
   label: string;
+  /** Which pot: the only one, the main pot, or a numbered side pot. */
+  pot: { kind: "only" | "main" | "side"; number?: number };
   /** Opponents who can win this pot, still in the hand. */
   opponents: number;
 }
@@ -117,7 +119,11 @@ export function equityRequests(view: TableView, learner: number): EquityRequest[
   let sideNumber = 0;
   const add = (opponents: number) => {
     if (opponents <= 0 || requests.some((r) => r.opponents === opponents)) return;
-    requests.push({ label: requests.length === 0 ? "the main pot" : `side pot ${++sideNumber}`, opponents });
+    if (requests.length === 0) requests.push({ label: "the main pot", pot: { kind: "main" }, opponents });
+    else {
+      sideNumber++;
+      requests.push({ label: `side pot ${sideNumber}`, pot: { kind: "side", number: sideNumber }, opponents });
+    }
   };
   // Pots from earlier rounds.
   for (const pot of view.pots.filter((pot) => pot.eligibleSeats.includes(learner))) add(pot.eligibleSeats.length - 1);
@@ -132,6 +138,6 @@ export function equityRequests(view: TableView, learner: number): EquityRequest[
     for (const level of levels) add(live.filter((s) => s.seat === learner || limit(s) >= level).length - 1);
   }
   if (requests.length === 0) add(live.length - 1);
-  if (requests.length === 1) requests[0] = { ...requests[0], label: "the pot" };
+  if (requests.length === 1) requests[0] = { ...requests[0], label: "the pot", pot: { kind: "only" } };
   return requests;
 }

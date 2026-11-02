@@ -95,9 +95,7 @@ function Shell() {
         )}
         {route.area === "play" && (
           <Suspense fallback={<p className="loading">{t("app.loadingTable")}</p>}>
-            <EnglishFallback>
-              <PlayPage />
-            </EnglishFallback>
+            <PlayPage />
           </Suspense>
         )}
         {route.area === "review" && (

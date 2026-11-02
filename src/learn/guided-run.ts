@@ -1,12 +1,21 @@
 // Plays one guided hand through the real engine (Table). The bot's moves are
 // applied automatically; the learner's moves must match the script.
+import { createIntl } from "react-intl";
+import type { LogFact, Who } from "../game/log-facts";
 import { Table } from "../game/table";
 import type { Move, TableView } from "../game/types";
+import { wordLog } from "../i18n/log-text";
+import { en } from "../i18n/messages/en";
 import { BOT, YOU, type GuidedHand, type ScriptStep } from "./guided-hands";
 
-export type MoveCheck = { ok: true } | { ok: false; reason: string };
+/** Why a move was refused, as facts for any language, plus the English sentence. */
+export type MoveCheck =
+  | { ok: true }
+  | { ok: false; reason: string; why: { kind: "notYourTurn" } | { kind: "wrongMove"; move: Move; call: number | null } };
 
-const STREET_NAMES: Record<string, string> = { flop: "Flop", turn: "Turn", river: "River" };
+const english = createIntl({ locale: "en", messages: en });
+const YOU_WHO: Who = { kind: "you" };
+const BOT_WHO: Who = { kind: "bot" };
 
 function sameMove(a: Move, b: Move): boolean {
   return a.type === b.type && ("to" in a ? a.to : null) === ("to" in b ? b.to : null);
@@ -30,8 +39,8 @@ export function describeMove(move: Move, callAmount: number | null): string {
 
 export class GuidedRun {
   readonly table: Table;
-  /** What happened so far, oldest first. Card tokens like {Ad} show as cards. */
-  readonly log: string[] = [];
+  /** What happened so far, oldest first, as facts each language words (src/i18n/log-text.ts). */
+  readonly facts: LogFact[] = [];
   readonly hand: GuidedHand;
   private index = 0;
 
@@ -46,11 +55,15 @@ export class GuidedRun {
     });
     this.table.dealHand({ hands: hand.hands, board: hand.board });
     const you = hand.youSeat;
-    this.log.push(
-      you === 0 ? "You post the small blind (1). The bot posts the big blind (2)." : "The bot posts the small blind (1). You post the big blind (2).",
-    );
-    this.log.push(`Your cards: {${hand.hands[you][0]}} {${hand.hands[you][1]}}. The bot's cards are face down.`);
+    const [small, big] = you === 0 ? [YOU_WHO, BOT_WHO] : [BOT_WHO, YOU_WHO];
+    this.facts.push({ kind: "blinds", small, smallAmount: 1, smallAllIn: false, big, bigAmount: 2, bigAllIn: false });
+    this.facts.push({ kind: "yourCards", cards: hand.hands[you], botHidden: true });
     this.playBotMoves();
+  }
+
+  /** The log in English (for tests and reference). Card tokens like {Ad} show as cards. */
+  get log(): string[] {
+    return this.facts.map((fact) => wordLog(english, fact));
   }
 
   get youSeat(): number {
@@ -61,6 +74,11 @@ export class GuidedRun {
   get pending(): ScriptStep | null {
     const step = this.hand.script[this.index];
     return step && step.who === YOU ? step : null;
+  }
+
+  /** The script index of the learner's pending step (for its coach line in any language). */
+  get stepIndex(): number {
+    return this.index;
   }
 
   get over(): boolean {
@@ -74,12 +92,13 @@ export class GuidedRun {
   /** Applies the learner's move if it's the one this walkthrough asks for. */
   tryMove(move: Move): MoveCheck {
     const step = this.pending;
-    if (!step) return { ok: false, reason: "It isn't your turn." };
+    if (!step) return { ok: false, reason: "It isn't your turn.", why: { kind: "notYourTurn" } };
     if (!sameMove(step.move, move)) {
       const call = this.table.legalMoves(this.youSeat)?.call ?? null;
       return {
         ok: false,
         reason: `That's a legal move, but this walkthrough asks you to ${describeMove(step.move, call)}. You'll make your own choices in Play.`,
+        why: { kind: "wrongMove", move: step.move, call },
       };
     }
     this.apply(step);
@@ -98,24 +117,29 @@ export class GuidedRun {
     const result = this.table.move(seat, step.move);
     if (!result.ok) throw new Error(`Guided hand ${this.hand.id}, step ${this.index + 1}: ${result.reason}`);
     this.index++;
-    const words = describeMove(step.move, callAmount);
-    this.log.push(step.who === YOU ? `You ${words}.` : `The bot ${words.replace(/^(\w+)/, "$1s").replace(/^raises to/, "raises to")}.`);
+    const amount = step.move.type === "call" ? (callAmount ?? undefined) : "to" in step.move ? step.move.to : undefined;
+    this.facts.push({
+      kind: "move",
+      who: step.who === YOU ? YOU_WHO : BOT_WHO,
+      move: step.move.type,
+      ...(amount === undefined ? {} : { amount }),
+      allIn: false,
+    });
 
     const after = this.table.view(null);
     if (after.board.length > before.board.length) {
-      const newCards = after.board.slice(before.board.length).map((c) => `{${c}}`).join(" ");
-      if (after.handOver && after.board.length === 5 && before.board.length < 3) this.log.push(`The board runs out: ${newCards}.`);
-      else this.log.push(`${STREET_NAMES[after.street] ?? "Board"}: ${newCards}.`);
+      const cards = after.board.slice(before.board.length);
+      if (after.handOver && after.board.length === 5 && before.board.length < 3) this.facts.push({ kind: "runOut", cards });
+      else this.facts.push({ kind: "deal", street: after.street, cards });
     }
-    if (after.handOver) this.log.push(this.resultLine(after));
+    if (after.handOver) this.facts.push(this.resultFact(after));
   }
 
-  private resultLine(view: TableView): string {
+  private resultFact(view: TableView): LogFact {
     const winners = view.winners ?? [];
     const net = this.table.netResults()[this.youSeat];
-    const outcome = net > 0 ? `You're ${net} chips up.` : net < 0 ? `You're ${-net} chips down.` : "You're even.";
-    if (winners.length > 1) return `Split pot: ${winners.map((w) => w.amount).join(" and ")}. ${outcome}`;
-    const who = winners[0]?.seat === this.youSeat ? "You win" : "The bot wins";
-    return `${who} ${winners[0]?.amount ?? 0} chips. ${outcome}`;
+    if (winners.length > 1) return { kind: "result", result: { kind: "splitAmounts", amounts: winners.map((w) => w.amount) }, net };
+    const who = winners[0]?.seat === this.youSeat ? YOU_WHO : BOT_WHO;
+    return { kind: "result", result: { kind: "win", who, amount: winners[0]?.amount ?? 0 }, net };
   }
 }

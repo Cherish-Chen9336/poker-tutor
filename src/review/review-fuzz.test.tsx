@@ -3,6 +3,7 @@
 // at random (wrong types, out-of-range numbers, odd strings) and every one that
 // passes the checks is run through everything Review shows.
 import { renderToStaticMarkup } from "react-dom/server";
+import { IntlProvider } from "react-intl";
 import { describe, expect, it } from "vitest";
 import { isHandRecord } from "../app/hand-store";
 import { practiceBot } from "../game/bot";
@@ -10,6 +11,7 @@ import { tableBot } from "../game/bot2";
 import { handLog, resultLine } from "../game/hand-log";
 import { Match, type HandRecord } from "../game/match";
 import { reviewHand } from "../game/review";
+import { en } from "../i18n/messages/en";
 import { CardText } from "../learn/cards";
 import { PokerTable } from "../ui/PokerTable";
 
@@ -48,7 +50,7 @@ function showInReview(record: HandRecord) {
   const lines = handLog(record);
   renderToStaticMarkup(<>{lines.map((l, i) => <CardText key={i} text={l} />)}</>);
   renderToStaticMarkup(<CardText text={resultLine(record.final!, record.net!)} />);
-  for (const view of [...record.moves.map((m) => m.view), record.final!]) renderToStaticMarkup(<PokerTable view={view} youSeat={record.learnerSeat} names={record.seats.map((s) => s.name)} />);
+  for (const view of [...record.moves.map((m) => m.view), record.final!]) renderToStaticMarkup(<IntlProvider locale="en" messages={en}><PokerTable view={view} youSeat={record.learnerSeat} names={record.seats.map((s) => s.name)} /></IntlProvider>);
 }
 
 describe("damaged saved hands", () => {

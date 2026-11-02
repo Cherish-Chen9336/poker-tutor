@@ -52,7 +52,7 @@ export const GUIDED_HANDS: GuidedHand[] = [
       { who: BOT, move: check },
       { who: YOU, move: check, coach: "Checking is fine too. It keeps the pot smaller, and you act last on the river anyway." },
       { who: BOT, move: betTo(14) },
-      { who: YOU, move: call, coach: "Your opponent's bet doesn't tell you their cards. Bots and people sometimes bet with weak hands (a bluff). You'd need to win more than 1 time in 4 for this call to pay off. That's Lesson 9." },
+      { who: YOU, move: call, coach: "Your opponent's bet doesn't tell you their cards. Bots and people sometimes bet with weak hands (a bluff). For this call to pay off, you need to win more than 1 time in 4, counting a tie as half a win. That's Lesson 9." },
     ],
     ending: "The bot was bluffing. Notice that its calls earlier didn't mean it had a strong hand. Your pair of aces wins the 56-chip pot, and you end the hand 28 chips up.",
     expectedNet: 28,
@@ -67,7 +67,7 @@ export const GUIDED_HANDS: GuidedHand[] = [
       { who: BOT, move: raiseTo(6) },
       { who: YOU, move: fold, coach: "7-2 with different suits is one of the weakest starting hands. Calling would cost 4 more chips with a hand that rarely wins. Folding loses only the 2 you already posted." },
     ],
-    ending: "Folding weak hands early is how good players save chips. You lost 2, not more. The bot's extra 4 chips that you didn't match came back to it. Its cards stay hidden: when everyone folds, the winner doesn't show.",
+    ending: "Folding weak hands early is how good players save chips. You lost 2, not more. The bot's extra 4 chips that you didn't match came back to it. Its cards stay hidden: when everyone else folds, the winner doesn't have to show.",
     expectedNet: -2,
   },
   {

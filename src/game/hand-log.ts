@@ -56,6 +56,14 @@ function moveLine(seats: SeatInfo[], step: RecordedMove): string {
   return `${says(seats, step.actorSeat, words)}${allIn ? " (all-in)" : ""}.`;
 }
 
+/**
+ * The hand a seat won with, if it showed one. The engine labels a pot nobody
+ * contested "Uncontested", which isn't a hand, so it's skipped.
+ */
+export function handDescription(final: TableView, seat: number): string | undefined {
+  return final.winners?.find((w) => w.seat === seat && w.description && w.description !== "Uncontested")?.description ?? undefined;
+}
+
 /** "a flush", "two pair", "one pair"… from a hand description like "Flush". */
 function handPhrase(description: string): string {
   const lower = description.toLowerCase();
@@ -77,7 +85,7 @@ function newCardsLine(before: TableView, after: TableView): string | null {
 export function resultLine(final: TableView, net: number, seats: SeatInfo[] = HEADS_UP_SEATS): string {
   const outcome = net > 0 ? `You're ${net} chips up.` : net < 0 ? `You're ${-net} chips down.` : "You're even.";
   const how = (seat: number) => {
-    const description = final.winners?.find((w) => w.seat === seat)?.description;
+    const description = handDescription(final, seat);
     return description ? ` with ${handPhrase(description)}` : "";
   };
   const potLine = (pot: { amount: number; winners: { seat: number; amount: number }[] }, label: string) =>
@@ -125,8 +133,9 @@ export function handLog(record: HandRecord): string[] {
     const small = n === 2 ? button : (button + 1) % n;
     const big = first.bigBlindSeat ?? (small + 1) % n;
     const posted = (seat: number, blind: number) => {
+      // All-in whenever the blind takes the player's last chip, including a stack of exactly the blind.
       const amount = Math.min(blind, record.startStacks[seat]);
-      return amount < blind ? `${amount}, all-in` : `${amount}`;
+      return amount > 0 && amount === record.startStacks[seat] ? `${amount}, all-in` : `${amount}`;
     };
     lines.push(
       `${says(seats, small, "post")} the small blind (${posted(small, first.smallBlind)}). ${says(seats, big, "post")} the big blind (${posted(big, first.bigBlind)}).`,

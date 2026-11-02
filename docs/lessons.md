@@ -379,7 +379,7 @@ You have the button. **Your cards:** A♠ K♦
    - *Coach:* "Checking is fine too. It keeps the pot smaller, and you act last on the river anyway."
    - **You check.**
 4. **River: 2♣.** The bot bets 14.
-   - *Coach:* "Your opponent's bet doesn't tell you their cards. Bots and people sometimes bet with weak hands (a **bluff**). You'd need to win more than 1 time in 4 for this call to pay off. That's Lesson 9."
+   - *Coach:* "Your opponent's bet doesn't tell you their cards. Bots and people sometimes bet with weak hands (a **bluff**). For this call to pay off, you need to win more than 1 time in 4, counting a tie as half a win. That's Lesson 9."
    - **You call 14.** The pot is 56.
 5. **Showdown.** The bot shows Q♣ J♣, which is queen-high (no pair). **Your pair of aces wins the 56-chip pot**, and you end the hand 28 chips up.
    - *Coach:* "The bot was bluffing. Notice that its calls earlier didn't mean it had a strong hand."
@@ -391,7 +391,7 @@ The bot has the button, so you're the big blind. **Your cards:** 7♣ 2♦
 1. **Preflop.** The bot (small blind) acts first and raises to 6.
    - *Coach:* "7-2 with different suits is one of the weakest starting hands. Calling would cost 4 more chips with a hand that rarely wins. Folding loses only the 2 you already posted."
    - **You fold.** The bot wins the pot. Its extra 4 chips that you didn't match come back to it, so it wins just your 2.
-   - *Coach:* "Folding weak hands early is how good players save chips. You lost 2, not more. The bot's cards stay hidden: when everyone folds, the winner doesn't show."
+   - *Coach:* "Folding weak hands early is how good players save chips. You lost 2, not more. The bot's cards stay hidden: when everyone else folds, the winner doesn't have to show."
 
 ### Hand 3: Winning when the bot folds
 

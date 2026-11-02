@@ -57,6 +57,10 @@ describe("hand log", () => {
       net: 1,
     };
     expect(handLog(record)[0]).toBe("You post the small blind (1). The bot posts the big blind (1, all-in).");
+    // A stack of exactly the blind is all-in too, and so is a small blind of exactly 1.
+    expect(handLog({ ...record, startStacks: [398, 2] })[0]).toBe("You post the small blind (1). The bot posts the big blind (2, all-in).");
+    expect(handLog({ ...record, startStacks: [1, 399] })[0]).toBe("You post the small blind (1, all-in). The bot posts the big blind (2).");
+    expect(handLog({ ...record, startStacks: [398, 3] })[0]).toBe("You post the small blind (1). The bot posts the big blind (2).");
   });
 
   it("names the blinds, top-ups, and separate pots at the six-player table", () => {

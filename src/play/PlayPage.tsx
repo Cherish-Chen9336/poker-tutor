@@ -6,8 +6,9 @@ import { BOT_POLICY_VERSION, practiceBot } from "../game/bot";
 import { BOT2_POLICY_VERSION, tableBot } from "../game/bot2";
 import { coachLines } from "../game/coach";
 import { useCoachLine } from "../i18n/coach-text";
-import { useHref } from "../i18n/hooks";
-import { handLog } from "../game/hand-log";
+import { useHref, useLocale, useT } from "../i18n/hooks";
+import { useLog } from "../i18n/log-text";
+import { handFacts } from "../game/log-facts";
 import { Match, YOU_SEAT, type HandRecord } from "../game/match";
 import { potTotal, sizedTo } from "../game/pot-math";
 import type { LegalMoves, Move, TableView } from "../game/types";
@@ -16,6 +17,8 @@ import { spokenText } from "../learn/card-names";
 import { CardText } from "../learn/cards";
 import { PokerTable } from "../ui/PokerTable";
 import { equityRequests } from "../game/equity";
+import { CoachHint } from "./CoachHint";
+import { noticeText, type Notice } from "./notice";
 import { OddsBox } from "./OddsBox";
 import { useEquity } from "./useEquity";
 
@@ -38,22 +41,24 @@ function saveCoachSetting(on: boolean) {
 }
 
 function SizeChooser({ view, legal, onMove }: { view: TableView; legal: LegalMoves; onMove: (move: Move) => void }) {
+  const t = useT();
   const range = legal.bet ?? legal.raise!;
   const kind = legal.bet ? "bet" : "raise";
   const [amount, setAmount] = useState(range.min);
   const preset = (fraction: number) => sizedTo(view, YOU_SEAT, legal, fraction) ?? range.min;
   const presets = [
-    { label: "½ pot", to: preset(0.5) },
-    { label: "Pot", to: preset(1) },
-    { label: "All-in", to: range.max },
+    { label: t("play.half"), to: preset(0.5) },
+    { label: t("play.pot"), to: preset(1) },
+    { label: t("play.allIn"), to: range.max },
   ];
   const to = Math.min(range.max, Math.max(range.min, Math.round(amount) || range.min));
-  const label = `${kind === "bet" ? "Bet" : "Raise to"} ${to}${to === range.max ? " (all-in)" : ""}`;
+  const label = t("play.callAllIn", { label: t("move.label", { move: kind, amount: String(to) }), allIn: to === range.max ? "yes" : "no" });
+  const amountLabel = t("play.amountLabel", { kind });
   return (
     <div className="sizer">
       <div className="sizer-row">
         <label className="visually-hidden" htmlFor="size-slider">
-          {kind === "bet" ? "Bet amount" : "Raise to"}
+          {amountLabel}
         </label>
         <input
           id="size-slider"
@@ -67,7 +72,7 @@ function SizeChooser({ view, legal, onMove }: { view: TableView; legal: LegalMov
         <input
           className="size-number"
           type="number"
-          aria-label={kind === "bet" ? "Bet amount" : "Raise to"}
+          aria-label={amountLabel}
           min={range.min}
           max={range.max}
           value={amount}
@@ -85,29 +90,32 @@ function SizeChooser({ view, legal, onMove }: { view: TableView; legal: LegalMov
         </button>
       </div>
       <p className="sizer-note">
-        From {range.min} (the minimum) to {range.max} (all-in).
-        {kind === "raise" ? " Presets mean: call, then raise by that share of the pot." : ""}
+        {t("play.range", { min: String(range.min), max: String(range.max) })}
+        {kind === "raise" ? t("play.presetNote") : ""}
       </p>
     </div>
   );
 }
 
 function Actions({ view, legal, onMove }: { view: TableView; legal: LegalMoves; onMove: (move: Move) => void }) {
+  const t = useT();
   return (
-    <div className="actions-bar" role="group" aria-label="Your move">
+    <div className="actions-bar" role="group" aria-label={t("play.yourMove")}>
       <div className="action-buttons">
         <button type="button" className="button" onClick={() => onMove({ type: "fold" })}>
-          Fold
+          {t("move.label", { move: "fold" })}
         </button>
         {legal.check && (
           <button type="button" className="button" onClick={() => onMove({ type: "check" })}>
-            Check
+            {t("move.label", { move: "check" })}
           </button>
         )}
         {legal.call !== null && (
           <button type="button" className="button" onClick={() => onMove({ type: "call" })}>
-            Call {legal.call}
-            {view.seats[YOU_SEAT]!.stack === legal.call ? " (all-in)" : ""}
+            {t("play.callAllIn", {
+              label: t("move.label", { move: "call", amount: String(legal.call) }),
+              allIn: view.seats[YOU_SEAT]!.stack === legal.call ? "yes" : "no",
+            })}
           </button>
         )}
       </div>
@@ -117,6 +125,7 @@ function Actions({ view, legal, onMove }: { view: TableView; legal: LegalMoves; 
 }
 
 type Size = 2 | 6;
+
 
 // Each table size keeps its own session, outside the page, so visiting Review
 // (or a lesson, or the other table) and coming back continues where you were.
@@ -175,8 +184,10 @@ export default function PlayPage() {
   const heading = useRef<HTMLHeadingElement>(null);
   useTakePendingFocus(heading);
   const [coachOn, setCoachOn] = useState(loadCoachSetting);
-  const [notice, setNotice] = useState<string | null>(null);
-  const [announcement, setAnnouncement] = useState("");
+  // Kept as facts and worded when shown, so switching language never leaves old-language text behind.
+  const [notice, setNotice] = useState<Notice | null>(null);
+  // An announcement is spoken once, in the language it was made in; it's dropped if the language changes.
+  const [announcement, setAnnouncement] = useState<{ text: string; locale: string }>({ text: "", locale: "en" });
   const { addHand, saved } = useHands();
   const [focusTick, setFocusTick] = useState(0);
   const nextRef = useRef<HTMLButtonElement>(null);
@@ -185,7 +196,10 @@ export default function PlayPage() {
   const view = match.view();
   const legal = started ? match.legalMoves() : null;
   const record = match.current;
-  const log = record ? handLog(record) : [];
+  const word = useLog();
+  const log = record ? handFacts(record).map(word) : [];
+  const t = useT();
+  const locale = useLocale();
 
   // After a move, the pressed button may be gone: move focus to what comes next.
   useEffect(() => {
@@ -195,12 +209,12 @@ export default function PlayPage() {
   }, [focusTick, match]);
 
   function afterChange(linesBefore: number) {
-    const lines = match.current ? handLog(match.current) : [];
-    setAnnouncement(spokenText(lines.slice(linesBefore).join(" ")));
+    const lines = match.current ? handFacts(match.current).map(word) : [];
+    setAnnouncement({ text: spokenText(lines.slice(linesBefore).join(" "), locale), locale });
     const record = match.current;
     if (match.handOver && record && countFinished(size, record)) {
       // Saved for the Review screen; a hand too long to store is reported, not lost silently.
-      if (!addHand(record).kept) setNotice("This hand was too long to save for Review.");
+      if (!addHand(record).kept) setNotice({ kind: "tooLong" });
     }
     setFocusTick((n) => n + 1);
     rerender();
@@ -215,10 +229,10 @@ export default function PlayPage() {
   }
 
   function move(m: Move) {
-    const before = record ? handLog(record).length : 0;
+    const before = record ? handFacts(record).length : 0;
     const result = match.act(m);
     if (!result.ok) {
-      setNotice(result.reason);
+      setNotice({ kind: "rejected", reason: result.reason });
       return;
     }
     setNotice(null);
@@ -235,30 +249,25 @@ export default function PlayPage() {
     return (
       <section className="panel play-intro">
         <h1 tabIndex={-1} ref={heading}>
-          Play
+          {t("play.title")}
         </h1>
-        <p className="lede">Choose a table. Blinds are 1/2, and everyone starts with 200 chips. The button moves every hand.</p>
-        <div className="seg size-choice" role="group" aria-label="Table size">
+        <p className="lede">{t("play.intro")}</p>
+        <div className="seg size-choice" role="group" aria-label={t("play.tableSize")}>
           {([2, 6] as const).map((n) => (
             <button key={n} type="button" aria-pressed={size === n} onClick={() => choose(n)}>
-              {n === 2 ? "Heads-up: you and 1 bot" : "6 players: you and 5 bots"}
+              {n === 2 ? t("play.chooseHeadsUp") : t("play.chooseSix")}
             </button>
           ))}
         </div>
         <ul>
-          <li>The bots play a simple, fixed style. Each sees only its own cards, never yours.</li>
-          {size === 6 && <li>A bot that runs out of chips is topped back up to 200. If you run out, a new session starts.</li>}
-          {size === 6 && (
-            <li>
-              The bots are simplified practice opponents that call a lot, so expect pots with several players. Against frequent
-              callers, bet your good hands and bluff less.
-            </li>
-          )}
-          <li>The coach describes your situation before each move. It doesn't tell you what to do.</li>
-          <li>Play chips only. Your hands are saved in this browser, so you can replay them in Review.</li>
+          <li>{t("play.botsFixed")}</li>
+          {size === 6 && <li>{t("play.topUp")}</li>}
+          {size === 6 && <li>{t("play.callers")}</li>}
+          <li>{t("play.coachNote")}</li>
+          <li>{t("play.chipsOnly")}</li>
         </ul>
         <button type="button" className="button primary" onClick={deal}>
-          Deal the first hand
+          {t("play.dealFirst")}
         </button>
       </section>
     );
@@ -276,18 +285,24 @@ export default function PlayPage() {
     <section className="panel play">
       <div className="play-head">
         <h1 tabIndex={-1} ref={heading}>
-          Play
+          {t("play.title")}
         </h1>
-        <div className="seg" role="group" aria-label="Table size">
+        <div className="seg" role="group" aria-label={t("play.tableSize")}>
           {([2, 6] as const).map((n) => (
             <button key={n} type="button" aria-pressed={size === n} onClick={() => choose(n)}>
-              {n === 2 ? "Heads-up" : "6 players"}
+              {n === 2 ? t("play.headsUp") : t("play.six")}
             </button>
           ))}
         </div>
         <p className="mono">
-          {size === 2 ? "Match" : "Session"} {match.matchNumber} · {totals.hands} {totals.hands === 1 ? "hand" : "hands"} played ·{" "}
-          {matchNet > 0 ? `you're ${matchNet} up` : matchNet < 0 ? `you're ${-matchNet} down` : "you're even"}
+          {t("play.status", {
+            size: size === 2 ? "two" : "six",
+            number: String(match.matchNumber),
+            hands: String(totals.hands),
+            count: totals.hands,
+            net: matchNet > 0 ? "up" : matchNet < 0 ? "down" : "even",
+            amount: String(Math.abs(matchNet)),
+          })}
         </p>
       </div>
       <div className={size === 6 ? "guided six" : "guided"}>
@@ -301,29 +316,27 @@ export default function PlayPage() {
                 <p>
                   <CardText text={log.at(-1) ?? ""} />
                 </p>
-                <a href={href({ area: "review" })}>Review this hand</a>
-                {!saved && <p className="mono">This browser isn't saving hands, so they'll be kept only until you close the page.</p>}
+                <a href={href({ area: "review" })}>{t("play.reviewThis")}</a>
+                {!saved && <p className="mono">{t("play.noSave")}</p>}
                 {match.matchOver ? (
                   <>
-                    <p>
-                      {stack === 0 ? "You're out of chips." : "The bot is out of chips."} A new {size === 2 ? "match" : "session"} starts with 200 each.
-                    </p>
+                    <p>{t("play.out", { who: stack === 0 ? "you" : "bot", size: size === 2 ? "two" : "six" })}</p>
                     <button ref={nextRef} type="button" className="button primary" onClick={deal}>
-                      Start a new match
+                      {t("play.newMatch")}
                     </button>
                   </>
                 ) : (
                   <button ref={nextRef} type="button" className="button primary" onClick={deal}>
-                    Deal the next hand
+                    {t("play.next")}
                   </button>
                 )}
               </div>
             ) : (
-              <p className="mono">{size === 2 ? "The bot is" : "The bots are"} thinking…</p>
+              <p className="mono">{t("play.thinking", { size: size === 2 ? "two" : "six" })}</p>
             )}
             {notice && (
               <p className="gfeedback" role="alert">
-                {notice}
+                {noticeText(notice, locale, t)}
               </p>
             )}
           </div>
@@ -331,7 +344,7 @@ export default function PlayPage() {
         <div className="gside">
           <div className="gcoach">
             <div className="coach-top">
-              <b>Coach</b>
+              <b>{t("play.coach")}</b>
               <label className="switch">
                 <input
                   type="checkbox"
@@ -341,32 +354,29 @@ export default function PlayPage() {
                     saveCoachSetting(e.target.checked);
                   }}
                 />
-                Hints before my move
+                {t("play.hintsSwitch")}
               </label>
             </div>
             {coachOn ? (
               yourTurn ? (
                 <>
+                  {locale !== "en" && <p className="note">{t("play.coachEnglish")}</p>}
                   <ul className="coach-list">
                     {coach.map((line, i) => (
-                      <li key={i} className={`topic-${line.topic}`}>
-                        <span lang={coachLine(line).lang}>
-                          <CardText text={coachLine(line).text} />
-                        </span>
-                      </li>
+                      <CoachHint key={i} line={line} phrase={coachLine} />
                     ))}
                   </ul>
                   {hole && <OddsBox estimates={estimates} />}
                 </>
               ) : (
-                <p className="mono">Hints appear when it's your turn.</p>
+                <p className="mono">{t("play.hintsLater")}</p>
               )
             ) : (
-              <p className="mono">Hints are off.</p>
+              <p className="mono">{t("play.hintsOff")}</p>
             )}
           </div>
           <details className="glog" open>
-            <summary>This hand</summary>
+            <summary>{t("play.thisHand")}</summary>
             <ol>
               {log.map((line, i) => (
                 <li key={i}>
@@ -378,7 +388,7 @@ export default function PlayPage() {
         </div>
       </div>
       <p className="visually-hidden" role="status">
-        {announcement}
+        {announcement.locale === locale ? announcement.text : ""}
       </p>
     </section>
   );
