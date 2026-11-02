@@ -63,7 +63,7 @@ describe("lesson text claims", () => {
 
   describe("lesson 6: when a short all-in reopens the betting", () => {
     it("states the rule with its exceptions", () => {
-      stated(Lesson6, "A player who already bet or raised can raise again only if the amount has gone up by at least a full raise since then.");
+      stated(Lesson6, "A player who already bet, called, or raised can raise again only if the amount has gone up by at least a full raise since then.");
       stated(Lesson6, "A may call the 6 or fold, but may not raise. If A had only checked, A could raise. And if several short all-ins add up to a full raise, A may raise again.");
       stated(Lesson6, "You can always call all-in, even with fewer chips than the bet. And whenever you're allowed to raise, you may go all-in");
     });

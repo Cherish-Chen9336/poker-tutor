@@ -72,9 +72,7 @@ export function Lesson11() {
   return (
     <>
       <p>
-        <T>A bluff</T> is a bet with a hand that's probably worse, hoping better hands fold. It can seem like a trick, but
-        game theory (the math of decisions against an opponent who is also thinking) shows that good play <i>needs</i> some
-        bluffs.
+        <T>A bluff</T> is a bet with a hand that's probably worse, hoping better hands fold. Game theory (the math of decisions against an opponent who is also thinking) shows why some bluffs can improve your play.
       </p>
       <h2>A tiny game to see why</h2>
       <p>
@@ -209,7 +207,7 @@ export function Lesson14() {
         <b>10%</b> of your bankroll each time.
       </p>
       <p>
-        <b>Kelly makes a bankroll grow fastest over the long run.</b> It doesn't promise short-run profit, and the swings
+        <b>Under these assumptions, Kelly maximizes long-run compound growth.</b> It doesn't promise short-run profit, and the swings
         are large.
       </p>
       <h2>Betting too much is worse than betting too little</h2>
@@ -225,7 +223,7 @@ export function Lesson14() {
         </li>
         <li>
           <b>Twice Kelly</b> ends up about where it started, even though you won 55% of the time. Losing 20% takes you to
-          80, and winning 20% from there only gets you back to 96. Its growth per bet is slightly below zero, so over
+          80, and winning 20% from there only gets you back to 96. In a typical run, its compound growth per bet is slightly below zero, so over
           thousands of bets it slowly shrinks (100 becomes about 25 after 10,000 bets).
         </li>
       </ul>

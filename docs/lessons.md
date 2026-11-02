@@ -1,9 +1,9 @@
-# Learn lessons (draft for review)
+# Learn lessons
 
-These are the texts for the Learn area (Step 4). Each lesson takes about 3–5 minutes and ends with quick checks. The owner reviews them as a beginner before any screens are built: mark anything confusing, too long, or too fast.
+These are the English texts for the Learn area. Each lesson ends with quick checks. The app shows the same text; tests check the two match.
 
 How to read this file:
-- **[Diagram: …]** describes a picture that will be drawn in the app.
+- **[Diagram: …]** describes a picture drawn in the app.
 - Each quick check has an ID (like `L3-Q2`), the answer, and a short "Why" shown after answering.
 - **Checked by** says how the answer is verified: `evaluator` (the hand-ranking library), `table` (the real game engine through the adapter), `math` (an exact calculation in a test), or `review` (a concept question that only a person can check).
 - Every card example below was run through the evaluator on 2026-10-30, and the results matched.
@@ -22,13 +22,15 @@ Unless a lesson says otherwise, the blinds are 1/2 and each player starts with 2
 1. **Everyone else folds.** To **fold** means to give up the hand. If every other player folds, you win the pot at once, without showing your cards. This happens in many hands.
 2. **The showdown.** If two or more players are still in after the last betting round, they show their cards. The best five-card hand wins; equal hands share the pot.
 
+Cards have a rank (2–10, J for jack, Q for queen, K for king, or A for ace) and a suit: ♠ spades, ♥ hearts, ♦ diamonds, or ♣ clubs.
+
 **A hand has four betting rounds.** Before each one, cards are dealt:
 
 [Diagram: the existing timeline (Preflop: 2 private cards each; Flop: 3 shared cards; Turn: a 4th; River: the 5th; "then a betting round" after each), plus a side note on it: "Everyone else folds → the hand ends at once, with no more cards."]
 
-In each betting round, players take turns to bet, match a bet, or fold (Lesson 5 explains each move). A betting round ends when everyone still in has matched the biggest bet or is all-in, and everyone who still has a decision to make has had a turn. Then the hand moves on.
+In each betting round, players take turns to bet, match a bet, or fold (Lesson 5 explains each move). A betting round ends when everyone still in has matched the biggest bet or has put in all their chips (all-in), and everyone who still has a decision to make has had a turn. Then the hand moves on.
 
-**Before any cards are dealt,** two players must put in forced bets called **blinds**, so there's always something to win. Lesson 4 explains who pays them.
+**Before any cards are dealt,** two players must put in forced bets called **blinds**, so there's always something to win. Lesson 4 explains who pays them. Unless a lesson says otherwise, the blinds are 1/2 and each player starts with 200 chips.
 
 ### Quick checks
 
@@ -234,7 +236,7 @@ With a medium hand, checking or calling is often better: betting may make weaker
 [Diagram: the existing "raise to / raise by" bars, plus a third bar: "next full raise: to at least 10 (6 + 4)".]
 
 **Smallest and largest bets:**
-- The smallest **bet** is the big blind (2).
+- The smallest full **bet** is the big blind (2). With fewer chips, you may bet them all.
 - A full **raise** must add at least as much as the last full bet or raise this round. After a raise to 6 (by 4), the next full raise is to at least 10.
 - In No-Limit Hold'em, the only maximum is your stack. Betting everything is going **all-in** (Lesson 6).
 
@@ -246,11 +248,11 @@ With a medium hand, checking or calling is often better: betting may make weaker
 - *Why:* Your 2 already matches everyone else's 2, so there's nothing to call. You may check, or raise.
 - *Checked by:* table
 
-**L5-Q2.** The big blind is 2. A raises to 6. What's the smallest raise you can make?
+**L5-Q2.** The big blind is 2. A raises to 6. What's the smallest full raise you can make?
 - A. To 8
 - B. **To 10** ✓
 - C. To 12
-- *Why:* A raised by 4 (from 2 to 6). Your raise must also be at least 4 more, so you must raise to at least 10.
+- *Why:* A raised by 4 (from 2 to 6). A full raise must add at least 4 again, so it must be to at least 10.
 - *Checked by:* table
 
 **L5-Q3.** On the flop, both players have 100 chips. Your opponent bets 20. Which moves can you make?
@@ -290,7 +292,7 @@ With a medium hand, checking or calling is often better: betting may make weaker
 
 **More than two players?** Two things change, and you'll practice both at a bigger table later:
 - The players who still have chips can keep betting against each other. Their matched extra chips go into a **side pot** the all-in player can't win; unmatched chips go back.
-- **A short all-in may not reopen the betting.** A player who already bet or raised can raise again only if the amount has gone up by at least a full raise since then. For example: A bets 10, B goes all-in for 16 (only 6 more), and C calls. A may call the 6 or fold, but may not raise. If A had only checked, A could raise. And if several short all-ins add up to a full raise, A may raise again.
+- **A short all-in may not reopen the betting.** A player who already bet, called, or raised can raise again only if the amount has gone up by at least a full raise since then. For example: A bets 10, B goes all-in for 16 (only 6 more), and C calls. A may call the 6 or fold, but may not raise. If A had only checked, A could raise. And if several short all-ins add up to a full raise, A may raise again.
 
 ### Quick checks
 
@@ -321,7 +323,7 @@ With a medium hand, checking or calling is often better: betting may make weaker
 
 At the showdown, the remaining players show their cards, and the best five-card hand wins.
 
-**Kickers can decide otherwise matching hands.** A **kicker** is a card that doesn't make up the pair or other combination but still counts toward the 5. First compare the pair (or other combination); if it matches, compare the other cards one at a time, highest first.
+**Kickers can decide otherwise matching hands.** A **kicker** is a card that doesn't make up the pair or other combination but still counts toward the 5. Compare matching ranks before kickers. For two pair, compare the higher pairs, then the lower pairs; for full houses, compare the three-card groups, then the pairs. Only then compare kickers, highest first. For straights and straight flushes, compare the top card, counting A-2-3-4-5 as 5-high. For flushes and high-card hands, compare all five cards, highest first.
 
 [Diagram: the existing two hands side by side (board A♦ 8♣ 4♠ 9♥ 2♣; you A♠ K♦, your opponent A♣ Q♥), with the deciding cards highlighted: both have a pair of aces, and your K beats their Q. You win.]
 
@@ -459,7 +461,7 @@ The bot has the button, so you're the big blind. **Your cards:** A♦ 4♣
 
 **Expected value (EV)** is how much a decision wins or loses on average, if you could repeat it many times.
 
-**Pot odds** compare the price of a call with the pot you could win:
+**Pot odds** compare the price of a call with the pot you could win. Here, we consider heads-up calls with no side pots:
 - **P** = the pot, including your opponent's bet, but not chips that will be returned.
 - **C** = what you must put in to call.
 - If you win, you receive **P + C**, including your call back. Compared with folding now, winning gains **P**, and losing costs **C**.
@@ -485,7 +487,7 @@ Same cards, different prices, different answers. Try other amounts:
 
 **Careful with outs:** some "outs" can still lose. For example, they might also give your opponent a better hand.
 
-**Later:** in real play, you'll also think about chips you might win or lose on later rounds (called **implied odds**).
+**Later:** **implied odds** account for extra chips you might win on later rounds. Future losses matter too.
 
 ### Quick checks
 
@@ -527,7 +529,7 @@ Same cards, different prices, different answers. Try other amounts:
 
 [Diagram: a four-step strip above the existing demo: "Hand 1: lost → Hand 2: lost → Hand 3: lost → Hand 4: premium?" Caption: "Hands are dealt in separate groups of 4, so every case is independent. A tie breaks the streak."]
 
-[Diagram: the existing live demo. Its "95% margin of error" label becomes "95% range". New caption: "The dashed line is the true chance, 2.56% (34 of the 1,326 two-card combinations). The bracket is a 95% range for the underlying chance, given the hands dealt so far. If the line falls inside it, the results fit ordinary random variation. (Even with a fair shuffle, about 1 run in 20 lands outside.) Each hand is a fresh shuffle from the browser's secure random source."]
+[Diagram: the existing live demo. Each bar shows a bracket labeled "95% range". Caption: "The dashed line is the true chance, 2.56% (34 of the 1,326 two-card combinations). The bracket is a 95% range for the underlying chance, given the hands dealt so far. If the line falls inside it, the results fit ordinary random variation. (Across repeated samples of the same size, about 1 in 20 such ranges would miss the true chance.) Each hand is a fresh shuffle from the browser's secure random source."]
 
 - **The chance** of a premium hand is 34 of the 1,326 two-card combinations, about **2.56%** (1 in 39). This doesn't change after losses.
 - **The counts will wobble.** Over a few hundred cases, a bar might show 2% or 3.5%. That's normal randomness, not a pattern. The 95% range shows the uncertainty in the estimated chance. With more hands, the bars tend toward 2.56% and the ranges generally get shorter.
@@ -560,13 +562,13 @@ Same cards, different prices, different answers. Try other amounts:
 
 ---
 
-# After you start playing (Step 5)
+# After you start playing
 
 These four lessons come after the Play area opens, so they can point back to hands you've played.
 
 ## Lesson 11: Why bluffing works
 
-**A bluff** is a bet with a hand that's probably worse, hoping better hands fold. It can seem like a trick, but game theory (the math of decisions against an opponent who is also thinking) shows that good play *needs* some bluffs.
+**A bluff** is a bet with a hand that's probably worse, hoping better hands fold. Game theory (the math of decisions against an opponent who is also thinking) shows why some bluffs can improve your play.
 
 **A tiny game to see why.** It's the river. The pot is 100. You have either the best possible hand or nothing at all, with equal chances, and your opponent knows that. Your opponent always holds a medium hand: it beats nothing and loses to your best hand. You may check (then the cards are shown) or bet exactly 50. If you bet, your opponent calls or folds.
 
@@ -687,14 +689,14 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 **Example:** an even-money bet (b = 1) that wins 55% of the time. Kelly says risk (0.55 − 0.45) ÷ 1 = **10%** of your bankroll each time.
 
-**Kelly makes a bankroll grow fastest over the long run.** It doesn't promise short-run profit, and the swings are large.
+**Under these assumptions, Kelly maximizes long-run compound growth.** It doesn't promise short-run profit, and the swings are large.
 
 **Betting too much is worse than betting too little.** Take 100 bets with the typical result, 55 wins and 45 losses, starting with 100. Each win multiplies your bankroll by (1 + the fraction you bet), and each loss by (1 − that fraction). The order doesn't change the final balance: multiplying gives the same answer in any order.
 
 [Diagram: three bars starting from 0, with a line marking the starting 100: Half Kelly (5%) → 146, Kelly (10%) → 165, Twice Kelly (20%) → 99. Beside them, a small chain: "100 → lose 20% → 80 → win 20% → 96". Caption: "Rounded balances after 55 wins and 45 losses, starting from 100. Real results vary."]
 
 - **Half Kelly's** long-run growth rate is about three-quarters of full Kelly's, with much smaller swings.
-- **Twice Kelly** ends up about where it started, even though you won 55% of the time. Losing 20% takes you to 80, and winning 20% from there only gets you back to 96. Its growth per bet is slightly below zero, so over thousands of bets it slowly shrinks (100 becomes about 25 after 10,000 bets).
+- **Twice Kelly** ends up about where it started, even though you won 55% of the time. Losing 20% takes you to 80, and winning 20% from there only gets you back to 96. In a typical run, its compound growth per bet is slightly below zero, so over thousands of bets it slowly shrinks (100 becomes about 25 after 10,000 bets).
 
 **Kelly is a guide, not a rule.** Many players risk half or a quarter of Kelly: it grows more slowly but swings less, and it hurts less if you've overestimated your edge. In poker you never know your exact edge, and overestimating it makes Kelly bet too much, which is the costly direction.
 
@@ -725,7 +727,7 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 
 ---
 
-# At a bigger table (Step 6)
+# At a bigger table
 
 These two lessons come with the 6-player table in Play.
 

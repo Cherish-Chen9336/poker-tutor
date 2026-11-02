@@ -26,17 +26,22 @@ export function Lesson1() {
           best five-card hand wins; equal hands share the pot.
         </li>
       </ol>
+      <p>
+        Cards have a rank (2–10, J for jack, Q for queen, K for king, or A for ace) and a suit: ♠ spades, ♥ hearts, ♦
+        diamonds, or ♣ clubs.
+      </p>
       <h2>A hand has four betting rounds</h2>
       <p>Before each one, cards are dealt:</p>
       <StreetTimeline />
       <p>
         In each betting round, players take turns to bet, match a bet, or fold (Lesson 5 explains each move). A betting
-        round ends when everyone still in has matched the biggest bet or is all-in, and everyone who still has a decision to
+        round ends when everyone still in has matched the biggest bet or has put in all their chips (all-in), and everyone who still has a decision to
         make has had a turn. Then the hand moves on.
       </p>
       <p>
         <b>Before any cards are dealt,</b> two players must put in forced bets called <T>blinds</T>, so there's always
-        something to win. Lesson 4 explains who pays them.
+        something to win. Lesson 4 explains who pays them. Unless a lesson says otherwise, the blinds are 1/2 and each
+        player starts with 200 chips.
       </p>
     </>
   );
@@ -187,7 +192,7 @@ export function Lesson5() {
       <RaiseToBy />
       <h2>Smallest and largest bets</h2>
       <ul>
-        <li>The smallest <b>bet</b> is the big blind (2).</li>
+        <li>The smallest full <b>bet</b> is the big blind (2). With fewer chips, you may bet them all.</li>
         <li>
           A full <b>raise</b> must add at least as much as the last full bet or raise this round. After a raise to 6 (by 4),
           the next full raise is to at least 10.
@@ -230,7 +235,7 @@ export function Lesson6() {
           <T>side pot</T> the all-in player can't win; unmatched chips go back.
         </li>
         <li>
-          <b>A short all-in may not reopen the betting.</b> A player who already bet or raised can raise again only if the
+          <b>A short all-in may not reopen the betting.</b> A player who already bet, called, or raised can raise again only if the
           amount has gone up by at least a full raise since then. For example: A bets 10, B goes all-in for 16 (only 6
           more), and C calls. A may call the 6 or fold, but may not raise. If A had only checked, A could raise. And if
           several short all-ins add up to a full raise, A may raise again.
@@ -246,8 +251,7 @@ export function Lesson7() {
       <p>At the showdown, the remaining players show their cards, and the best five-card hand wins.</p>
       <h2>Kickers can decide otherwise matching hands</h2>
       <p>
-        A <T>kicker</T> is a card that doesn't make up the pair or other combination but still counts toward the 5. First
-        compare the pair (or other combination); if it matches, compare the other cards one at a time, highest first.
+        A <T>kicker</T> is a card that doesn't make up the pair or other combination but still counts toward the 5. Compare matching ranks before kickers. For two pair, compare the higher pairs, then the lower pairs; for full houses, compare the three-card groups, then the pairs. Only then compare kickers, highest first. For straights and straight flushes, compare the top card, counting A-2-3-4-5 as 5-high. For flushes and high-card hands, compare all five cards, highest first.
       </p>
       <p>
         Board: <C c="Ad" /> <C c="8c" /> <C c="4s" /> <C c="9h" /> <C c="2c" />. You hold <C c="As" /> <C c="Kd" />; your

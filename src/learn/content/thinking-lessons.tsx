@@ -36,7 +36,7 @@ export function Lesson9() {
         <T>Expected value (EV)</T> is how much a decision wins or loses on average, if you could repeat it many times.
       </p>
       <p>
-        <T>Pot odds</T> compare the price of a call with the pot you could win:
+        <T>Pot odds</T> compare the price of a call with the pot you could win. Here, we consider heads-up calls with no side pots:
       </p>
       <ul>
         <li>
@@ -95,8 +95,7 @@ export function Lesson9() {
         hand.
       </p>
       <p>
-        <b>Later:</b> in real play, you'll also think about chips you might win or lose on later rounds (called{" "}
-        <T>implied odds</T>).
+        <b>Later:</b> <T>implied odds</T> account for extra chips you might win on later rounds. Future losses matter too.
       </p>
     </>
   );

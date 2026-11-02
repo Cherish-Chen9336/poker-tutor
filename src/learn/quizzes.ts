@@ -163,10 +163,10 @@ export const QUIZZES: Record<number, Question[]> = {
     },
     {
       id: "L5-Q2",
-      prompt: "The big blind is 2. A raises to 6. What's the smallest raise you can make?",
+      prompt: "The big blind is 2. A raises to 6. What's the smallest full raise you can make?",
       choices: ["To 8", "To 10", "To 12"],
       answer: 1,
-      why: "A raised by 4 (from 2 to 6). Your raise must also be at least 4 more, so you must raise to at least 10.",
+      why: "A raised by 4 (from 2 to 6). A full raise must add at least 4 again, so it must be to at least 10.",
       checkedBy: "table",
     },
     {

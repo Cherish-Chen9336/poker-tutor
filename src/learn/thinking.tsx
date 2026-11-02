@@ -181,8 +181,7 @@ export function StreakDemo() {
       <figcaption>
         <span className="key expected" /> the true chance, 2.56% (34 of the 1,326 two-card combinations).{" "}
         <span className="key ci" /> a 95% range for the underlying chance, given the hands dealt so far. If the dashed line
-        falls inside it, the results fit ordinary random variation. (Even with a fair shuffle, about 1 run in 20 lands
-        outside.) Each hand is a fresh shuffle from the browser's secure random source.
+        falls inside it, the results fit ordinary random variation. (Across repeated samples of the same size, about 1 in 20 such ranges would miss the true chance.) Each hand is a fresh shuffle from the browser's secure random source.
       </figcaption>
     </figure>
   );
