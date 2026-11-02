@@ -34,27 +34,51 @@ const SEAT_PHRASE: Record<string, string> = {
 
 /**
  * What a line says, as facts without wording, so each language can phrase it
- * (translation pilot: only the six-player preflop position line so far).
+ * (src/i18n/coach-text.tsx). A test proves the English phrasing equals `text`.
  */
-export type CoachFact = {
-  kind: "preflopPosition";
-  position: string;
-  /** Where the learner acts after the flop among players who can still bet: 1 is first. */
-  rank: number;
-  count: number;
-  /** Seats that act before the learner after the flop, in order. */
-  before: string[];
-};
+export type CoachFact =
+  /** Heads-up position; `callEnds` means calling now ends all betting, so no later turn is promised. */
+  | { kind: "headsUpPreflop"; button: boolean; callEnds: boolean }
+  | { kind: "headsUpPostflop"; button: boolean; callEnds: boolean }
+  | {
+      kind: "preflopPosition";
+      position: string;
+      /** Where the learner acts after the flop among players who can still bet: 1 is first. */
+      rank: number;
+      count: number;
+      /** Seats that act before the learner after the flop, in order. */
+      before: string[];
+    }
+  /** After the flop at a full table: the learner's turn among players who can bet (0 if none), and opponents still in. */
+  | { kind: "postflopPosition"; mine: number; count: number; others: number }
+  /** Hole cards, highest first. */
+  | { kind: "startingHand"; cards: [string, string] }
+  /**
+   * The best five cards and the hand's name. `shared` means the named combination is on the board, so others
+   * can use it too; it does not mean their best five equal the learner's.
+   */
+  | { kind: "bestFive"; cards: string[]; hand: string; shared: boolean; headsUp: boolean }
+  | { kind: "draw"; count: number; flush: boolean; straight: boolean; flop: boolean }
+  | { kind: "boardFlush"; count: number; suit: string }
+  | { kind: "boardPaired" }
+  | { kind: "boardStraight" }
+  | { kind: "free" }
+  | { kind: "price"; toCall: number; pot: number; pct: string; allIn: boolean; sidePots: boolean; ends: boolean };
 
 export interface CoachLine {
   topic: "position" | "hand" | "draw" | "board" | "price";
   /** The English text. */
   text: string;
-  fact?: CoachFact;
+  fact: CoachFact;
+}
+
+function highFirst(hole: string[]): [string, string] {
+  const [a, b] = [...hole].sort((x, y) => RANKS.indexOf(y[0]) - RANKS.indexOf(x[0]));
+  return [a, b];
 }
 
 function startingHand(hole: string[]): string {
-  const [a, b] = [...hole].sort((x, y) => RANKS.indexOf(y[0]) - RANKS.indexOf(x[0]));
+  const [a, b] = highFirst(hole);
   const cards = `{${a}} {${b}}`;
   if (a[0] === b[0]) return `${cards}: a pocket pair of ${RANK_WORDS[a[0]][1]}.`;
   const suited = a[1] === b[1] ? "same suit (suited)" : "different suits";
@@ -62,20 +86,25 @@ function startingHand(hole: string[]): string {
 }
 
 /** Board features that make strong hands possible for anyone. */
-function boardThreats(board: string[]): string[] {
-  const notes: string[] = [];
+function boardThreats(board: string[]): { text: string; fact: CoachFact }[] {
+  const notes: { text: string; fact: CoachFact }[] = [];
   for (const suit of "shdc") {
     const n = board.filter((c) => c[1] === suit).length;
-    if (n >= 3) notes.push(`${n === 3 ? "Three" : n === 4 ? "Four" : "Five"} ${SUIT_WORDS[suit]} on the board: a flush is possible.`);
+    if (n >= 3)
+      notes.push({
+        text: `${n === 3 ? "Three" : n === 4 ? "Four" : "Five"} ${SUIT_WORDS[suit]} on the board: a flush is possible.`,
+        fact: { kind: "boardFlush", count: n, suit },
+      });
   }
   const values = board.map((c) => RANKS.indexOf(c[0]) + 2);
-  if (new Set(values).size < values.length) notes.push("The board is paired: a full house or four of a kind is possible.");
+  if (new Set(values).size < values.length)
+    notes.push({ text: "The board is paired: a full house or four of a kind is possible.", fact: { kind: "boardPaired" } });
   const set = new Set(values);
   if (set.has(14)) set.add(1);
   for (let low = 1; low <= 10; low++) {
     const inWindow = [0, 1, 2, 3, 4].filter((d) => set.has(low + d)).length;
     if (inWindow >= 3) {
-      notes.push("Three cards close in rank: a straight is possible.");
+      notes.push({ text: "Three cards close in rank: a straight is possible.", fact: { kind: "boardStraight" } });
       break;
     }
   }
@@ -96,19 +125,33 @@ export function coachLines(view: TableView): CoachLine[] {
   const live = view.seats.filter((s) => s && (s.status === "active" || s.status === "all-in"));
   const ordinal = (k: number) => ["first", "second", "third", "fourth", "fifth", "sixth"][k - 1];
 
+  // Whether calling now would end all betting in the hand: nobody else could still bet after it
+  // (everyone else still in is all-in), the call puts the learner all-in, or (on the river) it closes the betting.
+  const price = callPrice(view, seat);
+  const highest = Math.max(...view.seats.map((s) => s?.betThisStreet ?? 0));
+  const othersWithChips = live.filter((s) => s!.seat !== seat && s!.status === "active" && s!.stack > 0);
+  const callEnds =
+    !!price &&
+    (price.toCall >= me.stack || othersWithChips.length === 0 || (view.street === "river" && othersWithChips.every((s) => s!.betThisStreet === highest)));
+
   // Position (lessons 4 and 15).
-  if (n === 2) {
+  if (n === 2 && callEnds) {
+    // Heads-up, the usual "who acts first" sentence would promise a later turn that can't happen.
+    lines.push({ topic: "position", text: "If you call, betting ends for this hand.", fact: { kind: preflop ? "headsUpPreflop" : "headsUpPostflop", button, callEnds: true } });
+  } else if (n === 2) {
     if (preflop) {
       lines.push({
         topic: "position",
         text: button
           ? "You have the button: you act first before the flop, and last on every later round."
           : "You're the big blind: you act last before the flop, and first on every later round.",
+        fact: { kind: "headsUpPreflop", button, callEnds: false },
       });
     } else {
       lines.push({
         topic: "position",
         text: button ? "You act last this round, so you'll see the bot's choice first (in position)." : "You act first this round; the bot will see your choice before deciding.",
+        fact: { kind: "headsUpPostflop", button, callEnds: false },
       });
     }
   } else if (preflop) {
@@ -146,21 +189,26 @@ export function coachLines(view: TableView): CoachLine[] {
     const others = live.length - 1;
     const where =
       mine === actors.length ? "You act last this round (in position)" : mine === 1 ? "You act first this round" : `You act ${ordinal(mine)} of the ${actors.length} players who can still bet`;
-    lines.push({ topic: "position", text: `${where}. ${others} ${others === 1 ? "opponent is" : "opponents are"} still in.` });
+    lines.push({
+      topic: "position",
+      text: `${where}. ${others} ${others === 1 ? "opponent is" : "opponents are"} still in.`,
+      fact: { kind: "postflopPosition", mine, count: actors.length, others },
+    });
   }
 
   // The hand.
   if (preflop) {
-    lines.push({ topic: "hand", text: `Your cards: ${startingHand(hole)}` });
+    lines.push({ topic: "hand", text: `Your cards: ${startingHand(hole)}`, fact: { kind: "startingHand", cards: highFirst(hole) } });
   } else {
     const all = [...hole, ...view.board];
-    const name = handName(all).toLowerCase();
+    const description = handName(all);
+    const name = description.toLowerCase();
     const best = displayOrder(bestFive(all));
     const read = readHand(hole, view.board);
     const shared = (read.strength === "nothing" || read.strength === "aceHigh") && name !== "high card";
     let text = `Your best five: ${best.map((c) => `{${c}}`).join(" ")}, ${name}.`;
     if (shared) text += ` The ${name} is on the board, so ${n === 2 ? "the bot shares it" : "everyone still in shares it"}.`;
-    lines.push({ topic: "hand", text });
+    lines.push({ topic: "hand", text, fact: { kind: "bestFive", cards: best, hand: description, shared, headsUp: n === 2 } });
 
     if (read.drawCards.length) {
       const kinds = [read.flushDraw ? "flush" : null, read.straightDraw ? "straight" : null].filter(Boolean).join(" or ");
@@ -168,33 +216,30 @@ export function coachLines(view: TableView): CoachLine[] {
       lines.push({
         topic: "draw",
         text: `${read.drawCards.length} unseen cards could complete a ${kinds} ${more}. Even then, a stronger hand could still beat you.`,
+        fact: { kind: "draw", count: read.drawCards.length, flush: read.flushDraw, straight: !!read.straightDraw, flop: view.board.length === 3 },
       });
     }
-    for (const note of boardThreats(view.board)) lines.push({ topic: "board", text: note });
+    for (const note of boardThreats(view.board)) lines.push({ topic: "board", ...note });
   }
 
   // The price (lesson 9).
-  const price = callPrice(view, seat);
   if (!price) {
-    lines.push({ topic: "price", text: "Nothing to call: you can check for free." });
+    lines.push({ topic: "price", text: "Nothing to call: you can check for free.", fact: { kind: "free" } });
   } else {
     const pct = (price.breakEven * 100).toFixed(1);
-    const allIn = price.toCall >= me.stack ? " Calling puts you all-in: you'd put in nothing more, though others may keep betting into a side pot you can't win." : "";
+    const allIn =
+      price.toCall >= me.stack
+        ? " Calling puts you all-in: you'd put in nothing more. If at least two opponents match extra chips beyond your total contribution, those matched chips form side pots you can't win."
+        : "";
     const sidePots = view.pots.length > 1 ? " With side pots, this lumps together the pots you can win." : "";
-    // The call ends the betting only if nobody else can still bet after it: everyone
-    // else still in is all-in, or (on the river) has already matched the bet.
-    const highest = Math.max(...view.seats.map((s) => s?.betThisStreet ?? 0));
-    const othersWithChips = live.filter((s) => s!.seat !== seat && s!.status === "active" && s!.stack > 0);
-    const ends =
-      price.toCall >= me.stack ||
-      othersWithChips.length === 0 ||
-      (view.street === "river" && othersWithChips.every((s) => s!.betThisStreet === highest));
+    const ends = callEnds;
     const caveat = ends
       ? "We haven't estimated your chance of winning."
       : "More betting may follow, which changes this math. We haven't estimated your chance of winning.";
     lines.push({
       topic: "price",
       text: `Calling costs ${price.toCall} to win a pot of ${price.potIfCalled}. If the betting ended here, you'd need to win at least ${pct}% of the pot on average to break even (a tie earns your share of it).${allIn}${sidePots} ${caveat}`,
+      fact: { kind: "price", toCall: price.toCall, pot: price.potIfCalled, pct, allIn: !!allIn, sidePots: !!sidePots, ends },
     });
   }
   return lines;

@@ -18,8 +18,8 @@ export interface ReviewRecord {
 }
 
 export const REVIEWS: ReviewRecord[] = [
-  { unit: "messages", locale: "zh-Hans", glossaryVersion: 4, source: "398752f77193721a", translation: "3a7e958023c06521", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, batch 4: Review, verified on the working tree after b81988d)", date: "2026-11-02" },
-  { unit: "messages", locale: "ja", glossaryVersion: 4, source: "398752f77193721a", translation: "80e7bf41abd37e41", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, batch 4: Review, verified on the working tree after b81988d)", date: "2026-11-02" },
+  { unit: "messages", locale: "zh-Hans", glossaryVersion: 4, source: "ef267dc78780939f", translation: "d9a158f122c9624e", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, batch 5: coach, verified on the working tree after 30d7de2)", date: "2026-11-02" },
+  { unit: "messages", locale: "ja", glossaryVersion: 4, source: "ef267dc78780939f", translation: "2bc60c1f31df0b88", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, batch 5: coach, verified on the working tree after 30d7de2)", date: "2026-11-02" },
   { unit: "lesson1", locale: "zh-Hans", glossaryVersion: 4, source: "313aa6f96111b1ff", translation: "42a85a00696f35a1", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, batch 2: lessons 9–16, verified on the working tree after ffb287c)", date: "2026-11-02" },
   { unit: "lesson1", locale: "ja", glossaryVersion: 4, source: "313aa6f96111b1ff", translation: "1cdfdf9c9e31457c", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, batch 2: lessons 9–16, verified on the working tree after ffb287c)", date: "2026-11-02" },
   { unit: "lesson2", locale: "zh-Hans", glossaryVersion: 4, source: "50b5bd4199139473", translation: "93f68963564da30d", status: "passed", checkedBy: "Codex (thread 01a19200-e08d-7f61-a533-e99bcd483ab0, batch 2: lessons 9–16, verified on the working tree after ffb287c)", date: "2026-11-02" },

@@ -3,7 +3,7 @@
 import { parse, TYPE, type MessageFormatElement } from "@formatjs/icu-messageformat-parser";
 import { createIntl } from "react-intl";
 import { describe, expect, it } from "vitest";
-import { coachLines } from "../game/coach";
+import { coachLines, type CoachFact } from "../game/coach";
 import type { TableView } from "../game/types";
 import { cardName } from "../learn/card-names";
 import { QUIZZES } from "../learn/quizzes";
@@ -109,8 +109,9 @@ describe("the coach's position line with players all-in", () => {
     };
   }
   const say = (v: TableView) => {
-    const line = coachLines(v).find((l) => l.fact)!;
-    return { en: line.text, fact: line.fact!, zh: phraseFact(intls["zh-Hans"], line.fact!), ja: phraseFact(intls.ja, line.fact!) };
+    const line = coachLines(v).find((l) => l.fact.kind === "preflopPosition")!;
+    const fact = line.fact as Extract<CoachFact, { kind: "preflopPosition" }>;
+    return { en: line.text, fact, zh: phraseFact(intls["zh-Hans"], fact), ja: phraseFact(intls.ja, fact) };
   };
 
   it("leaves all-in players out of the count, in every language", () => {

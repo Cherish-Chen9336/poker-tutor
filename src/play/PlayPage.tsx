@@ -360,7 +360,6 @@ export default function PlayPage() {
             {coachOn ? (
               yourTurn ? (
                 <>
-                  {locale !== "en" && <p className="note">{t("play.coachEnglish")}</p>}
                   <ul className="coach-list">
                     {coach.map((line, i) => (
                       <CoachHint key={i} line={line} phrase={coachLine} />

@@ -367,7 +367,6 @@ export const en = {
   "play.tooLong": "This hand was too long to save for Review.",
   "play.rejected": "That move isn't allowed right now.",
   "play.coach": "Coach",
-  "play.coachEnglish": "Most of the coach's hints aren't translated yet, so they're shown in English.",
   "play.hintsSwitch": "Hints before my move",
   "play.hintsLater": "Hints appear when it's your turn.",
   "play.hintsOff": "Hints are off.",
@@ -444,6 +443,20 @@ export const en = {
   "review.verdict": "{verdict, select, mistake {✗ Mistake} good {✓ Good} other {Note}}",
 
   // The coach's position line (pilot: one coach sentence built from facts)
+  "coach.huCallEnds": "If you call, betting ends for this hand.",
+  "coach.huPreflop": "{button, select, yes {You have the button: you act first before the flop, and last on every later round.} other {You're the big blind: you act last before the flop, and first on every later round.}}",
+  "coach.huPostflop": "{button, select, yes {You act last this round, so you'll see the bot's choice first (in position).} other {You act first this round; the bot will see your choice before deciding.}}",
+  "coach.postflop": "{where, select, last {You act last this round (in position)} first {You act first this round} other {You act {rank, select, 1 {first} 2 {second} 3 {third} 4 {fourth} 5 {fifth} other {sixth}} of the {count} players who can still bet}}. {others, plural, one {# opponent is} other {# opponents are}} still in.",
+  "coach.startingPair": "Your cards: {cards}: a pocket pair of {rank, select, A {aces} K {kings} Q {queens} J {jacks} T {10s} other {{rank}s}}.",
+  "coach.starting": "Your cards: {cards}: {high, select, A {ace} K {king} Q {queen} J {jack} T {10} other {{high}}}-{low, select, A {ace} K {king} Q {queen} J {jack} T {10} other {{low}}}, {suited, select, yes {same suit (suited)} other {different suits}}.",
+  "coach.handName": "{hand, select, royalFlush {royal flush} straightFlush {straight flush} fourOfAKind {four of a kind} fullHouse {full house} flush {flush} straight {straight} threeOfAKind {three of a kind} twoPair {two pair} onePair {one pair} highCard {high card} other {{text}}}",
+  "coach.bestFive": "Your best five: {cards}, {hand}.{shared, select, yes { The {hand} is on the board, so {headsUp, select, yes {the bot shares it} other {everyone still in shares it}}.} other {}}",
+  "coach.draw": "{count} unseen cards could complete a {kind, select, flush {flush} straight {straight} both {flush or straight} other {}} {street, select, flop {on the turn or river} other {on the river}}. Even then, a stronger hand could still beat you.",
+  "coach.boardFlush": "{count, select, 3 {Three} 4 {Four} other {Five}} {suit, select, s {spades} h {hearts} d {diamonds} other {clubs}} on the board: a flush is possible.",
+  "coach.boardPaired": "The board is paired: a full house or four of a kind is possible.",
+  "coach.boardStraight": "Three cards close in rank: a straight is possible.",
+  "coach.free": "Nothing to call: you can check for free.",
+  "coach.price": "Calling costs {toCall} to win a pot of {pot}. If the betting ended here, you'd need to win at least {pct}% of the pot on average to break even (a tie earns your share of it).{allIn, select, yes { Calling puts you all-in: you'd put in nothing more. If at least two opponents match extra chips beyond your total contribution, those matched chips form side pots you can't win.} other {}}{sidePots, select, yes { With side pots, this lumps together the pots you can win.} other {}} {ends, select, yes {We haven't estimated your chance of winning.} other {More betting may follow, which changes this math. We haven't estimated your chance of winning.}}",
   "coach.position.preflop":
     "You're {seat} ({short}). Before the flop, action goes from under the gun to the big blind, skipping players who can't act, and a raise gives the others who can still act another turn. After the flop, {later}.",
   "coach.position.last": "you act last on every later round",

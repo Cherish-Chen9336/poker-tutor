@@ -7,7 +7,7 @@ import { en, type MessageId } from "./messages/en";
 type Values = Record<string, string | number>;
 
 /** The evaluator's hand names, by their message ids. */
-const HAND_IDS: Record<string, string> = {
+export const HAND_IDS: Record<string, string> = {
   "Royal Flush": "royalFlush",
   "Straight Flush": "straightFlush",
   "Four of a Kind": "fourOfAKind",

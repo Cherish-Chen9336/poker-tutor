@@ -10,7 +10,9 @@ import { handFacts, moveFactAt, resultFact } from "../game/log-facts";
 import { Match, type HandRecord } from "../game/match";
 import type { LegalMoves, Move } from "../game/types";
 import { potLabel, potText } from "../ui/labels";
+import { coachLines, type CoachFact } from "../game/coach";
 import { reviewHand } from "../game/review";
+import { phraseFact } from "./coach-text";
 import { wordLog } from "./log-text";
 import { wordComment } from "./review-text";
 import { en } from "./messages/en";
@@ -94,6 +96,21 @@ describe("the hand log from facts", () => {
     for (const part of ["price", "draw", "size", "foldDepends", "callDepends", "checkFree"]) expect([...kinds].join(" "), part).toContain(part);
   });
 
+  it("phrases every coach hint exactly as the English coach says it", () => {
+    const kinds = new Set<string>();
+    for (const record of records) {
+      for (const step of record.moves.filter((m) => m.actorSeat === record.learnerSeat)) {
+        for (const line of coachLines(step.view)) {
+          expect(phraseFact(english, line.fact)).toBe(line.text);
+          kinds.add(line.fact.kind);
+        }
+      }
+    }
+    expect([...kinds].sort()).toEqual(
+      ["boardFlush", "boardPaired", "boardStraight", "bestFive", "draw", "free", "headsUpPostflop", "headsUpPreflop", "postflopPosition", "preflopPosition", "price", "startingHand"].sort(),
+    );
+  });
+
   it("labels the pot exactly as the English pot label did", () => {
     for (const record of records) {
       const names = record.seats.length > 2 ? record.seats.map((s) => s.name) : undefined;
@@ -111,22 +128,73 @@ describe("the hand log from facts", () => {
     }
   });
 
+  /** Numbers in a text, as a sorted list (card tokens removed; decimals kept whole). */
+  const numbers = (s: string) => [...s.replace(/\{[2-9TJQKA][shdc]\}/g, "").matchAll(/\d+(?:\.\d+)?/g)].map((m) => m[0]).sort();
+  const tokens = (s: string) => [...s.matchAll(/\{[2-9TJQKA][shdc]\}/g)].map((m) => m[0]);
+  // No English words are left, apart from the bots' names and the seat abbreviations (glossary short forms).
+  const noEnglish = (line: string, english: string) => expect(line.replace(/\b(Mia|Leo|Sam|Ava|Kai|BTN|UTG)\b/g, ""), english).not.toMatch(/[A-Za-z]{3,}/);
+
+  /**
+   * The numbers a coach hint must contain in each language, from its fact. Where a language writes a number
+   * English spells out ("second" → 第 2 个, "best five" → 5枚), it's listed here, so nothing else can slip in.
+   */
+  function hintNumbers(fact: CoachFact, locale: "en" | "zh-Hans" | "ja"): string[] {
+    const ranks = (cards: string[]) => cards.map((c) => (c[0] === "T" ? "10" : c[0])).filter((r) => /\d/.test(r));
+    const translated = locale !== "en";
+    switch (fact.kind) {
+      case "preflopPosition":
+        if (fact.count === 1 || fact.rank === fact.count) return [];
+        return fact.rank === 1 ? [String(fact.count)] : [String(fact.count), ...(translated ? [String(fact.rank)] : [])];
+      case "postflopPosition": {
+        const middle = fact.mine !== fact.count && fact.mine !== 1;
+        return [...(middle ? [String(fact.count), ...(translated ? [String(fact.mine)] : [])] : []), String(fact.others)];
+      }
+      case "startingHand":
+        return fact.cards[0][0] === fact.cards[1][0] ? ranks([fact.cards[0]]) : ranks(fact.cards);
+      case "bestFive":
+        return locale === "ja" ? ["5"] : [];
+      case "draw":
+        return [String(fact.count)];
+      case "boardFlush":
+        return locale === "ja" ? [String(fact.count)] : [];
+      case "boardStraight":
+        return locale === "ja" ? ["3"] : [];
+      case "price":
+        return [String(fact.toCall), String(fact.pot), fact.pct, ...(fact.allIn && locale === "ja" ? ["2"] : [])];
+      default:
+        return [];
+    }
+  }
+
+  it("lists exactly the numbers each English coach hint contains", () => {
+    for (const record of records)
+      for (const step of record.moves.filter((m) => m.actorSeat === record.learnerSeat))
+        for (const line of coachLines(step.view)) expect(numbers(line.text), line.text).toEqual(hintNumbers(line.fact, "en").sort());
+  });
+
   for (const [locale, messages] of [["zh-Hans", zhHans], ["ja", ja]] as const) {
-    it(`${locale}: words every log fact and comment, keeping the cards and amounts`, () => {
+    it(`${locale}: words every log fact, comment, and coach hint, with exactly the same cards and amounts`, () => {
       const intl = createIntl({ locale, messages: { ...en, ...messages } });
       for (const record of records.slice(0, 300).concat(records.slice(600, 900))) {
-        const facts = handFacts(record);
-        const comments = reviewHand(record).map((c) => c.fact);
-        const words = [...facts.map((f) => wordLog(intl, f)), ...comments.map((f) => wordComment(intl, f))];
-        const englishWords = [...facts.map((f) => wordLog(english, f)), ...comments.map((f) => wordComment(english, f))];
-        words.forEach((line, i) => {
-          // No English words are left, apart from the bots' names.
-          expect(line.replace(/\b(Mia|Leo|Sam|Ava|Kai)\b/g, ""), englishWords[i]).not.toMatch(/[A-Za-z]{3,}/);
-          const tokens = (s: string) => [...s.matchAll(/\{[2-9TJQKA][shdc]\}/g)].map((m) => m[0]);
-          expect(tokens(line), englishWords[i]).toEqual(tokens(englishWords[i]));
-          const numbers = (s: string) => [...s.replace(/\{[2-9TJQKA][shdc]\}/g, "").matchAll(/\d+/g)].map((m) => m[0]).sort();
-          expect(numbers(line), englishWords[i]).toEqual(numbers(englishWords[i]));
-        });
+        // The log and the comments: exactly the English numbers, each as often.
+        const pairs = [
+          ...handFacts(record).map((f) => [wordLog(intl, f), wordLog(english, f)]),
+          ...reviewHand(record).map((c) => [wordComment(intl, c.fact), wordComment(english, c.fact)]),
+        ];
+        for (const [line, englishLine] of pairs) {
+          noEnglish(line, englishLine);
+          expect(tokens(line), englishLine).toEqual(tokens(englishLine));
+          expect(numbers(line), `${englishLine} → ${line}`).toEqual(numbers(englishLine));
+        }
+        // Coach hints: exactly the numbers their facts call for in this language.
+        for (const step of record.moves.filter((m) => m.actorSeat === record.learnerSeat)) {
+          for (const { fact, text } of coachLines(step.view)) {
+            const line = phraseFact(intl, fact);
+            noEnglish(line, text);
+            expect(tokens(line), text).toEqual(tokens(text));
+            expect(numbers(line), `${text} → ${line}`).toEqual(hintNumbers(fact, locale).sort());
+          }
+        }
       }
     });
   }
