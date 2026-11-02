@@ -2,16 +2,10 @@
 // gambler's fallacy simulation.
 import { useEffect, useId, useRef, useState } from "react";
 import { oneCardOdds } from "../game/hands";
-import { LESSON9_EXAMPLE } from "./diagram-data";
+import { averageResult, LESSON9_EXAMPLE } from "./diagram-data";
 import { addTally, EMPTY_TALLY, interval95, PREMIUM_CHANCE, runBlocks, secureRandom, type StreakTally } from "../game/simulate";
 
 const pct = (x: number, digits = 1) => `${(x * 100).toFixed(digits)}%`;
-
-/** Words for a call's average result. The choice uses the unrounded `ev`; one that rounds to 0.0 is called even. */
-export function averageResult(ev: number): string {
-  if (Math.abs(ev) < 0.05) return "About break-even: calling and folding have about the same average result.";
-  return `${ev > 0 ? "+" : "−"}${Math.abs(ev).toFixed(1)} chips per call → ${ev > 0 ? "call" : "fold"}`;
-}
 
 /** The final pot split into the call and the pot, and the chance needed against the chance you have. */
 function PriceBars({ pot, call, need, have }: { pot: number; call: number; need: number; have: number }) {
