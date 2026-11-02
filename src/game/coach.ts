@@ -125,15 +125,18 @@ export function coachLines(view: TableView): CoachLine[] {
       .map((s) => positionOf(view, s!.seat));
     const before = beforeSeats.map((p) => `the ${p}`);
     const after = before.length <= 2 ? before.join(" and ") : `${before.slice(0, -1).join(", ")}, and ${before.at(-1)}`;
+    // With nobody else able to bet, staying in ends the betting: the remaining cards are dealt out.
     const later =
-      rank === actors.length
-        ? "you act last on every later round"
-        : rank === 1
-          ? `you act first of the ${actors.length} players still in`
-          : `if everyone still in stays in, you act ${ordinal(rank)} of ${actors.length}, after ${after}`;
+      actors.length === 1
+        ? "if you stay in, nobody can bet after this round: the remaining cards are dealt out"
+        : rank === actors.length
+          ? "you act last on every later round"
+          : rank === 1
+            ? `you act first of the ${actors.length} players who can still bet`
+            : `if everyone who can still bet stays in, you act ${ordinal(rank)} of ${actors.length}, after ${after}`;
     lines.push({
       topic: "position",
-      text: `You're ${SEAT_PHRASE[position]} (${position}). Before the flop, betting goes around from under the gun to the big blind, and a raise gives everyone else another turn. After the flop, ${later}.`,
+      text: `You're ${SEAT_PHRASE[position]} (${position}). Before the flop, action goes from under the gun to the big blind, skipping players who can't act, and a raise gives the others who can still act another turn. After the flop, ${later}.`,
       fact: { kind: "preflopPosition", position, rank, count: actors.length, before: beforeSeats },
     });
   } else {

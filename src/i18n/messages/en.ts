@@ -20,7 +20,7 @@ export const en = {
   "lang.label": "Language",
   "lang.machine": "Machine-assisted translation",
   "lang.machineDetail":
-    "Claude translated this text and Codex cross-checked it. No human translator has reviewed it, so the English version is the reference.",
+    "Claude translated this text, and Codex checks each part against the English. No human translator has reviewed it, so the English version is the reference.",
   "lang.notYet": "This part isn't translated yet, so it's shown in English.",
 
   // Lesson list
@@ -124,10 +124,11 @@ export const en = {
 
   // The coach's position line (pilot: one coach sentence built from facts)
   "coach.position.preflop":
-    "You're {seat} ({short}). Before the flop, betting goes around from under the gun to the big blind, and a raise gives everyone else another turn. After the flop, {later}.",
+    "You're {seat} ({short}). Before the flop, action goes from under the gun to the big blind, skipping players who can't act, and a raise gives the others who can still act another turn. After the flop, {later}.",
   "coach.position.last": "you act last on every later round",
-  "coach.position.first": "you act first of the {count} players still in",
-  "coach.position.middle": "if everyone still in stays in, you act {rank, select, 1 {first} 2 {second} 3 {third} 4 {fourth} 5 {fifth} other {sixth}} of {count}, after {before}",
+  "coach.position.only": "if you stay in, nobody can bet after this round: the remaining cards are dealt out",
+  "coach.position.first": "you act first of the {count} players who can still bet",
+  "coach.position.middle": "if everyone who can still bet stays in, you act {rank, select, 1 {first} 2 {second} 3 {third} 4 {fourth} 5 {fifth} other {sixth}} of {count}, after {before}",
   "seat.UTG": "under the gun",
   "seat.HJ": "in the hijack",
   "seat.CO": "in the cutoff",
@@ -135,6 +136,7 @@ export const en = {
   "seat.SB": "the small blind",
   "seat.BB": "the big blind",
   "coach.seatRef": "the {short}",
+  "coach.and": "{a} and {b}",
 } as const;
 
 export type MessageId = keyof typeof en;

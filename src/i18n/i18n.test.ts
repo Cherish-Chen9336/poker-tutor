@@ -9,7 +9,10 @@ import { coachLines } from "../game/coach";
 import type { TableView } from "../game/types";
 import { cardName } from "../learn/card-names";
 import { QUIZZES } from "../learn/quizzes";
-import { QUIZ_TEXT } from "../learn/quizzes-i18n";
+import { text as jaQuiz } from "../learn/quiz-text/ja";
+import { text as zhQuiz } from "../learn/quiz-text/zh-Hans";
+
+const QUIZ_TEXT = { "zh-Hans": zhQuiz, ja: jaQuiz };
 import { phraseFact } from "./coach-text";
 import { GLOSSARY, term } from "./glossary";
 import { en, type MessageId } from "./messages/en";
@@ -50,12 +53,13 @@ describe("interface text", () => {
 });
 
 describe("the coach's position line, built from facts", () => {
-  function view(button: number, folded: number[]): TableView {
+  function view(button: number, folded: number[], allIn: number[] = []): TableView {
     return {
       viewerSeat: 0, handNumber: 1, street: "preflop", board: [], pots: [],
       seats: Array.from({ length: 6 }, (_, seat) => ({
-        seat, id: `p${seat}`, name: `P${seat}`, stack: 190, betThisStreet: 0,
-        status: folded.includes(seat) ? ("folded" as const) : ("active" as const), cards: seat === 0 ? ["Ah", "Kd"] : null,
+        seat, id: `p${seat}`, name: `P${seat}`, stack: allIn.includes(seat) ? 0 : 190, betThisStreet: allIn.includes(seat) ? 10 : 0,
+        status: folded.includes(seat) ? ("folded" as const) : allIn.includes(seat) ? ("all-in" as const) : ("active" as const),
+        cards: seat === 0 ? ["Ah", "Kd"] : null,
       })),
       buttonSeat: button, bigBlindSeat: (button + 2) % 6, smallBlind: 1, bigBlind: 2, actionTo: 0, handOver: false, winners: null,
     };
@@ -81,11 +85,72 @@ describe("the coach's position line, built from facts", () => {
   it("phrases the same facts in Chinese and Japanese", () => {
     const fact = coachLines(view(1, [4, 5])).find((l) => l.fact)!.fact!; // the cutoff, after the SB and the BB
     expect(phraseFact(createIntl({ locale: "zh-Hans", messages: { ...en, ...zhHans } }), fact)).toBe(
-      "你在关煞位（CO）。翻牌前，下注从枪口位开始，依次轮到大盲位；有人加注时，其他人都会再轮到一次。翻牌后，如果仍在局中的玩家都继续，你在 4 人中第 3 个行动，排在SB和BB之后。",
+      "你在关煞位（CO）。翻牌前，从枪口位开始依次行动，直到大盲位，跳过无法行动的玩家；有人加注后，其他仍能行动的玩家会再轮到一次。翻牌后，如果仍能下注的玩家都继续，你在 4 人中第 3 个行动，排在小盲位和大盲位之后。",
     );
     expect(phraseFact(createIntl({ locale: "ja", messages: { ...en, ...ja } }), fact)).toMatch(
-      /^あなたはカットオフ（CO）です。.*残っている全員が続ければ、4人中3番目に、SB.*BBの後でアクションします。$/,
+      /^あなたはカットオフ（CO）です。.*ベットできる全員が続ければ、4人中3番目に、スモールブラインド.*ビッグブラインドの後でアクションします。$/,
     );
+  });
+});
+
+describe("the coach's position line with players all-in", () => {
+  const intls = {
+    en: createIntl({ locale: "en", messages: en }),
+    "zh-Hans": createIntl({ locale: "zh-Hans", messages: { ...en, ...zhHans } }),
+    ja: createIntl({ locale: "ja", messages: { ...en, ...ja } }),
+  };
+  function view(button: number, folded: number[], allIn: number[]): TableView {
+    return {
+      viewerSeat: 0, handNumber: 1, street: "preflop", board: [], pots: [],
+      seats: Array.from({ length: 6 }, (_, seat) => ({
+        seat, id: `p${seat}`, name: `P${seat}`, stack: allIn.includes(seat) ? 0 : 190, betThisStreet: allIn.includes(seat) ? 10 : 0,
+        status: folded.includes(seat) ? ("folded" as const) : allIn.includes(seat) ? ("all-in" as const) : ("active" as const),
+        cards: seat === 0 ? ["Ah", "Kd"] : null,
+      })),
+      buttonSeat: button, bigBlindSeat: (button + 2) % 6, smallBlind: 1, bigBlind: 2, actionTo: 0, handOver: false, winners: null,
+    };
+  }
+  const say = (v: TableView) => {
+    const line = coachLines(v).find((l) => l.fact)!;
+    return { en: line.text, fact: line.fact!, zh: phraseFact(intls["zh-Hans"], line.fact!), ja: phraseFact(intls.ja, line.fact!) };
+  };
+
+  it("leaves all-in players out of the count, in every language", () => {
+    // Under the gun (button in seat 3); the big blind (seat 5) is all-in, so 5 players can still bet.
+    const s = say(view(3, [], [5]));
+    expect([s.fact.rank, s.fact.count, s.fact.before]).toEqual([2, 5, ["SB"]]);
+    expect(s.en).toMatch(/you act second of 5, after the SB\.$/);
+    expect(s.zh).toMatch(/你在 5 人中第 2 个行动，排在小盲位之后。$/);
+    expect(s.ja).toMatch(/5人中2番目に、スモールブラインドの後でアクションします。$/);
+  });
+
+  it("says when nobody else can bet any more", () => {
+    // Everyone else is all-in: staying in ends the betting.
+    const s = say(view(3, [], [1, 2, 3, 4, 5]));
+    expect(s.fact.count).toBe(1);
+    expect(s.en).toMatch(/if you stay in, nobody can bet after this round: the remaining cards are dealt out\.$/);
+    expect(s.zh).toMatch(/本轮之后没有人能再下注，剩下的公共牌会直接发完。$/);
+    expect(s.ja).toMatch(/このラウンドの後は誰もベットできず、残りのカードがそのまま配られます。$/);
+  });
+
+  it("names one to four earlier seats, in order, in every language", () => {
+    // The button (seat 0) acts after up to five others; fold some to get each list length.
+    for (const [folded, count] of [[[1, 2, 3, 4], 1], [[2, 3, 4], 2], [[3, 4], 3], [[4], 4], [[], 5]] as [number[], number][]) {
+      const s = say(view(0, folded, []));
+      expect(s.fact.before.length).toBe(count);
+      expect(s.en).toContain("you act last on every later round");
+      expect(s.zh).toContain("你每一轮都最后行动");
+    }
+    // Under the gun with the SB and BB still in: two names, joined the way each language does it.
+    const two = say(view(3, [], []));
+    expect(two.en).toContain("after the SB and the BB");
+    expect(two.zh).toContain("排在小盲位和大盲位之后");
+    expect(two.ja).toContain("スモールブラインドとビッグブラインドの後");
+    // The cutoff with UTG and HJ in too: four names before it.
+    const four = say(view(1, [], []));
+    expect(four.fact.before).toEqual(["SB", "BB", "UTG", "HJ"]);
+    expect(four.en).toContain("after the SB, the BB, the UTG, and the HJ");
+    expect(four.zh).toContain("小盲位、大盲位、枪口位和劫位");
   });
 });
 
@@ -98,7 +163,13 @@ describe("quiz translations", () => {
         const q = all.find((x) => x.id === id);
         expect(q, id).toBeDefined();
         expect(text.choices.length, id).toBe(q!.choices.length);
-        expect(cards([text.prompt, ...text.choices, text.why].join(" ")), id).toEqual(cards([q!.prompt, ...q!.choices, q!.why].join(" ")));
+        // Cards match field by field, and a choice that's only numbers or cards must be identical to the English.
+        expect(cards(text.prompt), `${id} prompt`).toEqual(cards(q!.prompt));
+        expect(cards(text.why), `${id} why`).toEqual(cards(q!.why));
+        text.choices.forEach((choice, i) => {
+          expect(cards(choice), `${id} choice ${i}`).toEqual(cards(q!.choices[i]));
+          if (!/[A-Za-z]/.test(q!.choices[i].replace(/\{[2-9TJQKA][shdc]\}/g, ""))) expect(choice, `${id} choice ${i}`).toBe(q!.choices[i]);
+        });
       }
     });
   }

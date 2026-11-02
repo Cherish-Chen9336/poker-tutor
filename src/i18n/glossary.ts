@@ -1,10 +1,10 @@
-// The poker glossary for translations (version 1, 2026-11-02). One entry per
+// The poker glossary for translations (version 2, 2026-11-02). One entry per
 // concept: every translation uses the preferred term, so a learner sees one
 // name per idea. These are editorial choices for this app, made by Claude and
 // cross-checked by Codex (machine-assisted; no human translator reviewed them).
 // `avoid` lists terms a translation must not use for this concept (tested).
 
-export const GLOSSARY_VERSION = 1;
+export const GLOSSARY_VERSION = 2;
 
 export interface Term {
   id: string;
@@ -34,7 +34,7 @@ export const GLOSSARY: Term[] = [
   { id: "raise", en: "raise", zh: "加注", ja: "レイズ" },
   { id: "allIn", en: "all-in", zh: "全下", ja: "オールイン", avoid: { zh: ["梭哈"] } },
   { id: "raiseTo", en: "raise to", zh: "加注到", ja: "レイズ額（合計）", note: "The total for the round, never the increase." },
-  { id: "raiseBy", en: "raise by", zh: "加注了", ja: "レイズの上乗せ分", note: "The increase over the current bet." },
+  { id: "raiseBy", en: "raise by", zh: "加注增量", ja: "レイズの上乗せ分", note: "The increase over the current bet. In prose: 在当前下注额上再加 {amount}." },
   // Rounds and cards
   { id: "hand", en: "hand", zh: "一手牌", ja: "ハンド", note: "One deal from the blinds to the end." },
   { id: "bettingRound", en: "betting round", zh: "下注轮", ja: "ベッティングラウンド" },
@@ -48,7 +48,8 @@ export const GLOSSARY: Term[] = [
   { id: "kicker", en: "kicker", zh: "踢脚", ja: "キッカー" },
   { id: "headsUp", en: "heads-up", zh: "单挑", ja: "ヘッズアップ", note: "Two players." },
   // Seats and blinds: the position and the forced payment are different ideas.
-  { id: "button", en: "button", zh: "庄位", ja: "ボタン", short: "BTN" },
+  { id: "button", en: "button (seat)", zh: "庄位", ja: "ボタン", short: "BTN", note: "The position, not the physical marker." },
+  { id: "dealerButton", en: "dealer button (marker)", zh: "庄家按钮", ja: "ディーラーボタン" },
   { id: "smallBlindSeat", en: "small blind (seat)", zh: "小盲位", ja: "スモールブラインド", short: "SB" },
   { id: "bigBlindSeat", en: "big blind (seat)", zh: "大盲位", ja: "ビッグブラインド", short: "BB" },
   { id: "blinds", en: "blinds (forced bets)", zh: "盲注", ja: "ブラインド" },

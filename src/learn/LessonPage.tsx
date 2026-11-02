@@ -1,4 +1,4 @@
-import { Suspense, useRef, useState } from "react";
+import { Suspense, use, useRef, useState } from "react";
 import { useTakePendingFocus } from "../app/focus";
 import type { Progress } from "../app/progress";
 import { EnglishFallback } from "../i18n/I18n";
@@ -8,7 +8,7 @@ import { lessonContent } from "./content";
 import { findLesson, LESSONS } from "./lessons";
 import { Quiz } from "./Quiz";
 import { QUIZZES } from "./quizzes";
-import { localizeQuestion } from "./quizzes-i18n";
+import { localizeQuestion, quizText } from "./quizzes-i18n";
 
 interface Props {
   lessonId: number;
@@ -43,7 +43,8 @@ export default function LessonPage({ lessonId, progress, onComplete }: Props) {
   const content = lessonContent(lesson.id, locale);
   const Content = content?.Component;
   const english = QUIZZES[lesson.id];
-  const localized = english?.map((q) => localizeQuestion(q, locale));
+  const texts = use(quizText(locale));
+  const localized = english?.map((q) => localizeQuestion(q, locale, texts));
   // A quiz is shown in the page's language only when every question is translated.
   const quizTranslated = !!localized && localized.every((q) => q !== null);
   const questions = quizTranslated ? (localized as typeof english) : english;

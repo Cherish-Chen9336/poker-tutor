@@ -17,7 +17,7 @@ export const zhHans: Partial<Record<MessageId, string>> = {
 
   "lang.label": "语言",
   "lang.machine": "机器辅助翻译",
-  "lang.machineDetail": "本文由 Claude 翻译，并由 Codex 交叉核对。尚未经过人工译者审校，因此以英文版本为准。",
+  "lang.machineDetail": "本文由 Claude 翻译，Codex 会逐段对照英文进行核对。尚未经过人工译者审校，因此以英文版本为准。",
   "lang.notYet": "这部分尚未翻译，因此以英文显示。",
 
   "home.title": "学习德州扑克",
@@ -88,7 +88,7 @@ export const zhHans: Partial<Record<MessageId, string>> = {
   "lesson.10.title": "赌徒谬误",
   "lesson.10.summary": "为什么连输之后好牌并不会更容易出现，附实时演示。",
   "lesson.11.title": "为什么诈唬有效",
-  "lesson.11.summary": "用一个小游戏说明诈唬何时有用，以及该多久诈唬一次。",
+  "lesson.11.summary": "用一个小游戏说明诈唬何时有用，以及合适的诈唬频率。",
   "lesson.12.title": "沉没成本",
   "lesson.12.summary": "底池里的筹码已经不属于你，但底池的大小仍然重要。",
   "lesson.13.title": "结果论",
@@ -101,7 +101,7 @@ export const zhHans: Partial<Record<MessageId, string>> = {
   "lesson.16.summary": "不同筹码量的全下如何把筹码分成几个不同的底池。",
 
   "timeline.preflop": "翻牌前",
-  "timeline.preflopNote": "每人 2 张底牌",
+  "timeline.preflopNote": "每人 2 张底牌，仅自己可见",
   "timeline.flop": "翻牌",
   "timeline.flopNote": "3 张公共牌",
   "timeline.turn": "转牌",
@@ -115,15 +115,17 @@ export const zhHans: Partial<Record<MessageId, string>> = {
   "timeline.caption": "公共牌从 0 张变成 3 张、4 张，再到 5 张，每次发牌后都有一轮下注。",
 
   "coach.position.preflop":
-    "你在{seat}（{short}）。翻牌前，下注从枪口位开始，依次轮到大盲位；有人加注时，其他人都会再轮到一次。翻牌后，{later}。",
+    "你在{seat}（{short}）。翻牌前，从枪口位开始依次行动，直到大盲位，跳过无法行动的玩家；有人加注后，其他仍能行动的玩家会再轮到一次。翻牌后，{later}。",
   "coach.position.last": "你每一轮都最后行动",
-  "coach.position.first": "在仍在局中的 {count} 名玩家里你第一个行动",
-  "coach.position.middle": "如果仍在局中的玩家都继续，你在 {count} 人中第 {rank} 个行动，排在{before}之后",
+  "coach.position.only": "如果你继续参与这手牌，本轮之后没有人能再下注，剩下的公共牌会直接发完",
+  "coach.position.first": "在仍能下注的 {count} 名玩家中你第一个行动",
+  "coach.position.middle": "如果仍能下注的玩家都继续，你在 {count} 人中第 {rank} 个行动，排在{before}之后",
   "seat.UTG": "枪口位",
   "seat.HJ": "劫位",
   "seat.CO": "关煞位",
   "seat.BTN": "庄位",
   "seat.SB": "小盲位",
   "seat.BB": "大盲位",
-  "coach.seatRef": "{short}",
+  "coach.and": "{a}和{b}",
+  "coach.seatRef": "{short, select, UTG {枪口位} HJ {劫位} CO {关煞位} BTN {庄位} SB {小盲位} BB {大盲位} other {{short}}}",
 };

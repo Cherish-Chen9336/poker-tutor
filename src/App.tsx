@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef } from "react";
-import { parseLocation, useHash, type Route } from "./app/route";
-import { I18nProvider, LanguageSwitch, MachineLabel } from "./i18n/I18n";
+import { parseLocation, routeHref, useHash, type Route } from "./app/route";
+import { EnglishFallback, I18nProvider, LanguageErrorBoundary, LanguageSwitch, LoadingLanguage, MachineLabel } from "./i18n/I18n";
 import { useHref, useT } from "./i18n/hooks";
 import type { MessageId } from "./i18n/messages/en";
 import { focusPageHeading } from "./app/focus";
@@ -21,13 +21,15 @@ const AREAS: { area: Route["area"]; label: MessageId }[] = [
 ];
 
 export default function App() {
-  const { locale } = parseLocation(useHash());
+  const { locale, route } = parseLocation(useHash());
   return (
-    <Suspense fallback={null}>
-      <I18nProvider locale={locale}>
-        <Shell />
-      </I18nProvider>
-    </Suspense>
+    <LanguageErrorBoundary key={locale} locale={locale} englishHref={routeHref(route)}>
+      <Suspense fallback={<LoadingLanguage />}>
+        <I18nProvider locale={locale}>
+          <Shell />
+        </I18nProvider>
+      </Suspense>
+    </LanguageErrorBoundary>
   );
 }
 
@@ -93,12 +95,16 @@ function Shell() {
         )}
         {route.area === "play" && (
           <Suspense fallback={<p className="loading">{t("app.loadingTable")}</p>}>
-            <PlayPage />
+            <EnglishFallback>
+              <PlayPage />
+            </EnglishFallback>
           </Suspense>
         )}
         {route.area === "review" && (
           <Suspense fallback={<p className="loading">{t("app.loadingHands")}</p>}>
-            <ReviewPage />
+            <EnglishFallback>
+              <ReviewPage />
+            </EnglishFallback>
           </Suspense>
         )}
       </main>

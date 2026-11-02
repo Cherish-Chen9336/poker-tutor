@@ -17,13 +17,13 @@ export const ja: Partial<Record<MessageId, string>> = {
 
   "lang.label": "言語",
   "lang.machine": "機械支援翻訳",
-  "lang.machineDetail": "この文章は Claude が翻訳し、Codex がクロスチェックしました。人間の翻訳者による確認は受けていないため、英語版を基準とします。",
+  "lang.machineDetail": "この文章は Claude が翻訳し、Codex が各部分を英語と照らし合わせて確認しています。人間の翻訳者による確認は受けていないため、英語版を基準とします。",
   "lang.notYet": "この部分はまだ翻訳されていないため、英語で表示しています。",
 
   "home.title": "テキサスホールデムを学ぶ",
   "home.intro":
-    "10本の短いレッスンで、ゼロから最初のハンドをプレイできるところまで進みます。さらに4本は何ハンドかプレイした後に役立ち、残りの2本は6人テーブルに備えるためのものです。各レッスンの最後には簡単な確認問題があり、どの答えにも理由の解説が付いています。",
-  "home.progress": "{total}本中 <b>{done}</b> 本のレッスンが完了",
+    "10の短いレッスンで、ゼロから最初のハンドをプレイできるところまで進みます。さらに4つのレッスンは何ハンドかプレイした後に役立ち、残りの2つのレッスンは6人テーブルに備えるためのものです。各レッスンの最後には簡単な確認問題があり、どの答えにも理由の解説が付いています。",
+  "home.progress": "全{total}レッスン中、<b>{done}</b>レッスン完了",
   "home.start": "レッスン1を始める",
   "home.continue": "続き：レッスン{id}",
   "home.noSave": "このブラウザではアプリが保存できません。進捗はこのページを閉じるまでしか保持されません。",
@@ -36,7 +36,7 @@ export const ja: Partial<Record<MessageId, string>> = {
   "home.reset": "進捗をリセット",
 
   "lesson.back": "← レッスン一覧",
-  "lesson.position": "レッスン{id}（全{total}本）· {minutes}分",
+  "lesson.position": "レッスン{id}／全{total}レッスン · {minutes}分",
   "lesson.notFound": "レッスンが見つかりません",
   "lesson.notFoundBody": "レッスン{id}はありません。<a>レッスン一覧を見る</a>。",
   "lesson.building": "このレッスンのページは作成中です。今後のアップデートで公開されます。",
@@ -101,7 +101,7 @@ export const ja: Partial<Record<MessageId, string>> = {
   "lesson.16.summary": "額の異なるオールインによって、チップが別々のポットに分かれる仕組み。",
 
   "timeline.preflop": "プリフロップ",
-  "timeline.preflopNote": "各自2枚のホールカード",
+  "timeline.preflopNote": "各自2枚のホールカード（自分だけが見るカード）",
   "timeline.flop": "フロップ",
   "timeline.flopNote": "共有カード3枚",
   "timeline.turn": "ターン",
@@ -115,15 +115,17 @@ export const ja: Partial<Record<MessageId, string>> = {
   "timeline.caption": "ボードは共有カード0枚から3枚、4枚、5枚と増え、配られるたびにベッティングラウンドがあります。",
 
   "coach.position.preflop":
-    "あなたは{seat}（{short}）です。プリフロップでは、ベットはアンダー・ザ・ガンからビッグブラインドまで順に回り、レイズがあると他の全員にもう一度番が回ります。フロップ以降は、{later}。",
+    "あなたは{seat}（{short}）です。プリフロップのアクションはアンダー・ザ・ガンからビッグブラインドへ順に回り、アクションできないプレイヤーは飛ばします。レイズがあると、アクションできるほかのプレイヤーにもう一度番が回ります。フロップ以降は、{later}。",
   "coach.position.last": "すべてのラウンドで最後にアクションします",
-  "coach.position.first": "まだ残っている{count}人の中で最初にアクションします",
-  "coach.position.middle": "残っている全員が続ければ、{count}人中{rank}番目に、{before}の後でアクションします",
+  "coach.position.only": "このハンドを続けても、このラウンドの後は誰もベットできず、残りのカードがそのまま配られます",
+  "coach.position.first": "まだベットできる{count}人の中で最初にアクションします",
+  "coach.position.middle": "ベットできる全員が続ければ、{count}人中{rank}番目に、{before}の後でアクションします",
   "seat.UTG": "アンダー・ザ・ガン",
   "seat.HJ": "ハイジャック",
   "seat.CO": "カットオフ",
   "seat.BTN": "ボタン",
   "seat.SB": "スモールブラインド",
   "seat.BB": "ビッグブラインド",
-  "coach.seatRef": "{short}",
+  "coach.and": "{a}と{b}",
+  "coach.seatRef": "{short, select, UTG {アンダー・ザ・ガン} HJ {ハイジャック} CO {カットオフ} BTN {ボタン} SB {スモールブラインド} BB {ビッグブラインド} other {{short}}}",
 };
