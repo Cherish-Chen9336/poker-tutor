@@ -1,10 +1,10 @@
-// The poker glossary for translations (version 2, 2026-11-02). One entry per
+// The poker glossary for translations (version 3, 2026-11-02). One entry per
 // concept: every translation uses the preferred term, so a learner sees one
 // name per idea. These are editorial choices for this app, made by Claude and
 // cross-checked by Codex (machine-assisted; no human translator reviewed them).
 // `avoid` lists terms a translation must not use for this concept (tested).
 
-export const GLOSSARY_VERSION = 2;
+export const GLOSSARY_VERSION = 3;
 
 export interface Term {
   id: string;
@@ -33,6 +33,8 @@ export const GLOSSARY: Term[] = [
   { id: "bet", en: "bet", zh: "下注", ja: "ベット" },
   { id: "raise", en: "raise", zh: "加注", ja: "レイズ" },
   { id: "allIn", en: "all-in", zh: "全下", ja: "オールイン", avoid: { zh: ["梭哈"] } },
+  { id: "muck", en: "muck", zh: "盖牌", ja: "マック", note: "Discard face down at showdown without showing." },
+  { id: "noLimit", en: "No-Limit Hold'em", zh: "无限注德州扑克", ja: "ノーリミット・ホールデム" },
   { id: "raiseTo", en: "raise to", zh: "加注到", ja: "レイズ額（合計）", note: "The total for the round, never the increase." },
   { id: "raiseBy", en: "raise by", zh: "加注增量", ja: "レイズの上乗せ分", note: "The increase over the current bet. In prose: 在当前下注额上再加 {amount}." },
   // Rounds and cards
@@ -46,6 +48,9 @@ export const GLOSSARY: Term[] = [
   { id: "board", en: "board", zh: "公共牌", ja: "ボード", note: "The five shared cards." },
   { id: "holeCards", en: "hole cards", zh: "底牌", ja: "ホールカード" },
   { id: "kicker", en: "kicker", zh: "踢脚", ja: "キッカー" },
+  { id: "pocketPair", en: "pocket pair", zh: "口袋对", ja: "ポケットペア", note: "Two hole cards of the same rank." },
+  { id: "suited", en: "suited", zh: "同花色", ja: "スーテッド", note: "Both hole cards in one suit; not 同花 (flush)." },
+  { id: "runOut", en: "run out (the board)", zh: "发完公共牌", ja: "ボードを最後まで配る" },
   { id: "headsUp", en: "heads-up", zh: "单挑", ja: "ヘッズアップ", note: "Two players." },
   // Seats and blinds: the position and the forced payment are different ideas.
   { id: "button", en: "button (seat)", zh: "庄位", ja: "ボタン", short: "BTN", note: "The position, not the physical marker." },
@@ -59,6 +64,8 @@ export const GLOSSARY: Term[] = [
   { id: "hijack", en: "hijack", zh: "劫位", ja: "ハイジャック", short: "HJ" },
   { id: "cutoff", en: "cutoff", zh: "关煞位", ja: "カットオフ", short: "CO" },
   { id: "position", en: "position", zh: "位置", ja: "ポジション" },
+  { id: "inPosition", en: "in position", zh: "有位置优势", ja: "インポジション", note: "Acting last after the flop." },
+  { id: "option", en: "the big blind's option", zh: "大盲位的选择权", ja: "ビッグブラインドのオプション" },
   // Suits and ranks
   { id: "spades", en: "spades", zh: "黑桃", ja: "スペード" },
   { id: "hearts", en: "hearts", zh: "红桃", ja: "ハート", avoid: { zh: ["红心"] } },

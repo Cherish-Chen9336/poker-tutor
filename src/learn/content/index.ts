@@ -30,8 +30,24 @@ export const LESSON_CONTENT: Record<number, ComponentType> = {
 
 /** Translated lesson text, loaded only for its language. */
 const TRANSLATED: Record<Exclude<Locale, "en">, Record<number, ComponentType>> = {
-  "zh-Hans": { 1: lazy(() => import("./zh-Hans/lesson1").then((m) => ({ default: m.Lesson1 }))) },
-  ja: { 1: lazy(() => import("./ja/lesson1").then((m) => ({ default: m.Lesson1 }))) },
+  "zh-Hans": {
+    1: lazy(() => import("./zh-Hans/lesson1").then((m) => ({ default: m.Lesson1 }))),
+    2: lazy(() => import("./zh-Hans/lesson2").then((m) => ({ default: m.Lesson2 }))),
+    3: lazy(() => import("./zh-Hans/lesson3").then((m) => ({ default: m.Lesson3 }))),
+    4: lazy(() => import("./zh-Hans/lesson4").then((m) => ({ default: m.Lesson4 }))),
+    5: lazy(() => import("./zh-Hans/lesson5").then((m) => ({ default: m.Lesson5 }))),
+    6: lazy(() => import("./zh-Hans/lesson6").then((m) => ({ default: m.Lesson6 }))),
+    7: lazy(() => import("./zh-Hans/lesson7").then((m) => ({ default: m.Lesson7 }))),
+  },
+  ja: {
+    1: lazy(() => import("./ja/lesson1").then((m) => ({ default: m.Lesson1 }))),
+    2: lazy(() => import("./ja/lesson2").then((m) => ({ default: m.Lesson2 }))),
+    3: lazy(() => import("./ja/lesson3").then((m) => ({ default: m.Lesson3 }))),
+    4: lazy(() => import("./ja/lesson4").then((m) => ({ default: m.Lesson4 }))),
+    5: lazy(() => import("./ja/lesson5").then((m) => ({ default: m.Lesson5 }))),
+    6: lazy(() => import("./ja/lesson6").then((m) => ({ default: m.Lesson6 }))),
+    7: lazy(() => import("./ja/lesson7").then((m) => ({ default: m.Lesson7 }))),
+  },
 };
 
 /** A lesson's text in the page's language, or the English one (marked untranslated) if there's none yet. */

@@ -16,7 +16,7 @@ Step 7, Part 2. Plan reviewed by Codex (thread `01a19200-e08d-7f61-a533-e99bcd48
 - URLs: `#/zh-Hans/learn/1`, `#/ja/learn/1`; no language (or `en`) is English, so old links work. (Saved preference and browser-language detection come at release.)
 - Interface text: React Intl with ICU messages in `src/i18n/messages/{en,zh-Hans,ja}.ts`, loaded only for the language in use.
 - Lesson prose: one component per language and lesson (`src/learn/content/zh-Hans/lesson1.tsx`), around the shared diagrams.
-- Quiz wording: `src/learn/quizzes-i18n.ts` (words only).
+- Diagram text lives in the catalogs too (`best5.*`, `hand.*`, `seatMap.*`, …), so one diagram serves every language; cards inside a sentence are message values (`{c1}`). The seat map widens itself when a translated seat name would run off the edge.
 - Coach: lines carry facts (`CoachFact` in `src/game/coach.ts`); `src/i18n/coach-text.tsx` words them per language. A test proves the English built from facts equals the coach's English in every tested seat situation.
 - Card names for screen readers: `cardName(code, locale)` ("红桃A", "ハートのエース").
 - Fonts: system Chinese and Japanese fonts (no download), set by the page's `lang`.
@@ -33,3 +33,5 @@ Translated in both languages: the app frame, the lesson list (all unit and lesso
 | Batch | English source | Translated | Codex cross-check | Result |
 |---|---|---|---|---|
 | Pilot | lessons frozen at `15f5c2c`; messages in `en.ts` | 2026-11-02 | Codex cross-check ("request changes": coach all-in wording, fallback scopes, loading, quiz checks, records, word choices), then two verification rounds | **passed** at `912465d`; fingerprints in `src/i18n/reviews.ts` |
+| Owner's simplification | Chinese, then Japanese (concise style) | 2026-11-02 | Codex rewrite suggestions, then verification of each | **passed** (`8e2b19f`, `145256e`) |
+| Batch 1: Lessons 2–7 | lessons as frozen, plus one English fix (L5-Q5: "who can still act") | 2026-11-02 | Codex cross-check ("request changes": suit-tie wording, raise increments, short all-in conditions, fingerprint and test gaps, bar labels clipping), then verification | **passed**; glossary version 3 |

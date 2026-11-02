@@ -5,9 +5,10 @@ import lessonsDoc from "../../docs/lessons.md?raw";
 import coachSource from "../game/coach.ts?raw";
 import cardNamesSource from "../learn/card-names.ts?raw";
 import rulesLessons from "../learn/content/rules-lessons.tsx?raw";
-import jaLesson1 from "../learn/content/ja/lesson1.tsx?raw";
+import diagramDataSource from "../learn/diagram-data.ts?raw";
+import diagramsSource from "../learn/diagrams.tsx?raw";
+import visualsSource from "../learn/visuals.tsx?raw";
 import coachTextSource from "./coach-text.tsx?raw";
-import zhLesson1 from "../learn/content/zh-Hans/lesson1.tsx?raw";
 import { text as jaQuiz } from "../learn/quiz-text/ja";
 import { text as zhQuiz } from "../learn/quiz-text/zh-Hans";
 import { QUIZZES } from "../learn/quizzes";
@@ -24,14 +25,17 @@ function fingerprint(text: string): string {
   return h.toString(16).padStart(16, "0");
 }
 
-const lesson1Doc = lessonsDoc.slice(lessonsDoc.indexOf("## Lesson 1:"), lessonsDoc.indexOf("## Lesson 2:"));
-const lesson1Page = rulesLessons.slice(rulesLessons.indexOf("export function Lesson1()"), rulesLessons.indexOf("export function Lesson2()"));
+/** Translated lesson files by language and lesson number. */
+const LESSON_FILES = import.meta.glob<string>("../learn/content/{zh-Hans,ja}/lesson*.tsx", { query: "?raw", import: "default", eager: true });
+const TRANSLATED_LESSONS = [1, 2, 3, 4, 5, 6, 7];
+const lessonFile = (locale: string, n: number) => LESSON_FILES[`../learn/content/${locale}/lesson${n}.tsx`];
+const between = (text: string, from: string, to: string) => text.slice(text.indexOf(from), to ? text.indexOf(to) : undefined);
 
 /** Everything a review checked, by name, so a test can show that changing any one of them invalidates it. */
 type Inputs = Record<string, string>;
 function inputs(): Inputs {
   const keys = Object.keys(en).sort() as (keyof typeof en)[];
-  return {
+  const all: Inputs = {
     enMessages: JSON.stringify(keys.map((k) => [k, en[k]])),
     zhMessages: JSON.stringify(keys.map((k) => [k, zhHans[k]])),
     jaMessages: JSON.stringify(keys.map((k) => [k, ja[k]])),
@@ -39,24 +43,31 @@ function inputs(): Inputs {
     cardNames: cardNamesSource,
     coach: coachSource,
     coachText: coachTextSource,
-    lesson1Doc,
-    lesson1Page,
-    lesson1Quiz: JSON.stringify(QUIZZES[1]),
-    zhLesson1: zhLesson1 + JSON.stringify(QUIZZES[1].map((q) => zhQuiz[q.id])),
-    jaLesson1: jaLesson1 + JSON.stringify(QUIZZES[1].map((q) => jaQuiz[q.id])),
+    diagrams: diagramsSource + visualsSource,
+    diagramData: diagramDataSource,
   };
+  for (const n of TRANSLATED_LESSONS) {
+    all[`lesson${n}Doc`] = between(lessonsDoc, `## Lesson ${n}:`, `## Lesson ${n + 1}:`);
+    all[`lesson${n}Page`] = between(rulesLessons, `export function Lesson${n}()`, n < 7 ? `export function Lesson${n + 1}()` : "");
+    all[`lesson${n}Quiz`] = JSON.stringify(QUIZZES[n]);
+    all[`zhLesson${n}`] = lessonFile("zh-Hans", n) + JSON.stringify(QUIZZES[n].map((q) => zhQuiz[q.id]));
+    all[`jaLesson${n}`] = lessonFile("ja", n) + JSON.stringify(QUIZZES[n].map((q) => jaQuiz[q.id]));
+  }
+  return all;
 }
 /** Which inputs are the English source and which the translation, for each unit. Shared code counts on both sides. */
 const SCOPE: Record<string, (locale: ReviewRecord["locale"]) => { source: string[]; translation: string[] }> = {
   messages: (locale) => ({
-    source: ["enMessages", "glossary", "coach", "coachText"],
-    translation: [locale === "ja" ? "jaMessages" : "zhMessages", "glossary", "cardNames", "coachText"],
-  }),
-  lesson1: (locale) => ({
-    source: ["lesson1Doc", "lesson1Page", "lesson1Quiz", "glossary"],
-    translation: [locale === "ja" ? "jaLesson1" : "zhLesson1", "glossary"],
+    source: ["enMessages", "glossary", "coach", "coachText", "diagrams", "diagramData"],
+    translation: [locale === "ja" ? "jaMessages" : "zhMessages", "glossary", "cardNames", "coachText", "diagrams", "diagramData"],
   }),
 };
+for (const n of TRANSLATED_LESSONS) {
+  SCOPE[`lesson${n}`] = (locale) => ({
+    source: [`lesson${n}Doc`, `lesson${n}Page`, `lesson${n}Quiz`, "glossary"],
+    translation: [`${locale === "ja" ? "ja" : "zh"}Lesson${n}`, "glossary"],
+  });
+}
 function fingerprints(record: ReviewRecord, all: Inputs) {
   const scope = SCOPE[record.unit](record.locale);
   const join = (names: string[]) => names.map((n) => `${n}\n${all[n]}`).join("\n---\n");
@@ -66,7 +77,8 @@ function fingerprints(record: ReviewRecord, all: Inputs) {
 describe("translation review records", () => {
   it("cover every translated unit", () => {
     const units = REVIEWS.map((r) => `${r.unit}/${r.locale}`).sort();
-    expect(units).toEqual(["lesson1/ja", "lesson1/zh-Hans", "messages/ja", "messages/zh-Hans"]);
+    const expected = ["messages", ...TRANSLATED_LESSONS.map((n) => `lesson${n}`)].flatMap((u) => [`${u}/ja`, `${u}/zh-Hans`]);
+    expect(units).toEqual(expected.sort());
   });
 
   for (const record of REVIEWS) {

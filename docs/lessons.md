@@ -273,7 +273,7 @@ With a medium hand, checking or calling is often better: betting may make weaker
 - A. A and B must each put in 20 more
 - B. **A and B each choose: fold, call 20 more, or raise again** ✓
 - C. The round ends, because C raised last
-- *Why:* A raise gives every other player still in the hand a new turn. Nobody is forced to match it; folding is always allowed.
+- *Why:* A raise gives every other player who can still act a new turn. Nobody is forced to match it; folding is always allowed.
 - *Checked by:* table
 
 ---

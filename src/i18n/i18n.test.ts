@@ -1,8 +1,6 @@
 // Checks that keep translations honest (pilot). They can't prove a translation
 // means the same; Codex's sentence-by-sentence review does that (docs/translation.md).
 import { parse, TYPE, type MessageFormatElement } from "@formatjs/icu-messageformat-parser";
-import jaLesson1 from "../learn/content/ja/lesson1.tsx?raw";
-import zhLesson1 from "../learn/content/zh-Hans/lesson1.tsx?raw";
 import { createIntl } from "react-intl";
 import { describe, expect, it } from "vitest";
 import { coachLines } from "../game/coach";
@@ -189,18 +187,24 @@ describe("glossary", () => {
     for (const t of GLOSSARY) expect([t.en, t.zh, t.ja].every(Boolean), t.id).toBe(true);
   });
 
-  const pages: [string, "zh" | "ja", string][] = [
-    ["zh-Hans lesson 1", "zh", zhLesson1 + JSON.stringify(QUIZ_TEXT["zh-Hans"]) + JSON.stringify(zhHans)],
-    ["ja lesson 1", "ja", jaLesson1 + JSON.stringify(QUIZ_TEXT.ja) + JSON.stringify(ja)],
-  ];
-  for (const [name, lang, text] of pages) {
-    it(`${name} uses the glossary's terms`, () => {
-      for (const id of ["pot", "stack", "fold", "showdown", "blinds", "allIn", "flop", "turn", "river", "preflop"]) {
-        expect(text, `${name}: ${id}`).toContain(term(id)[lang]);
-      }
-      for (const t of GLOSSARY) for (const bad of t.avoid?.[lang] ?? []) expect(text, `${name} avoids ${bad}`).not.toContain(bad);
+  // Each lesson's own terms are checked on its rendered text in lessons-i18n.test.tsx.
+  for (const [locale, lang, catalog] of [["zh-Hans", "zh", zhHans], ["ja", "ja", ja]] as const) {
+    it(`${locale} text never uses a term the glossary rules out`, () => {
+      const files = import.meta.glob<string>("../learn/content/{zh-Hans,ja}/lesson*.tsx", { query: "?raw", import: "default", eager: true });
+      const all = [
+        ...Object.entries(files).filter(([path]) => path.includes(`/${locale}/`)).map(([, text]) => text),
+        JSON.stringify(QUIZ_TEXT[locale]),
+        JSON.stringify(catalog),
+      ];
+      for (const t of GLOSSARY) for (const bad of t.avoid?.[lang] ?? []) for (const text of all) expect(text, `${locale} avoids ${bad}`).not.toContain(bad);
     });
   }
+  it("the ladder names every hand with the glossary's term", () => {
+    for (const id of ["royalFlush", "straightFlush", "fourOfAKind", "fullHouse", "flush", "straight", "threeOfAKind", "twoPair", "onePair", "highCard"] as const) {
+      expect(zhHans[`hand.${id}`], id).toBe(term(id).zh);
+      expect(ja[`hand.${id}`], id).toBe(term(id).ja);
+    }
+  });
 });
 
 describe("card names", () => {

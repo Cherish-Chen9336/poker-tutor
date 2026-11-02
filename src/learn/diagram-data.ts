@@ -58,10 +58,15 @@ export function formatPercent(count: number, total: number): string {
   return `${((count / total) * 100).toPrecision(3)}%`;
 }
 
-/** "1 in 39" style: whole numbers from 10 up, one decimal below. */
-export function formatOneIn(count: number, total: number): string {
+/** The "39" in "1 in 39": whole numbers from 10 up, one decimal below. */
+export function oneInNumber(count: number, total: number): string {
   const n = total / count;
-  return `1 in ${n >= 10 ? Math.round(n).toLocaleString("en-US") : n.toFixed(1)}`;
+  return n >= 10 ? Math.round(n).toLocaleString("en-US") : n.toFixed(1);
+}
+
+/** "1 in 39" style. */
+export function formatOneIn(count: number, total: number): string {
+  return `1 in ${oneInNumber(count, total)}`;
 }
 
 /** Lesson 9's example: a heart flush draw against a pair of kings, one card to come. */

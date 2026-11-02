@@ -2,12 +2,14 @@
 // app renders it and as docs/lessons.md states it, then checks the fact with
 // the evaluator, the engine (Table), or exact math.
 import { renderToStaticMarkup } from "react-dom/server";
+import { IntlProvider } from "react-intl";
 import { describe, expect, it } from "vitest";
 import lessonsDoc from "../../docs/lessons.md?raw";
 import { allBoardsOdds, compareHands, handName } from "../game/hands";
 import { Table } from "../game/table";
 import { averageResult, breakEven, kellyBalance, LESSON9_EXAMPLE, LESSON13_CALLS } from "./diagram-data";
 import type { Move } from "../game/types";
+import { en } from "../i18n/messages/en";
 import { Lesson3, Lesson5, Lesson6 } from "./content/rules-lessons";
 import { Lesson9 } from "./content/thinking-lessons";
 import { Lesson11, Lesson12, Lesson13, Lesson14 } from "./content/after-play-lessons";
@@ -15,7 +17,11 @@ import { Lesson16 } from "./content/table-lessons";
 
 /** Visible text of a lesson, with card pictures read as their labels ("A♥" style isn't used; tokens become names). */
 function shown(Lesson: () => React.ReactNode): string {
-  return renderToStaticMarkup(<Lesson />)
+  return renderToStaticMarkup(
+    <IntlProvider locale="en" messages={en}>
+      <Lesson />
+    </IntlProvider>,
+  )
     .replace(/<span class="ic[^"]*" role="img" aria-label="([^"]+)">.*?<\/span><\/span>/g, "[$1]")
     .replace(/<[^>]+>/g, "")
     .replace(/&#x27;/g, "'")

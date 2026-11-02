@@ -194,7 +194,7 @@ export const QUIZZES: Record<number, Question[]> = {
         "The round ends, because C raised last",
       ],
       answer: 1,
-      why: "A raise gives every other player still in the hand a new turn. Nobody is forced to match it; folding is always allowed.",
+      why: "A raise gives every other player who can still act a new turn. Nobody is forced to match it; folding is always allowed.",
       checkedBy: "table",
     },
   ],

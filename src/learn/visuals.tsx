@@ -1,6 +1,8 @@
 // Step 1b visuals (lessons 5, 12, 13, 14, 16). Each is plain HTML (lists, a
 // table, bars with visible labels), so screen readers read the same facts the
 // picture shows. Numbers come from the formulas in diagram-data.ts.
+import { useT } from "../i18n/hooks";
+import type { MessageId } from "../i18n/messages/en";
 import { C } from "./cards";
 import { breakEven, kellyBalance, LESSON9_EXAMPLE, LESSON13_CALLS } from "./diagram-data";
 
@@ -8,37 +10,31 @@ const pct = (x: number, digits = 1) => `${(x * 100).toFixed(digits)}%`;
 
 /** Lesson 5: what you can do, by situation. */
 export function SituationCards() {
-  const cards = [
-    { when: "Nobody has bet this round", moves: [["Check", "pass for free"], ["Bet", "put in chips; others may call, raise, or fold"]] },
-    {
-      when: "You're the big blind, and everyone just matched your 2",
-      moves: [["Check", ""], ["Raise", ""]],
-      note: "Nothing to call isn't the same as nobody bet.",
-    },
-    {
-      when: "On the flop, both players have 100 chips. Your opponent bets 20.",
-      moves: [["Fold", ""], ["Call 20", "match it"], ["Raise to at least 40", ""]],
-    },
+  const t = useT();
+  const cards: { when: MessageId; moves: [MessageId, MessageId?][]; note?: MessageId }[] = [
+    { when: "situations.none", moves: [["situations.check", "situations.checkWhat"], ["situations.bet", "situations.betWhat"]] },
+    { when: "situations.bb", moves: [["situations.check"], ["situations.raise"]], note: "situations.bbNote" },
+    { when: "situations.facing", moves: [["situations.fold"], ["situations.call", "situations.callWhat"], ["situations.raiseTo"]] },
   ];
   return (
     <figure className="diagram">
       <ul className="situations">
         {cards.map((c) => (
           <li key={c.when} className="situation">
-            <p className="situation-when">{c.when}</p>
+            <p className="situation-when">{t(c.when)}</p>
             <ul className="situation-moves">
               {c.moves.map(([move, what]) => (
                 <li key={move}>
-                  <b>{move}</b>
-                  {what && <span className="situation-what"> ({what})</span>}
+                  <b>{t(move)}</b>
+                  {what && <span className="situation-what">{t("situations.what", { what: t(what) })}</span>}
                 </li>
               ))}
             </ul>
-            {c.note && <p className="situation-note">{c.note}</p>}
+            {c.note && <p className="situation-note">{t(c.note)}</p>}
           </li>
         ))}
       </ul>
-      <figcaption>If you owe chips, you can't check.</figcaption>
+      <figcaption>{t("situations.caption")}</figcaption>
     </figure>
   );
 }

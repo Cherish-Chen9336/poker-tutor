@@ -1,10 +1,12 @@
 // Lesson diagrams, drawn in code. Each one has a text equivalent (a caption
 // or a label) so it works without seeing it.
-import { useId, useState, type ReactNode } from "react";
+import { useId, useState } from "react";
 import { bestFive } from "../game/hands";
+import { useIntl } from "react-intl";
 import { useT } from "../i18n/hooks";
+import { en, type MessageId } from "../i18n/messages/en";
 import { C, Card, Cards } from "./cards";
-import { formatOneIn, formatPercent, RANK_LADDER, SEAT_LAYOUTS, SEVEN_CARD_TOTAL } from "./diagram-data";
+import { formatPercent, oneInNumber, RANK_LADDER, SEAT_LAYOUTS, SEVEN_CARD_TOTAL } from "./diagram-data";
 
 /** Lesson 1: the four betting rounds and how the board grows. */
 export function StreetTimeline() {
@@ -40,42 +42,20 @@ export function StreetTimeline() {
   );
 }
 
-const BEST_FIVE_ROWS: { label: string; hole: string[]; board: string[]; result: ReactNode }[] = [
-  {
-    label: "Uses 2 private cards",
-    hole: ["5c", "5d"],
-    board: ["5h", "Kd", "9c", "2s", "3d"],
-    result: (
-      <>
-        Three fives (<C c="5c" /> <C c="5d" /> <C c="5h" />, plus K and 9).
-      </>
-    ),
-  },
-  {
-    label: "Uses 1 private card",
-    hole: ["Ah", "3c"],
-    board: ["Kh", "9h", "6h", "2h", "Ts"],
-    result: (
-      <>
-        A flush in hearts (<C c="Ah" /> plus the board's four hearts). Your <C c="3c" /> doesn't count.
-      </>
-    ),
-  },
-  {
-    label: "Uses 0 private cards",
-    hole: ["Js", "Jd"],
-    board: ["As", "Ad", "Kc", "Kh", "Qs"],
-    result: (
-      <>
-        A-A-K-K-Q, all from the board. Your jacks don't play, so an opponent holding <C c="3c" /> <C c="2d" /> has the
-        same hand and you split the pot.
-      </>
-    ),
-  },
+const BEST_FIVE_ROWS: { label: MessageId; hole: string[]; board: string[]; result: MessageId; cards: string[] }[] = [
+  { label: "best5.uses2", hole: ["5c", "5d"], board: ["5h", "Kd", "9c", "2s", "3d"], result: "best5.result2", cards: ["5c", "5d", "5h"] },
+  { label: "best5.uses1", hole: ["Ah", "3c"], board: ["Kh", "9h", "6h", "2h", "Ts"], result: "best5.result1", cards: ["Ah", "3c"] },
+  { label: "best5.uses0", hole: ["Js", "Jd"], board: ["As", "Ad", "Kc", "Kh", "Qs"], result: "best5.result0", cards: ["3c", "2d"] },
 ];
+
+/** Cards for a message's {c1}, {c2}… values. */
+function cardValues(codes: string[]) {
+  return Object.fromEntries(codes.map((code, i) => [`c${i + 1}`, <C key={code} c={code} />]));
+}
 
 /** Lesson 2: which 5 of the 7 cards count. The highlight is computed, not typed in. */
 export function BestFiveRows() {
+  const t = useT();
   return (
     <figure className="diagram">
       <div className="best5">
@@ -83,47 +63,51 @@ export function BestFiveRows() {
           const lit = bestFive([...row.hole, ...row.board]);
           return (
             <div key={row.label} className="best5-row">
-              <span className="best5-label">{row.label}</span>
+              <span className="best5-label">{t(row.label)}</span>
               <span className="best5-cards">
                 <span className="group">
-                  <span className="group-label">Your cards</span>
+                  <span className="group-label">{t("best5.yourCards")}</span>
                   <Cards codes={row.hole} size="sm" lit={lit} />
                 </span>
                 <span className="group">
-                  <span className="group-label">Board</span>
+                  <span className="group-label">{t("best5.board")}</span>
                   <Cards codes={row.board} size="sm" lit={lit} />
                 </span>
               </span>
-              <span className="best5-result">{row.result}</span>
+              <span className="best5-result">{t(row.result, cardValues(row.cards))}</span>
             </div>
           );
         })}
       </div>
-      <figcaption>Highlighted cards make the best 5. Faded cards don't count.</figcaption>
+      <figcaption>{t("best5.caption")}</figcaption>
     </figure>
   );
 }
 
+/** The ladder's rows, strongest first, by their message ids. */
+const LADDER_IDS = ["royalFlush", "straightFlush", "fourOfAKind", "fullHouse", "flush", "straight", "threeOfAKind", "twoPair", "onePair", "highCard"] as const;
+
 /** Lesson 3: the ten hands, strongest first, with how often 7 cards make each. */
 export function RankLadder() {
+  const t = useT();
   const most = Math.max(...RANK_LADDER.map((row) => row.sevenCardCount));
   return (
     <figure className="diagram">
       <div className="ladder-head" aria-hidden="true">
-        <span>How often (7 cards)</span>
+        <span>{t("ladder.head")}</span>
       </div>
       <ol className="ladder">
         {RANK_LADDER.map((row, i) => (
           <li key={row.name}>
             <span className="ladder-n" aria-hidden="true">{i + 1}</span>
             <span className="ladder-text">
-              <b>{row.name}</b>
-              <span>{row.meaning}</span>
+              <b>{t(`hand.${LADDER_IDS[i]}`)}</b>
+              <span>{t(`hand.${LADDER_IDS[i]}.meaning`)}</span>
             </span>
             <Cards codes={row.cards} size="sm" />
             <span className="ladder-odds">
               <span className="pct">{formatPercent(row.sevenCardCount, SEVEN_CARD_TOTAL)}</span>
-              <span className="one-in">{formatOneIn(row.sevenCardCount, SEVEN_CARD_TOTAL)}</span>
+              <span className="one-in">{t("ladder.oneIn", { n: oneInNumber(row.sevenCardCount, SEVEN_CARD_TOTAL) })}</span>
               <span className="odds-bar" aria-hidden="true">
                 <i style={{ width: `${(row.sevenCardCount / most) * 100}%` }} />
               </span>
@@ -131,17 +115,28 @@ export function RankLadder() {
           </li>
         ))}
       </ol>
-      <figcaption>
-        Strongest at the top. Each hand beats every hand below it. The bars compare how often 7 cards make each hand.
-      </figcaption>
+      <figcaption>{t("ladder.caption")}</figcaption>
     </figure>
   );
 }
 
+/** Seat label ids by the data's English labels. */
+const SEAT_IDS: Record<string, { short: string; name: MessageId }> = {
+  Button: { short: "BTN", name: "seatName.BTN" },
+  "Button (small blind)": { short: "BTN", name: "seatName.BTNSB" },
+  "Small blind": { short: "SB", name: "seatName.SB" },
+  "Big blind": { short: "BB", name: "seatName.BB" },
+  "Under the gun": { short: "UTG", name: "seatName.UTG" },
+  Hijack: { short: "HJ", name: "seatName.HJ" },
+  Cutoff: { short: "CO", name: "seatName.CO" },
+};
+
 /** Lesson 4: who sits where and the order of play, before and after the flop. */
-export function SeatMap({ initialPlayers = 6 }: { initialPlayers?: 2 | 6 }) {
+export function SeatMap({ initialPlayers = 6, initialStreet = "preflop" }: { initialPlayers?: 2 | 6; initialStreet?: "preflop" | "postflop" }) {
+  const t = useT();
+  const intl = useIntl();
   const [players, setPlayers] = useState<number>(initialPlayers);
-  const [street, setStreet] = useState<"preflop" | "postflop">("preflop");
+  const [street, setStreet] = useState<"preflop" | "postflop">(initialStreet);
   const layout = SEAT_LAYOUTS.find((l) => l.players === players)!;
   const order = layout[street];
   const id = useId();
@@ -152,45 +147,56 @@ export function SeatMap({ initialPlayers = 6 }: { initialPlayers?: 2 | 6 }) {
     const angle = Math.PI / 2 + (seat * 2 * Math.PI) / layout.players;
     return { x: cx + 165 * Math.cos(angle), y: cy + 100 * Math.sin(angle) };
   };
-  const SHORT: Record<string, string> = { "Small blind": "SB", "Big blind": "BB", "Under the gun": "UTG", Hijack: "HJ", Cutoff: "CO" };
-  const short = (label: string) => (label.startsWith("Button") ? "BTN" : (SHORT[label] ?? label));
+  const name = (seat: number) => intl.formatMessage({ id: SEAT_IDS[layout.labels[seat]].name, defaultMessage: en[SEAT_IDS[layout.labels[seat]].name] });
   // An arrow along the bottom of the felt, right to left: play moves clockwise ("to the left").
   const arc = (deg: number) => ({ x: cx + 118 * Math.cos((deg * Math.PI) / 180), y: cy + 56 * Math.sin((deg * Math.PI) / 180) });
   const [arcFrom, arcTo] = [arc(62), arc(118)];
   const arrowId = `${id.replace(/[^\w-]/g, "")}-arrow`; // useId's colons would break url(#…)
-  const spoken = order.map((seat) => layout.labels[seat]).join(", then ");
+  const spoken = order
+    .map(name)
+    .reduce((first, next) => intl.formatMessage({ id: "seatMap.then", defaultMessage: en["seatMap.then"] }, { first, next }));
+  // Long seat names (such as Japanese スモールブラインド) would run off the sides, so the drawing widens to fit them.
+  // Widths are estimated at the largest name size (17): a CJK character is about one em, others about half.
+  const nameWidth = (text: string) => [...text].reduce((w, ch) => w + (ch.charCodeAt(0) > 0x2e80 ? 17 : 9.5), 0);
+  const pad = Math.ceil(
+    Math.max(0, ...layout.labels.map((_, seat) => nameWidth(name(seat)) / 2 + 4 - Math.min(position(seat).x, 400 - position(seat).x))),
+  );
+  const title = intl.formatMessage(
+    { id: "seatMap.title", defaultMessage: en["seatMap.title"] },
+    { players: players === 6 ? "six" : "two", street, order: spoken },
+  );
 
   return (
     <figure className="diagram seatmap">
       <div className="seg-row">
-        <div className="seg" role="group" aria-label="Players">
+        <div className="seg" role="group" aria-label={t("seatMap.players")}>
           {[6, 2].map((n) => (
             <button key={n} type="button" aria-pressed={players === n} onClick={() => setPlayers(n)}>
-              {n === 6 ? "6 players" : "Heads-up"}
+              {n === 6 ? t("seatMap.six") : t("seatMap.headsUp")}
             </button>
           ))}
         </div>
-        <div className="seg" role="group" aria-label="Betting round">
+        <div className="seg" role="group" aria-label={t("seatMap.round")}>
           {(["preflop", "postflop"] as const).map((s) => (
             <button key={s} type="button" aria-pressed={street === s} onClick={() => setStreet(s)}>
-              {s === "preflop" ? "Before the flop" : "After the flop"}
+              {s === "preflop" ? t("seatMap.preflop") : t("seatMap.postflop")}
             </button>
           ))}
         </div>
       </div>
-      <svg viewBox="0 -50 400 350" role="img" aria-labelledby={id}>
+      <svg viewBox={`${-pad} -50 ${400 + 2 * pad} 350`} role="img" aria-labelledby={id}>
         <defs>
           <marker id={arrowId} viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0 0 L10 5 L0 10 z" className="seat-arrow-head" />
           </marker>
         </defs>
-        <title id={id}>{`${players === 6 ? "6 players" : "Heads-up"}, ${street === "preflop" ? "before the flop" : "after the flop"}: ${spoken}.`}</title>
+        <title id={id}>{title}</title>
         <ellipse cx={cx} cy={cy} rx="150" ry="86" className="felt-rail" />
         <ellipse cx={cx} cy={cy} rx="138" ry="75" className="felt" />
-        <text x={cx} y={cy - 6} className="felt-text">Order of play</text>
-        <text x={cx} y={cy + 14} className="felt-sub">{street === "preflop" ? "before the flop" : "flop, turn, river"}</text>
+        <text x={cx} y={cy - 6} className="felt-text">{t("seatMap.felt")}</text>
+        <text x={cx} y={cy + 14} className="felt-sub">{street === "preflop" ? t("seatMap.feltPreflop") : t("seatMap.feltPostflop")}</text>
         <path d={`M${arcFrom.x} ${arcFrom.y} A118 56 0 0 1 ${arcTo.x} ${arcTo.y}`} className="seat-arrow" markerEnd={`url(#${arrowId})`} />
-        <text x={cx} y={cy + 48} className="felt-hint">clockwise</text>
+        <text x={cx} y={cy + 48} className="felt-hint">{t("seatMap.clockwise")}</text>
         {layout.labels.map((label, seat) => {
           const { x, y } = position(seat);
           const turn = order.indexOf(seat) + 1;
@@ -199,8 +205,8 @@ export function SeatMap({ initialPlayers = 6 }: { initialPlayers?: 2 | 6 }) {
             <g key={seat} transform={`translate(${x} ${y})`}>
               <circle r="21" className={seat === 0 ? "seat-dot btn" : "seat-dot"} />
               <text y="5" className="seat-num">{turn}</text>
-              <text y={below ? 38 : -30} className="seat-label">{short(label)}</text>
-              <text y={below ? 58 : -51} className="seat-name">{label}</text>
+              <text y={below ? 38 : -30} className="seat-label">{SEAT_IDS[label].short}</text>
+              <text y={below ? 58 : -51} className="seat-name">{name(seat)}</text>
               {seat === 0 && (
                 <g transform="translate(25 -17)">
                   <circle r="10" className="seat-dealer" />
@@ -211,59 +217,50 @@ export function SeatMap({ initialPlayers = 6 }: { initialPlayers?: 2 | 6 }) {
           );
         })}
       </svg>
-      <figcaption>
-        Numbers show the first order of play (1st, 2nd, 3rd…), assuming everyone can act; a raise gives players facing it
-        another turn. Switch the betting round to compare. <b>Order:</b> {spoken}. The seats are
-        named clockwise from the button (marked D).
-      </figcaption>
+      <figcaption>{t("seatMap.caption", { order: spoken })}</figcaption>
     </figure>
   );
 }
 
 /** Lesson 5: "raise to 6" vs. "raise by 4". */
 export function RaiseToBy() {
+  const t = useT();
   return (
     <figure className="diagram">
       <div className="bars" aria-hidden="true">
         <div className="bar-row">
-          <span className="bar-label">Big blind</span>
+          <span className="bar-label">{t("raiseBars.bb")}</span>
           <span className="bar-track"><span className="seg-a" style={{ width: "20%" }}>2</span></span>
         </div>
         <div className="bar-row">
-          <span className="bar-label">You raise to 6</span>
+          <span className="bar-label">{t("raiseBars.you")}</span>
           <span className="bar-track">
             <span className="seg-a" style={{ width: "20%" }}>2</span>
-            <span className="seg-b" style={{ width: "40%" }}>+4 the raise</span>
+            <span className="seg-b" style={{ width: "40%" }}>{t("raiseBars.theRaise")}</span>
           </span>
         </div>
         <div className="bar-row">
-          <span className="bar-label">Next full raise</span>
+          <span className="bar-label">{t("raiseBars.next")}</span>
           <span className="bar-track">
             <span className="seg-a" style={{ width: "60%" }}>6</span>
-            <span className="seg-b" style={{ width: "40%" }}>+4 or more</span>
+            <span className="seg-b" style={{ width: "40%" }}>{t("raiseBars.orMore")}</span>
           </span>
         </div>
       </div>
-      <figcaption>
-        The big blind is 2. Raising to 6 means 6 in total, which is 4 more: you raised by 4. The next full raise must add
-        at least 4 again, so it's to at least 10 (6 + 4).
-      </figcaption>
+      <figcaption>{t("raiseBars.caption")}</figcaption>
     </figure>
   );
 }
 
 /** Lesson 6: calling all-in for less than the bet. */
 export function AllInRefund() {
-  const steps = [
-    "Your opponent bets 100.",
-    "You call all-in for 30.",
-    "30 of theirs matches your 30; their other 70 goes back. These bets add 30 + 30 = 60 to the pot.",
-  ];
+  const t = useT();
+  const steps = [t("refund.step1"), t("refund.step2"), t("refund.step3")];
   return (
     <figure className="diagram">
       <ol className="steps">
         {steps.map((step, i) => (
-          <li key={step}>
+          <li key={i}>
             <span className="step-num" aria-hidden="true">
               {i + 1}
             </span>
@@ -273,14 +270,14 @@ export function AllInRefund() {
       </ol>
       <div className="bars" aria-hidden="true">
         <div className="bar-row">
-          <span className="bar-label">Their 100</span>
+          <span className="bar-label">{t("refund.theirs")}</span>
           <span className="bar-track">
             <span className="seg-a" style={{ width: "30%" }}>30</span>
-            <span className="seg-c" style={{ width: "70%" }}>70 goes back</span>
+            <span className="seg-c" style={{ width: "70%" }}>{t("refund.back")}</span>
           </span>
         </div>
         <div className="bar-row">
-          <span className="bar-label">Your 30</span>
+          <span className="bar-label">{t("refund.yours")}</span>
           <span className="bar-track"><span className="seg-a" style={{ width: "30%" }}>30</span></span>
         </div>
       </div>
@@ -290,6 +287,7 @@ export function AllInRefund() {
 
 /** Lesson 7: two pairs of aces, decided by the kicker. */
 export function KickerCompare() {
+  const t = useT();
   const board = ["Ad", "8c", "4s", "9h", "2c"];
   const you = bestFive(["As", "Kd", ...board]);
   const them = bestFive(["Ac", "Qh", ...board]);
@@ -302,14 +300,14 @@ export function KickerCompare() {
           <Card key={code} code={code} size="sm" lit={code === decider} />
         ))}
       </span>
-      <span className={won ? "kick-result good" : "kick-result"}>{won ? "✓ Wins: king kicker" : "Queen kicker"}</span>
+      <span className={won ? "kick-result good" : "kick-result"}>{won ? t("kicker.wins") : t("kicker.queen")}</span>
     </div>
   );
   return (
     <figure className="diagram">
-      {row("You", you, "Kd", true)}
-      {row("Opponent", them, "Qh", false)}
-      <figcaption>Both have a pair of aces. Comparing the next-highest cards, the king beats the queen.</figcaption>
+      {row(t("kicker.you"), you, "Kd", true)}
+      {row(t("kicker.opponent"), them, "Qh", false)}
+      <figcaption>{t("kicker.caption")}</figcaption>
     </figure>
   );
 }
