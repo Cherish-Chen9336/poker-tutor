@@ -5,6 +5,7 @@ Step 7, Part 2. Plan reviewed by Codex (thread `01a19200-e08d-7f61-a533-e99bcd48
 ## Policy
 
 - **Machine-assisted, no human review** (the owner's choice): Claude translates, Codex cross-checks every batch sentence by sentence against the English, the glossary, and the shared facts. The app shows a "machine-assisted translation" label on every translated page, and English stays the reference.
+- **Style: concise** (the owner's feedback on the Chinese pilot, 2026-11-02). Cut padding, use glossary terms instead of paraphrases (跟注, not 跟上别人的下注), and drop sentences that add no fact (the owner removed "This happens in many hands" from Lesson 1). Keep every rule condition: shorter wording must not lose a fact.
 - **Terms:** every translation uses `src/i18n/glossary.ts` (one term per concept; tests reject listed wrong terms).
 - **Facts are shared with English:** answer indices, cards, and coach facts come from the English data. Tests check message values and tags, quiz choice counts, cards per question field and choice, and that number-only choices are identical; Codex's review checks that the meaning is the same.
 - **A language ships only when Learn, Play, and Review are all translated.** Until then, translated pages are reachable only by direct link (`#/zh-Hans/…`, `#/ja/…`), and the language switch appears only on those pages.
