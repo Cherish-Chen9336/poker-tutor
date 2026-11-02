@@ -1,6 +1,6 @@
 # Learn lessons
 
-These are the English texts for the Learn area. Each lesson ends with quick checks. The app shows the same text; tests check the two match.
+These are the English texts for the Learn area. Each lesson ends with quick checks. App lessons follow this document; tests check quiz wording and selected lesson and diagram facts.
 
 How to read this file:
 - **[Diagram: …]** describes a picture drawn in the app.
