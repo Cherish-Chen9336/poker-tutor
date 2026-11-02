@@ -31,4 +31,4 @@ Translated in both languages: the app frame, the lesson list (all unit and lesso
 
 | Batch | English source | Translated | Codex cross-check | Result |
 |---|---|---|---|---|
-| Pilot | lessons frozen at `15f5c2c`; messages in `en.ts` | 2026-11-02 | Codex: "request changes" (coach all-in wording, fallback scopes, loading, quiz checks, records, a few word choices); fixes applied | pending verification |
+| Pilot | lessons frozen at `15f5c2c`; messages in `en.ts` | 2026-11-02 | Codex cross-check ("request changes": coach all-in wording, fallback scopes, loading, quiz checks, records, word choices), then two verification rounds | **passed** at `912465d`; fingerprints in `src/i18n/reviews.ts` |
