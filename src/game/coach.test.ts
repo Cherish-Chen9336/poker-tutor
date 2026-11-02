@@ -105,20 +105,20 @@ describe("coach", () => {
     it("names the seat and states the order without miscounting who acts later", () => {
       // Button in seat 3: seat 0 is 3 seats left of the button, under the gun.
       expect(text(six({ button: 3, bets: [0, 0, 0, 0, 1, 2] }))[0]).toBe(
-        "You're under the gun (UTG). Before the flop, action goes from under the gun to the big blind, skipping players who can't act, and a raise gives the others who can still act another turn. After the flop, if everyone who can still bet stays in, you act third of 6, after the SB and the BB.",
+        "You're under the gun (UTG). Before the flop, action goes from under the gun to the big blind, skipping players who can't act, and a raise gives the others who can still act another turn. After the flop, if all 6 players who can bet now still can, you act third, after the SB and the BB.",
       );
       expect(text(six({ button: 0, bets: [0, 1, 2, 0, 0, 0], folded: [3, 4] }))[0]).toBe(
         "You're on the button (BTN). Before the flop, action goes from under the gun to the big blind, skipping players who can't act, and a raise gives the others who can still act another turn. After the flop, you act last on every later round.",
       );
-      expect(text(six({ button: 4, bets: [2, 0, 0, 0, 0, 1] }))[0]).toBe("You're the big blind (BB). Before the flop, action goes from under the gun to the big blind, skipping players who can't act, and a raise gives the others who can still act another turn. After the flop, if everyone who can still bet stays in, you act second of 6, after the SB.");
+      expect(text(six({ button: 4, bets: [2, 0, 0, 0, 0, 1] }))[0]).toBe("You're the big blind (BB). Before the flop, action goes from under the gun to the big blind, skipping players who can't act, and a raise gives the others who can still act another turn. After the flop, if all 6 players who can bet now still can, you act second, after the SB.");
     });
 
     it("says of how many and after whom you'll act later, counting only players still in (the owner's question)", () => {
       // You're in the cutoff (button in seat 1); under the gun and the hijack folded.
       const line = (folded: number[]) => text(six({ button: 1, bets: [0, 0, 1, 2, 0, 0], folded }))[0];
-      expect(line([4, 5])).toMatch(/You're in the cutoff \(CO\)\. .* you act third of 4, after the SB and the BB\.$/);
+      expect(line([4, 5])).toMatch(/You're in the cutoff \(CO\)\. .* if all 4 players who can bet now still can, you act third, after the SB and the BB\.$/);
       // Later in the hand (facing a re-raise): the small blind folded too, so only the big blind acts before you.
-      expect(line([2, 4, 5])).toMatch(/you act second of 3, after the BB\.$/);
+      expect(line([2, 4, 5])).toMatch(/if all 3 players who can bet now still can, you act second, after the BB\.$/);
       // With the button gone as well, nobody acts after you.
       expect(line([1, 2, 4, 5])).toMatch(/you act last on every later round\.$/);
     });
@@ -150,7 +150,7 @@ describe("coach", () => {
       // Button in seat 3, so you (seat 0) are under the gun; the big blind (seat 5) is all-in.
       const view = six({ button: 3, bets: [0, 0, 0, 0, 1, 2] });
       view.seats[5] = { ...view.seats[5]!, stack: 0, status: "all-in" };
-      expect(text(view)[0]).toMatch(/After the flop, if everyone who can still bet stays in, you act second of 5, after the SB\.$/);
+      expect(text(view)[0]).toMatch(/After the flop, if all 5 players who can bet now still can, you act second, after the SB\.$/);
     });
   });
 });

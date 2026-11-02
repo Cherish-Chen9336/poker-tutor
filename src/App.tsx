@@ -23,7 +23,7 @@ const AREAS: { area: Route["area"]; label: MessageId }[] = [
 export default function App() {
   const { locale, route } = parseLocation(useHash());
   return (
-    <LanguageErrorBoundary key={locale} locale={locale} englishHref={routeHref(route)}>
+    <LanguageErrorBoundary locale={locale} englishHref={routeHref(route)}>
       <Suspense fallback={<LoadingLanguage />}>
         <I18nProvider locale={locale}>
           <Shell />

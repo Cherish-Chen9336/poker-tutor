@@ -85,10 +85,10 @@ describe("the coach's position line, built from facts", () => {
   it("phrases the same facts in Chinese and Japanese", () => {
     const fact = coachLines(view(1, [4, 5])).find((l) => l.fact)!.fact!; // the cutoff, after the SB and the BB
     expect(phraseFact(createIntl({ locale: "zh-Hans", messages: { ...en, ...zhHans } }), fact)).toBe(
-      "你在关煞位（CO）。翻牌前，从枪口位开始依次行动，直到大盲位，跳过无法行动的玩家；有人加注后，其他仍能行动的玩家会再轮到一次。翻牌后，如果仍能下注的玩家都继续，你在 4 人中第 3 个行动，排在小盲位和大盲位之后。",
+      "你在关煞位（CO）。翻牌前，从枪口位开始依次行动，直到大盲位，跳过无法行动的玩家；有人加注后，其他仍能行动的玩家会再轮到一次。翻牌后，如果目前能下注的 4 名玩家届时都还能下注，你第 3 个行动，排在小盲位和大盲位之后。",
     );
     expect(phraseFact(createIntl({ locale: "ja", messages: { ...en, ...ja } }), fact)).toMatch(
-      /^あなたはカットオフ（CO）です。.*ベットできる全員が続ければ、4人中3番目に、スモールブラインド.*ビッグブラインドの後でアクションします。$/,
+      /^あなたはカットオフ（CO）です。.*現在ベットできる4人全員がその時もベットできる場合、あなたは3番目に、スモールブラインドとビッグブラインドの後でアクションします。$/,
     );
   });
 });
@@ -119,9 +119,16 @@ describe("the coach's position line with players all-in", () => {
     // Under the gun (button in seat 3); the big blind (seat 5) is all-in, so 5 players can still bet.
     const s = say(view(3, [], [5]));
     expect([s.fact.rank, s.fact.count, s.fact.before]).toEqual([2, 5, ["SB"]]);
-    expect(s.en).toMatch(/you act second of 5, after the SB\.$/);
-    expect(s.zh).toMatch(/你在 5 人中第 2 个行动，排在小盲位之后。$/);
-    expect(s.ja).toMatch(/5人中2番目に、スモールブラインドの後でアクションします。$/);
+    expect(s.en).toMatch(/if all 5 players who can bet now still can, you act second, after the SB\.$/);
+    expect(s.zh).toMatch(/如果目前能下注的 5 名玩家届时都还能下注，你第 2 个行动，排在小盲位之后。$/);
+    expect(s.ja).toMatch(/現在ベットできる5人全員がその時もベットできる場合、あなたは2番目に、スモールブラインドの後でアクションします。$/);
+  });
+
+  it("after the blinds go all-in, under the gun acts first of the 4 who can still bet (Codex's table case)", () => {
+    const s = say(view(3, [], [4, 5]));
+    expect([s.fact.rank, s.fact.count]).toEqual([1, 4]);
+    expect(s.en).toMatch(/After the flop, if all 4 players who can bet now still can, you act first\.$/);
+    expect(s.zh).toMatch(/如果目前能下注的 4 名玩家届时都还能下注，你第一个行动。$/);
   });
 
   it("says when nobody else can bet any more", () => {

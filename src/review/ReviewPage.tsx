@@ -7,6 +7,7 @@ import { useHands } from "../app/hand-store";
 import { handLog, moveSentence, resultLine } from "../game/hand-log";
 import type { HandRecord } from "../game/match";
 import { reviewHand, type Verdict } from "../game/review";
+import { useHref } from "../i18n/hooks";
 import { CardText } from "../learn/cards";
 import { PokerTable } from "../ui/PokerTable";
 
@@ -103,6 +104,7 @@ function handTitle(record: HandRecord): string {
 }
 
 export default function ReviewPage() {
+  const href = useHref();
   const { hands, saved, clear } = useHands();
   const newestFirst = [...hands].reverse();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -119,7 +121,7 @@ export default function ReviewPage() {
         </h1>
         <p className="lede">No hands yet. Play a few hands, and each one will appear here to replay step by step.</p>
         <p className="note">
-          <a href="#/play">Go to Play</a>
+          <a href={href({ area: "play" })}>Go to Play</a>
         </p>
       </section>
     );

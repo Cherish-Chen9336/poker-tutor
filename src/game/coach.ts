@@ -132,8 +132,8 @@ export function coachLines(view: TableView): CoachLine[] {
         : rank === actors.length
           ? "you act last on every later round"
           : rank === 1
-            ? `you act first of the ${actors.length} players who can still bet`
-            : `if everyone who can still bet stays in, you act ${ordinal(rank)} of ${actors.length}, after ${after}`;
+            ? `if all ${actors.length} players who can bet now still can, you act first`
+            : `if all ${actors.length} players who can bet now still can, you act ${ordinal(rank)}, after ${after}`;
     lines.push({
       topic: "position",
       text: `You're ${SEAT_PHRASE[position]} (${position}). Before the flop, action goes from under the gun to the big blind, skipping players who can't act, and a raise gives the others who can still act another turn. After the flop, ${later}.`,

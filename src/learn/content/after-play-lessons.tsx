@@ -2,6 +2,7 @@
 // docs/lessons.md, which the owner reviewed.
 import type { ReactNode } from "react";
 import { useHands } from "../../app/hand-store";
+import { useHref } from "../../i18n/hooks";
 import { C } from "../cards";
 import { BluffTokens, KellyBars, PotCompare, ResultGrid } from "../visuals";
 
@@ -12,15 +13,16 @@ function T({ children }: { children: ReactNode }) {
 /** A pointer to the learner's own saved hands, when there are any. */
 function YourHands({ children }: { children: ReactNode }) {
   const { hands } = useHands();
+  const href = useHref();
   return (
     <p className="note">
       {hands.length ? (
         <>
-          {children} You have {hands.length} saved {hands.length === 1 ? "hand" : "hands"}: <a href="#/review">open Review</a>.
+          {children} You have {hands.length} saved {hands.length === 1 ? "hand" : "hands"}: <a href={href({ area: "review" })}>open Review</a>.
         </>
       ) : (
         <>
-          {children} Once you've played a few hands in <a href="#/play">Play</a>, you can look back at them in Review.
+          {children} Once you've played a few hands in <a href={href({ area: "play" })}>Play</a>, you can look back at them in Review.
         </>
       )}
     </p>

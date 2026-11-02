@@ -6,6 +6,7 @@ import { BOT_POLICY_VERSION, practiceBot } from "../game/bot";
 import { BOT2_POLICY_VERSION, tableBot } from "../game/bot2";
 import { coachLines } from "../game/coach";
 import { useCoachLine } from "../i18n/coach-text";
+import { useHref } from "../i18n/hooks";
 import { handLog } from "../game/hand-log";
 import { Match, YOU_SEAT, type HandRecord } from "../game/match";
 import { potTotal, sizedTo } from "../game/pot-math";
@@ -228,6 +229,7 @@ export default function PlayPage() {
   const oddsHole = started && coachOn && !match.handOver && view.actionTo === YOU_SEAT && view.seats[YOU_SEAT]?.cards?.every(Boolean) ? (view.seats[YOU_SEAT]!.cards as string[]) : null;
   const estimates = useEquity(oddsHole, view.board, oddsHole ? equityRequests(view, YOU_SEAT) : []);
   const coachLine = useCoachLine();
+  const href = useHref();
 
   if (!started) {
     return (
@@ -299,7 +301,7 @@ export default function PlayPage() {
                 <p>
                   <CardText text={log.at(-1) ?? ""} />
                 </p>
-                <a href="#/review">Review this hand</a>
+                <a href={href({ area: "review" })}>Review this hand</a>
                 {!saved && <p className="mono">This browser isn't saving hands, so they'll be kept only until you close the page.</p>}
                 {match.matchOver ? (
                   <>

@@ -45,30 +45,37 @@ function PageText({ locale, children }: { locale: Locale; children: ReactNode })
 
 /** Shown while a language's text loads, in every language since none is loaded yet. */
 export function LoadingLanguage() {
-  return <p className="loading">Loading… 加载中… 読み込み中…</p>;
+  return (
+    <p className="loading">
+      <span lang="en">Loading…</span> <span lang="zh-Hans">加载中…</span> <span lang="ja">読み込み中…</span>
+    </p>
+  );
 }
 
-/** If a language's text fails to load: try again, or continue in English. */
-export class LanguageErrorBoundary extends Component<{ locale: Locale; englishHref: string; children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
+/** If a language's text fails to load: reload to try again, or continue in English. */
+export class LanguageErrorBoundary extends Component<
+  { locale: Locale; englishHref: string; children: ReactNode },
+  { failed: boolean; locale: Locale }
+> {
+  state = { failed: false, locale: this.props.locale };
   static getDerivedStateFromError() {
     return { failed: true };
+  }
+  // A new language gets a fresh try, without remounting a page that's working.
+  static getDerivedStateFromProps(props: { locale: Locale }, state: { locale: Locale }) {
+    return props.locale === state.locale ? null : { failed: false, locale: props.locale };
   }
   render() {
     if (!this.state.failed) return this.props.children;
     return (
       <section className="panel" role="alert">
-        <p>This language couldn't load. 这个语言无法加载。この言語を読み込めませんでした。</p>
         <p>
-          <button
-            type="button"
-            className="button"
-            onClick={() => {
-              loaded.delete(this.props.locale);
-              this.setState({ failed: false });
-            }}
-          >
-            Try again · 重试 · 再試行
+          <span lang="en">This language couldn't load.</span> <span lang="zh-Hans">无法加载此语言的内容。</span>{" "}
+          <span lang="ja">この言語を読み込めませんでした。</span>
+        </p>
+        <p>
+          <button type="button" className="button" onClick={() => window.location.reload()}>
+            <span lang="en">Try again</span> · <span lang="zh-Hans">重试</span> · <span lang="ja">再試行</span>
           </button>{" "}
           <a className="button" href={this.props.englishHref} lang="en">
             Continue in English

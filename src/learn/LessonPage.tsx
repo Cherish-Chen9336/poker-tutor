@@ -43,7 +43,7 @@ export default function LessonPage({ lessonId, progress, onComplete }: Props) {
   const content = lessonContent(lesson.id, locale);
   const Content = content?.Component;
   const english = QUIZZES[lesson.id];
-  const texts = use(quizText(locale));
+  const texts = locale === "en" ? {} : use(quizText(locale));
   const localized = english?.map((q) => localizeQuestion(q, locale, texts));
   // A quiz is shown in the page's language only when every question is translated.
   const quizTranslated = !!localized && localized.every((q) => q !== null);
