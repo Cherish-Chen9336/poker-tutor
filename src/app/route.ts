@@ -1,6 +1,7 @@
 // Hash-based URLs (e.g. "#/learn/3") work on GitHub Pages without server
 // routing: a refresh or a bookmark always loads index.html.
 import { useSyncExternalStore } from "react";
+import { isLocale, type Locale } from "../i18n/locales";
 
 export type Route =
   | { area: "learn"; lesson: number | null }
@@ -18,9 +19,20 @@ export function parseRoute(hash: string): Route {
   return { area: "learn", lesson: null };
 }
 
-export function routeHref(route: Route): string {
-  if (route.area === "learn") return route.lesson === null ? "#/learn" : `#/learn/${route.lesson}`;
-  return `#/${route.area}`;
+/**
+ * Reads a location hash with an optional language in front ("#/zh-Hans/learn/3").
+ * No language, or "en", means English, so every older link keeps working.
+ */
+export function parseLocation(hash: string): { locale: Locale; route: Route } {
+  const parts = hash.replace(/^#\/?/, "").split("/");
+  if (parts[0] && isLocale(parts[0])) return { locale: parts[0], route: parseRoute(`#/${parts.slice(1).join("/")}`) };
+  return { locale: "en", route: parseRoute(hash) };
+}
+
+/** The link for a page. English links have no language part. */
+export function routeHref(route: Route, locale: Locale = "en"): string {
+  const path = route.area === "learn" ? (route.lesson === null ? "learn" : `learn/${route.lesson}`) : route.area;
+  return locale === "en" ? `#/${path}` : `#/${locale}/${path}`;
 }
 
 function subscribe(onChange: () => void): () => void {

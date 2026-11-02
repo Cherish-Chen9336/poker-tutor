@@ -1,5 +1,8 @@
 import { lazy, Suspense, useEffect, useRef } from "react";
-import { parseRoute, routeHref, useHash, type Route } from "./app/route";
+import { parseLocation, useHash, type Route } from "./app/route";
+import { I18nProvider, LanguageSwitch, MachineLabel } from "./i18n/I18n";
+import { useHref, useT } from "./i18n/hooks";
+import type { MessageId } from "./i18n/messages/en";
 import { focusPageHeading } from "./app/focus";
 import { useProgress } from "./app/progress";
 import { LearnHome } from "./learn/LearnHome";
@@ -11,23 +14,35 @@ const LessonPage = lazy(() => import("./learn/LessonPage"));
 const PlayPage = lazy(() => import("./play/PlayPage"));
 const ReviewPage = lazy(() => import("./review/ReviewPage"));
 
-const AREAS: { area: Route["area"]; label: string }[] = [
-  { area: "learn", label: "Learn" },
-  { area: "play", label: "Play" },
-  { area: "review", label: "Review" },
+const AREAS: { area: Route["area"]; label: MessageId }[] = [
+  { area: "learn", label: "app.learn" },
+  { area: "play", label: "app.play" },
+  { area: "review", label: "app.review" },
 ];
 
-function pageTitle(route: Route): string {
-  if (route.area === "learn") {
-    const lesson = route.lesson === null ? undefined : findLesson(route.lesson);
-    return lesson ? `${lesson.title} · Poker Tutor` : "Learn · Poker Tutor";
-  }
-  return `${route.area === "play" ? "Play" : "Review"} · Poker Tutor`;
+export default function App() {
+  const { locale } = parseLocation(useHash());
+  return (
+    <Suspense fallback={null}>
+      <I18nProvider locale={locale}>
+        <Shell />
+      </I18nProvider>
+    </Suspense>
+  );
 }
 
-export default function App() {
+function Shell() {
   const hash = useHash();
-  const route = parseRoute(hash);
+  const { route } = parseLocation(hash);
+  const t = useT();
+  const href = useHref();
+  const page =
+    route.area === "learn"
+      ? route.lesson !== null && findLesson(route.lesson)
+        ? t(`lesson.${route.lesson}.title` as MessageId)
+        : t("app.learn")
+      : t(route.area === "play" ? "app.play" : "app.review");
+  const title = t("app.title", { page });
   const { progress, saved, complete, reset } = useProgress();
   const main = useRef<HTMLElement>(null);
   const firstRender = useRef(true);
@@ -35,58 +50,62 @@ export default function App() {
   // After moving to another page, start at the top and move keyboard and
   // screen-reader focus to the new page's heading.
   useEffect(() => {
-    document.title = pageTitle(parseRoute(hash));
+    document.title = title;
     if (firstRender.current) {
       firstRender.current = false;
       return;
     }
     window.scrollTo(0, 0);
     focusPageHeading(main.current);
-  }, [hash]);
+  }, [hash, title]);
 
   return (
     <div className="shell">
       <header className="top">
-        <a className="brand" href={routeHref({ area: "learn", lesson: null })}>
-          Poker Tutor
+        <a className="brand" href={href({ area: "learn", lesson: null })}>
+          {t("app.brand")}
         </a>
-        <nav className="tabs" aria-label="App areas">
+        <nav className="tabs" aria-label={t("app.areas")}>
           {AREAS.map(({ area, label }) => (
             <a
               key={area}
-              href={routeHref(area === "learn" ? { area, lesson: null } : { area })}
+              href={href(area === "learn" ? { area, lesson: null } : { area })}
               aria-current={route.area === area ? "page" : undefined}
             >
-              {label}
+              {t(label)}
             </a>
           ))}
         </nav>
       </header>
+      <div className="lang-bar">
+        <LanguageSwitch route={route} />
+        <MachineLabel />
+      </div>
 
       <main ref={main}>
         {route.area === "learn" && route.lesson === null && (
           <LearnHome progress={progress} saved={saved} onReset={reset} />
         )}
         {route.area === "learn" && route.lesson !== null && (
-          <Suspense fallback={<p className="loading">Loading the lesson…</p>}>
+          <Suspense fallback={<p className="loading">{t("app.loadingLesson")}</p>}>
             <LessonPage key={route.lesson} lessonId={route.lesson} progress={progress} onComplete={complete} />
           </Suspense>
         )}
         {route.area === "play" && (
-          <Suspense fallback={<p className="loading">Loading the table…</p>}>
+          <Suspense fallback={<p className="loading">{t("app.loadingTable")}</p>}>
             <PlayPage />
           </Suspense>
         )}
         {route.area === "review" && (
-          <Suspense fallback={<p className="loading">Loading your hands…</p>}>
+          <Suspense fallback={<p className="loading">{t("app.loadingHands")}</p>}>
             <ReviewPage />
           </Suspense>
         )}
       </main>
 
       <footer className="foot">
-        <span>A learning project. No real money, ever.</span>
-        <a href="https://github.com/Cherish-Chen9336/poker-tutor">Source code</a>
+        <span>{t("app.footer")}</span>
+        <a href="https://github.com/Cherish-Chen9336/poker-tutor">{t("app.source")}</a>
       </footer>
     </div>
   );

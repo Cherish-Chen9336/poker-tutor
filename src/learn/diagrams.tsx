@@ -2,17 +2,19 @@
 // or a label) so it works without seeing it.
 import { useId, useState, type ReactNode } from "react";
 import { bestFive } from "../game/hands";
+import { useT } from "../i18n/hooks";
 import { C, Card, Cards } from "./cards";
 import { formatOneIn, formatPercent, RANK_LADDER, SEAT_LAYOUTS, SEVEN_CARD_TOTAL } from "./diagram-data";
 
 /** Lesson 1: the four betting rounds and how the board grows. */
 export function StreetTimeline() {
+  const t = useT();
   const board = ["Ad", "8c", "4s", "9h", "2c"];
   const steps = [
-    { name: "Preflop", shown: 0, note: "2 private cards each" },
-    { name: "Flop", shown: 3, note: "3 shared cards" },
-    { name: "Turn", shown: 4, note: "a 4th shared card" },
-    { name: "River", shown: 5, note: "the 5th shared card" },
+    { name: t("timeline.preflop"), shown: 0, note: t("timeline.preflopNote") },
+    { name: t("timeline.flop"), shown: 3, note: t("timeline.flopNote") },
+    { name: t("timeline.turn"), shown: 4, note: t("timeline.turnNote") },
+    { name: t("timeline.river"), shown: 5, note: t("timeline.riverNote") },
   ];
   return (
     <figure className="diagram">
@@ -24,18 +26,16 @@ export function StreetTimeline() {
               {board.map((code, i) => (i < step.shown ? <Card key={code} code={code} size="sm" /> : <span key={code} className="slot sm" />))}
             </span>
             <span className="t-note">{step.note}</span>
-            <span className="t-bet">then a betting round</span>
+            <span className="t-bet">{t("timeline.bet")}</span>
           </li>
         ))}
         <li className="t-end">
-          <span className="t-name">Showdown</span>
-          <span className="t-note">if 2 or more players are still in</span>
+          <span className="t-name">{t("timeline.showdown")}</span>
+          <span className="t-note">{t("timeline.showdownNote")}</span>
         </li>
       </ol>
-      <p className="t-fold">
-        <b>Everyone else folds</b> → the hand ends at once, with no more cards.
-      </p>
-      <figcaption>The board grows from 0 to 3, 4, then 5 shared cards, with a betting round after each deal.</figcaption>
+      <p className="t-fold">{t("timeline.fold")}</p>
+      <figcaption>{t("timeline.caption")}</figcaption>
     </figure>
   );
 }

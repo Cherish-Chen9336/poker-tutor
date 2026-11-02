@@ -5,6 +5,7 @@ import { useTakePendingFocus } from "../app/focus";
 import { BOT_POLICY_VERSION, practiceBot } from "../game/bot";
 import { BOT2_POLICY_VERSION, tableBot } from "../game/bot2";
 import { coachLines } from "../game/coach";
+import { useCoachLine } from "../i18n/coach-text";
 import { handLog } from "../game/hand-log";
 import { Match, YOU_SEAT, type HandRecord } from "../game/match";
 import { potTotal, sizedTo } from "../game/pot-math";
@@ -226,6 +227,7 @@ export default function PlayPage() {
   // Odds are estimated only on the learner's turn, with the coach on.
   const oddsHole = started && coachOn && !match.handOver && view.actionTo === YOU_SEAT && view.seats[YOU_SEAT]?.cards?.every(Boolean) ? (view.seats[YOU_SEAT]!.cards as string[]) : null;
   const estimates = useEquity(oddsHole, view.board, oddsHole ? equityRequests(view, YOU_SEAT) : []);
+  const coachLine = useCoachLine();
 
   if (!started) {
     return (
@@ -346,7 +348,9 @@ export default function PlayPage() {
                   <ul className="coach-list">
                     {coach.map((line, i) => (
                       <li key={i} className={`topic-${line.topic}`}>
-                        <CardText text={line.text} />
+                        <span lang={coachLine(line).lang}>
+                          <CardText text={coachLine(line).text} />
+                        </span>
                       </li>
                     ))}
                   </ul>

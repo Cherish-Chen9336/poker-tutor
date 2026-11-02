@@ -1,11 +1,14 @@
 import { Suspense, useRef, useState } from "react";
 import { useTakePendingFocus } from "../app/focus";
 import type { Progress } from "../app/progress";
-import { routeHref } from "../app/route";
-import { LESSON_CONTENT } from "./content";
+import { EnglishFallback } from "../i18n/I18n";
+import { useHref, useLocale, useT } from "../i18n/hooks";
+import type { MessageId } from "../i18n/messages/en";
+import { lessonContent } from "./content";
 import { findLesson, LESSONS } from "./lessons";
 import { Quiz } from "./Quiz";
 import { QUIZZES } from "./quizzes";
+import { localizeQuestion } from "./quizzes-i18n";
 
 interface Props {
   lessonId: number;
@@ -15,6 +18,9 @@ interface Props {
 
 export default function LessonPage({ lessonId, progress, onComplete }: Props) {
   const lesson = findLesson(lessonId);
+  const t = useT();
+  const locale = useLocale();
+  const routeHref = useHref();
   const allLessons = routeHref({ area: "learn", lesson: null });
   const [justFinished, setJustFinished] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -23,10 +29,10 @@ export default function LessonPage({ lessonId, progress, onComplete }: Props) {
   if (!lesson) {
     return (
       <section className="panel">
-        <h1 tabIndex={-1} ref={heading}>Lesson not found</h1>
-        <p className="lede">
-          There's no lesson {lessonId}. <a href={allLessons}>See all lessons</a>.
-        </p>
+        <h1 tabIndex={-1} ref={heading}>
+          {t("lesson.notFound")}
+        </h1>
+        <p className="lede">{t("lesson.notFoundBody", { id: lessonId, a: (chunks) => <a href={allLessons}>{chunks}</a> })}</p>
       </section>
     );
   }
@@ -34,64 +40,78 @@ export default function LessonPage({ lessonId, progress, onComplete }: Props) {
   const prev = findLesson(lesson.id - 1);
   const next = findLesson(lesson.id + 1);
   const finished = progress.completed.includes(lesson.id);
-  const Content = LESSON_CONTENT[lesson.id];
-  const questions = QUIZZES[lesson.id];
+  const content = lessonContent(lesson.id, locale);
+  const Content = content?.Component;
+  const english = QUIZZES[lesson.id];
+  const localized = english?.map((q) => localizeQuestion(q, locale));
+  // A quiz is shown in the page's language only when every question is translated.
+  const quizTranslated = !!localized && localized.every((q) => q !== null);
+  const questions = quizTranslated ? (localized as typeof english) : english;
 
   return (
     <article className="panel lesson">
       <a className="back" href={allLessons}>
-        ← All lessons
+        {t("lesson.back")}
       </a>
       <p className="eyebrow">
-        Lesson {lesson.id} of {LESSONS.length} · {lesson.minutes} min
-        {finished && <span className="status done">✓ Done</span>}
+        {t("lesson.position", { id: lesson.id, total: LESSONS.length, minutes: lesson.minutes })}
+        {finished && <span className="status done">{t("home.done")}</span>}
       </p>
-      <h1 tabIndex={-1} ref={heading}>{lesson.title}</h1>
+      <h1 tabIndex={-1} ref={heading}>
+        {t(`lesson.${lesson.id}.title` as MessageId)}
+      </h1>
 
-      {Content ? (
+      {content && Content ? (
         <div className="prose">
-          <Suspense fallback={<p className="loading">Loading the lesson…</p>}>
-            <Content />
+          <Suspense fallback={<p className="loading">{t("app.loadingLesson")}</p>}>
+            {content.translated ? <Content /> : <EnglishFallback><Content /></EnglishFallback>}
           </Suspense>
         </div>
       ) : (
         <>
-          <p className="lede">{lesson.summary}</p>
-          <p className="note">This lesson's page is being built. It arrives in a coming update.</p>
+          <p className="lede">{t(`lesson.${lesson.id}.summary` as MessageId)}</p>
+          <p className="note">{t("lesson.building")}</p>
         </>
       )}
 
       {questions && (
-        <Quiz
-          key={lesson.id}
-          questions={questions}
-          onComplete={() => {
-            onComplete(lesson.id);
-            setJustFinished(true);
-          }}
-        />
+        <QuizIn translated={quizTranslated}>
+          <Quiz
+            key={lesson.id}
+            questions={questions}
+            onComplete={() => {
+              onComplete(lesson.id);
+              setJustFinished(true);
+            }}
+          />
+        </QuizIn>
       )}
 
       {justFinished && (
         <p className="note done-note" role="status">
-          <b>✓ Lesson {lesson.id} complete.</b> {next ? "On to the next one when you're ready." : "That's every lesson!"}
+          <b>{t("lesson.complete", { id: lesson.id })}</b> {next ? t("lesson.onward") : t("lesson.allDone")}
         </p>
       )}
 
-      <nav className="pager" aria-label="Lessons">
+      <nav className="pager" aria-label={t("lesson.pager")}>
         {prev ? (
           <a className="button" href={routeHref({ area: "learn", lesson: prev.id })}>
-            ← Lesson {prev.id}
+            {t("lesson.prev", { id: prev.id })}
           </a>
         ) : (
           <span />
         )}
         {next && (
           <a className="button primary" href={routeHref({ area: "learn", lesson: next.id })}>
-            Lesson {next.id}: {next.title} →
+            {t("lesson.next", { id: next.id, title: t(`lesson.${next.id}.title` as MessageId) })}
           </a>
         )}
       </nav>
     </article>
   );
+}
+
+/** The quiz, marked as English when its translation isn't ready. */
+function QuizIn({ translated, children }: { translated: boolean; children: React.ReactNode }) {
+  return translated ? <>{children}</> : <EnglishFallback>{children}</EnglishFallback>;
 }

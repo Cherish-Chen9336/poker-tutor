@@ -1,6 +1,7 @@
 // Playing cards. Each card has a spoken name (e.g. "ace of hearts") and
 // shows its suit symbol, so red vs. black is never the only clue.
 import { Fragment, type ReactNode } from "react";
+import { useLocale } from "../i18n/hooks";
 import { cardName, rankLabel, SUITS } from "./card-names";
 
 interface CardProps {
@@ -14,10 +15,11 @@ interface CardProps {
 
 /** A face-up card, as a picture with a spoken name. */
 export function Card({ code, size = "md", lit, dim }: CardProps) {
+  const locale = useLocale();
   const suit = SUITS[code[1]];
   const classes = ["pc", size, suit.red ? "red" : "", lit ? "lit" : "", dim ? "dim" : ""].filter(Boolean).join(" ");
   return (
-    <span className={classes} role="img" aria-label={cardName(code)}>
+    <span className={classes} role="img" aria-label={cardName(code, locale)}>
       <span className="ix" aria-hidden="true">
         <span className="r">{rankLabel(code)}</span>
         <span className="s">{suit.symbol}</span>
@@ -42,9 +44,10 @@ export function Cards({ codes, size, lit }: { codes: string[]; size?: CardProps[
 
 /** A card inside running text, such as "You hold A♥". */
 export function C({ c }: { c: string }) {
+  const locale = useLocale();
   const suit = SUITS[c[1]];
   return (
-    <span className={suit.red ? "ic red" : "ic"} role="img" aria-label={cardName(c)}>
+    <span className={suit.red ? "ic red" : "ic"} role="img" aria-label={cardName(c, locale)}>
       <span aria-hidden="true">
         {rankLabel(c)}
         {suit.symbol}

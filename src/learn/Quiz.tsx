@@ -2,6 +2,7 @@
 // after a second wrong answer the right one is shown. The lesson counts as
 // done once every question has been answered correctly.
 import { useEffect, useId, useRef, useState } from "react";
+import { useT } from "../i18n/hooks";
 import { CardText } from "./cards";
 import type { Question } from "./quizzes";
 
@@ -9,6 +10,7 @@ type Result = "correct" | "wrong" | "revealed";
 
 function QuestionBlock({ q, number, onCorrect }: { q: Question; number: number; onCorrect: () => void }) {
   const name = useId();
+  const t = useT();
   const [choice, setChoice] = useState<number | null>(null);
   const [misses, setMisses] = useState(0);
   const [result, setResult] = useState<Result | null>(null);
@@ -36,7 +38,7 @@ function QuestionBlock({ q, number, onCorrect }: { q: Question; number: number; 
     <form className={`question ${result ?? ""}`} onSubmit={submit}>
       <fieldset disabled={solved}>
         <legend>
-          <span className="qnum">Question {number}</span>
+          <span className="qnum">{t("quiz.question", { number })}</span>
           <CardText text={q.prompt} />
         </legend>
         <div className="choices">
@@ -59,25 +61,25 @@ function QuestionBlock({ q, number, onCorrect }: { q: Question; number: number; 
         </div>
         {!solved && (
           <button type="submit" className="button primary" disabled={choice === null}>
-            Check answer
+            {t("quiz.check")}
           </button>
         )}
       </fieldset>
       <div className="feedback" role="status" tabIndex={-1} ref={feedbackRef}>
         {result === "correct" && (
           <p>
-            <b className="good">✓ Correct.</b> <CardText text={q.why} />
+            <b className="good">{t("quiz.correct")}</b> <CardText text={q.why} />
           </p>
         )}
         {result === "wrong" && (
           <p>
-            <b className="bad">✗ Not quite.</b> Have another look and try again.
+            <b className="bad">{t("quiz.wrong")}</b> {t("quiz.tryAgain")}
           </p>
         )}
         {result === "revealed" && (
           <p>
-            <b className="bad">✗ Not quite.</b> The answer is “<CardText text={q.choices[q.answer]} />”.{" "}
-            <CardText text={q.why} /> Pick it to continue.
+            <b className="bad">{t("quiz.wrong")}</b> {t("quiz.answerIs", { answer: <CardText text={q.choices[q.answer]} /> })}{" "}
+            <CardText text={q.why} /> {t("quiz.pickIt")}
           </p>
         )}
       </div>
@@ -87,6 +89,7 @@ function QuestionBlock({ q, number, onCorrect }: { q: Question; number: number; 
 
 export function Quiz({ questions, onComplete }: { questions: Question[]; onComplete: () => void }) {
   const [solved, setSolved] = useState<Set<string>>(new Set());
+  const t = useT();
 
   function markSolved(id: string) {
     const next = new Set(solved).add(id);
@@ -96,10 +99,8 @@ export function Quiz({ questions, onComplete }: { questions: Question[]; onCompl
 
   return (
     <section className="quiz" aria-labelledby="quiz-title">
-      <h2 id="quiz-title">Quick checks</h2>
-      <p className="quiz-progress">
-        {solved.size} of {questions.length} answered correctly
-      </p>
+      <h2 id="quiz-title">{t("quiz.title")}</h2>
+      <p className="quiz-progress">{t("quiz.progress", { solved: solved.size, total: questions.length })}</p>
       {questions.map((q, i) => (
         <QuestionBlock key={q.id} q={q} number={i + 1} onCorrect={() => markSolved(q.id)} />
       ))}

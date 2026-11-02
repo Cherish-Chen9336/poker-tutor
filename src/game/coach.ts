@@ -32,9 +32,25 @@ const SEAT_PHRASE: Record<string, string> = {
   BB: "the big blind",
 };
 
+/**
+ * What a line says, as facts without wording, so each language can phrase it
+ * (translation pilot: only the six-player preflop position line so far).
+ */
+export type CoachFact = {
+  kind: "preflopPosition";
+  position: string;
+  /** Where the learner acts after the flop among players who can still bet: 1 is first. */
+  rank: number;
+  count: number;
+  /** Seats that act before the learner after the flop, in order. */
+  before: string[];
+};
+
 export interface CoachLine {
   topic: "position" | "hand" | "draw" | "board" | "price";
+  /** The English text. */
   text: string;
+  fact?: CoachFact;
 }
 
 function startingHand(hole: string[]): string {
@@ -103,11 +119,12 @@ export function coachLines(view: TableView): CoachLine[] {
     const actors = view.seats.filter((s) => s && s.status !== "folded" && s.status !== "out" && s.status !== "all-in" && s.stack + s.betThisStreet > 0);
     const rank = actors.filter((s) => postflopRank(view, s!.seat) <= postflopRank(view, seat)).length;
     // Says of how many and after whom, so the count is checkable against the table (it leaves out folded players).
-    const before = actors
+    const beforeSeats = actors
       .filter((s) => postflopRank(view, s!.seat) < postflopRank(view, seat))
       .sort((a, b) => postflopRank(view, a!.seat) - postflopRank(view, b!.seat))
-      .map((s) => `the ${positionOf(view, s!.seat)}`);
-    const after = before.length === 1 ? before[0] : `${before.slice(0, -1).join(", ")} and ${before.at(-1)}`;
+      .map((s) => positionOf(view, s!.seat));
+    const before = beforeSeats.map((p) => `the ${p}`);
+    const after = before.length <= 2 ? before.join(" and ") : `${before.slice(0, -1).join(", ")}, and ${before.at(-1)}`;
     const later =
       rank === actors.length
         ? "you act last on every later round"
@@ -117,6 +134,7 @@ export function coachLines(view: TableView): CoachLine[] {
     lines.push({
       topic: "position",
       text: `You're ${SEAT_PHRASE[position]} (${position}). Before the flop, betting goes around from under the gun to the big blind, and a raise gives everyone else another turn. After the flop, ${later}.`,
+      fact: { kind: "preflopPosition", position, rank, count: actors.length, before: beforeSeats },
     });
   } else {
     // Only players with chips left take turns; all-in players are still in the hand but don't act.

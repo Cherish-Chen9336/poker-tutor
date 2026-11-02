@@ -1,4 +1,5 @@
 import { lazy, type ComponentType } from "react";
+import type { Locale } from "../../i18n/locales";
 import { Lesson1, Lesson2, Lesson3, Lesson4, Lesson5, Lesson6, Lesson7 } from "./rules-lessons";
 
 // Lessons 8 and 10 use the full game engine, which is large, so lessons 8–14
@@ -26,3 +27,17 @@ export const LESSON_CONTENT: Record<number, ComponentType> = {
   15: lazy(() => bigTable().then((m) => ({ default: m.Lesson15 }))),
   16: lazy(() => bigTable().then((m) => ({ default: m.Lesson16 }))),
 };
+
+/** Translated lesson text, loaded only for its language. */
+const TRANSLATED: Record<Exclude<Locale, "en">, Record<number, ComponentType>> = {
+  "zh-Hans": { 1: lazy(() => import("./zh-Hans/lesson1").then((m) => ({ default: m.Lesson1 }))) },
+  ja: { 1: lazy(() => import("./ja/lesson1").then((m) => ({ default: m.Lesson1 }))) },
+};
+
+/** A lesson's text in the page's language, or the English one (marked untranslated) if there's none yet. */
+export function lessonContent(id: number, locale: Locale): { Component: ComponentType; translated: boolean } | null {
+  const translated = locale === "en" ? undefined : TRANSLATED[locale][id];
+  if (translated) return { Component: translated, translated: true };
+  const english = LESSON_CONTENT[id];
+  return english ? { Component: english, translated: locale === "en" } : null;
+}
