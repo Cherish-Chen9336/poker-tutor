@@ -1,4 +1,9 @@
+import { createIntl } from "react-intl";
 import { describe, expect, it } from "vitest";
+import { en } from "../i18n/messages/en";
+import { ja } from "../i18n/messages/ja";
+import { zhHans } from "../i18n/messages/zh-Hans";
+import { wordComment } from "../i18n/review-text";
 import type { RecordedMove } from "./match";
 import { commentOn, reviewHand } from "./review";
 import { practiceBot } from "./bot";
@@ -51,6 +56,27 @@ describe("review comments", () => {
     const nuts = view(["As", "Ks"], ["Qs", "Js", "Ts", "2d", "3c"], { pot: 40, bets: [0, 20] });
     expect(commentOn(step(nuts, facing(20), { type: "fold" })).verdict).toBe("mistake");
     expect(commentOn(step(nuts, facing(20), { type: "call" })).verdict).toBe("good");
+  });
+
+  it("gives each comment facts that word to the same English, in every branch", () => {
+    const english = createIntl({ locale: "en", messages: en });
+    const nuts = view(["As", "Ks"], ["Qs", "Js", "Ts", "2d", "3c"], { pot: 40, bets: [0, 20] });
+    const folded = commentOn(step(nuts, facing(20), { type: "fold" }));
+    expect(folded.fact).toEqual({ kind: "unbeatableFold" });
+    const kept = commentOn(step(nuts, facing(20), { type: "call" }));
+    expect(kept.fact).toEqual({ kind: "unbeatable" });
+    for (const c of [folded, kept]) expect(wordComment(english, c.fact)).toBe(c.text);
+    // Every bet-size phrase: a pot of 12, betting 4, 6, 8, 12, or 20.
+    const shares = [4, 6, 8, 12, 20].map((to) => {
+      const c = commentOn(step(view(["2c", "7d"], ["Ks", "9h", "4c"], { pot: 12 }), free, { type: "bet", to }));
+      expect(wordComment(english, c.fact)).toBe(c.text);
+      return c.fact.kind === "note" ? c.fact.parts.find((part) => part.kind === "size")! : null;
+    });
+    expect(shares.map((part) => (part && part.kind === "size" ? part.share : null))).toEqual(["third", "half", "twoThirds", "pot", "more"]);
+    for (const locale of ["zh-Hans", "ja"] as const) {
+      const intl = createIntl({ locale, messages: { ...en, ...(locale === "ja" ? ja : zhHans) } });
+      for (const fact of [folded.fact, kept.fact]) expect(wordComment(intl, fact)).not.toMatch(/[A-Za-z]{3,}/);
+    }
   });
 
   it("explains other decisions without grading them", () => {

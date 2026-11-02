@@ -3,7 +3,7 @@
 // at random (wrong types, out-of-range numbers, odd strings) and every one that
 // passes the checks is run through everything Review shows.
 import { renderToStaticMarkup } from "react-dom/server";
-import { IntlProvider } from "react-intl";
+import { createIntl, IntlProvider } from "react-intl";
 import { describe, expect, it } from "vitest";
 import { isHandRecord } from "../app/hand-store";
 import { practiceBot } from "../game/bot";
@@ -11,9 +11,20 @@ import { tableBot } from "../game/bot2";
 import { handLog, resultLine } from "../game/hand-log";
 import { Match, type HandRecord } from "../game/match";
 import { reviewHand } from "../game/review";
+import { handFacts } from "../game/log-facts";
+import { wordLog } from "../i18n/log-text";
 import { en } from "../i18n/messages/en";
+import { ja } from "../i18n/messages/ja";
+import { zhHans } from "../i18n/messages/zh-Hans";
+import { wordComment } from "../i18n/review-text";
 import { CardText } from "../learn/cards";
 import { PokerTable } from "../ui/PokerTable";
+
+const INTLS = [
+  createIntl({ locale: "en", messages: en }),
+  createIntl({ locale: "zh-Hans", messages: { ...en, ...zhHans } }),
+  createIntl({ locale: "ja", messages: { ...en, ...ja } }),
+];
 
 function seeded(seed: number): () => number {
   let a = seed >>> 0;
@@ -50,6 +61,11 @@ function showInReview(record: HandRecord) {
   const lines = handLog(record);
   renderToStaticMarkup(<>{lines.map((l, i) => <CardText key={i} text={l} />)}</>);
   renderToStaticMarkup(<CardText text={resultLine(record.final!, record.net!)} />);
+  // The path the Review screen uses now: facts worded per language.
+  for (const intl of INTLS) {
+    for (const fact of handFacts(record)) wordLog(intl, fact);
+    for (const comment of reviewHand(record)) wordComment(intl, comment.fact);
+  }
   for (const view of [...record.moves.map((m) => m.view), record.final!]) renderToStaticMarkup(<IntlProvider locale="en" messages={en}><PokerTable view={view} youSeat={record.learnerSeat} names={record.seats.map((s) => s.name)} /></IntlProvider>);
 }
 

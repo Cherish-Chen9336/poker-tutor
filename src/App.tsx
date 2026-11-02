@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef } from "react";
 import { parseLocation, routeHref, useHash, type Route } from "./app/route";
-import { EnglishFallback, I18nProvider, LanguageErrorBoundary, LanguageSwitch, LoadingLanguage, MachineLabel } from "./i18n/I18n";
+import { I18nProvider, LanguageErrorBoundary, LanguageSwitch, LoadingLanguage, MachineLabel } from "./i18n/I18n";
 import { useHref, useT } from "./i18n/hooks";
 import type { MessageId } from "./i18n/messages/en";
 import { focusPageHeading } from "./app/focus";
@@ -100,9 +100,7 @@ function Shell() {
         )}
         {route.area === "review" && (
           <Suspense fallback={<p className="loading">{t("app.loadingHands")}</p>}>
-            <EnglishFallback>
-              <ReviewPage />
-            </EnglishFallback>
+            <ReviewPage />
           </Suspense>
         )}
       </main>

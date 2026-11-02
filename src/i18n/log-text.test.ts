@@ -10,7 +10,9 @@ import { handFacts, moveFactAt, resultFact } from "../game/log-facts";
 import { Match, type HandRecord } from "../game/match";
 import type { LegalMoves, Move } from "../game/types";
 import { potLabel, potText } from "../ui/labels";
+import { reviewHand } from "../game/review";
 import { wordLog } from "./log-text";
+import { wordComment } from "./review-text";
 import { en } from "./messages/en";
 import { ja } from "./messages/ja";
 import { zhHans } from "./messages/zh-Hans";
@@ -75,6 +77,23 @@ describe("the hand log from facts", () => {
     for (const record of uncontested) expect(handLog(record).join(" ")).not.toMatch(/uncontested/i);
   });
 
+  it("words every Review comment exactly as the English comment", () => {
+    const kinds = new Set<string>();
+    for (const record of records) {
+      for (const c of reviewHand(record)) {
+        expect(wordComment(english, c.fact)).toBe(c.text);
+        kinds.add(c.fact.kind === "note" ? (c.fact.parts.length ? `note:${c.fact.parts.map((p) => p.kind).join("+")}` : "note:chose") : c.fact.kind);
+      }
+    }
+    for (const kind of ["freeFold", "unbeatable"]) expect([...kinds], kind).toContain(kind);
+    // The fallback when nothing else applies never comes up in these hands, so check it directly.
+    const chose = (move: Move, call: number | null) => wordComment(english, { kind: "note", parts: [], chose: move, call });
+    expect(chose({ type: "call" }, 4)).toBe("You chose to call 4.");
+    expect(chose({ type: "call" }, null)).toBe("You chose to call.");
+    expect(chose({ type: "raise", to: 12 }, 4)).toBe("You chose to raise to 12.");
+    for (const part of ["price", "draw", "size", "foldDepends", "callDepends", "checkFree"]) expect([...kinds].join(" "), part).toContain(part);
+  });
+
   it("labels the pot exactly as the English pot label did", () => {
     for (const record of records) {
       const names = record.seats.length > 2 ? record.seats.map((s) => s.name) : undefined;
@@ -93,12 +112,13 @@ describe("the hand log from facts", () => {
   });
 
   for (const [locale, messages] of [["zh-Hans", zhHans], ["ja", ja]] as const) {
-    it(`${locale}: words every fact, keeping the cards and amounts`, () => {
+    it(`${locale}: words every log fact and comment, keeping the cards and amounts`, () => {
       const intl = createIntl({ locale, messages: { ...en, ...messages } });
       for (const record of records.slice(0, 300).concat(records.slice(600, 900))) {
         const facts = handFacts(record);
-        const words = facts.map((f) => wordLog(intl, f));
-        const englishWords = facts.map((f) => wordLog(english, f));
+        const comments = reviewHand(record).map((c) => c.fact);
+        const words = [...facts.map((f) => wordLog(intl, f)), ...comments.map((f) => wordComment(intl, f))];
+        const englishWords = [...facts.map((f) => wordLog(english, f)), ...comments.map((f) => wordComment(english, f))];
         words.forEach((line, i) => {
           // No English words are left, apart from the bots' names.
           expect(line.replace(/\b(Mia|Leo|Sam|Ava|Kai)\b/g, ""), englishWords[i]).not.toMatch(/[A-Za-z]{3,}/);
