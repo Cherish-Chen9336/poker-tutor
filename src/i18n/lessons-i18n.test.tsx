@@ -1,4 +1,4 @@
-// Translated lessons 1–7 as the reader sees them: each lesson's own words use
+// Translated lessons as the reader sees them: each lesson's own words use
 // the glossary, every quiz is translated, and the diagrams show the right
 // cards and seat orders in each language.
 import type { ComponentType } from "react";
@@ -22,7 +22,7 @@ const LANGS = [
   { locale: "zh-Hans", lang: "zh", catalog: zhHans, quiz: zhQuiz },
   { locale: "ja", lang: "ja", catalog: ja, quiz: jaQuiz },
 ] as const;
-const LESSONS = [1, 2, 3, 4, 5, 6, 7];
+const LESSONS = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16];
 const modules = import.meta.glob<Record<string, ComponentType>>("../learn/content/{zh-Hans,ja}/lesson*.tsx", { eager: true });
 
 /** Renders inside a language, as the app does. */
@@ -46,9 +46,17 @@ const TERMS: Record<number, string[]> = {
   5: ["fold", "check", "call", "raiseTo", "raiseBy", "noLimit", "allIn", "bluff"],
   6: ["allIn", "sidePot", "headsUp", "showdown"],
   7: ["kicker", "muck", "showdown", "splitPot"],
+  9: ["ev", "potOdds", "breakEven", "outs", "impliedOdds"],
+  10: ["gamblersFallacy", "premiumHand"],
+  11: ["bluff", "gameTheory", "mixedStrategy", "breakEven"],
+  12: ["sunkCost", "pot"],
+  13: ["resulting", "allIn"],
+  14: ["bankroll", "kelly", "potOdds"],
+  15: ["utg", "cutoff", "hijack", "button", "position", "valueBet", "bluff"],
+  16: ["sidePot", "mainPot", "splitPot", "allIn"],
 };
 
-describe("translated lessons 1–7", () => {
+describe("translated lessons", () => {
   for (const { locale, lang, catalog, quiz } of LANGS) {
     it(`${locale}: every lesson and quiz question is translated`, () => {
       for (const n of LESSONS) {

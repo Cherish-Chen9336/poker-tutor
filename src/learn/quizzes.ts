@@ -428,7 +428,7 @@ export const QUIZZES: Record<number, Question[]> = {
       prompt: "In the 55% example, what happens if you always bet twice the Kelly fraction (20%)?",
       choices: ["You grow twice as fast", "A typical run doesn't grow; over a long run it slowly shrinks", "You can't lose"],
       answer: 1,
-      why: "Betting too much makes the losses hurt more than the wins help. At twice Kelly, growth per bet is slightly below zero: after 100 bets you're about where you started, and after many more you slowly shrink. A few lucky runs pull the average up, but a typical run shrinks.",
+      why: "Betting too much makes the losses hurt more than the wins help. At twice Kelly, the typical compound growth rate per bet is slightly below zero: after 100 bets you're about where you started, and after many more you slowly shrink. A few lucky runs pull the average up, but a typical run shrinks.",
       checkedBy: "math",
     },
     {
@@ -496,7 +496,7 @@ export const QUIZZES: Record<number, Question[]> = {
       prompt: "What's the difference between a side pot and a split pot?",
       choices: ["A side pot is a separate pot some players can't win; a split pot is one pot shared by tied hands", "They're the same thing", "A split pot only happens with side pots"],
       answer: 0,
-      why: "Side pots exist when someone is all-in for less. Splits happen when hands tie.",
+      why: "A side pot forms when at least two other players match extra chips beyond a shorter all-in. A split pot is shared by tied winners.",
       checkedBy: "review",
     },
   ],

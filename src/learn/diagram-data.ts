@@ -77,10 +77,16 @@ export function breakEven(pot: number, call: number): number {
   return call / (pot + call);
 }
 
-/** Words for a call's average result. The choice uses the unrounded `ev`; one that rounds to 0.0 is called even. */
+/** A call's average result, for wording in any language. The choice uses the unrounded `ev`; one that rounds to 0.0 is even. */
+export function averageResultParts(ev: number): { even: boolean; sign: "+" | "−"; amount: string; action: "call" | "fold" } {
+  return { even: Math.abs(ev) < 0.05, sign: ev > 0 ? "+" : "−", amount: Math.abs(ev).toFixed(1), action: ev > 0 ? "call" : "fold" };
+}
+
+/** Words for a call's average result, in English (the catalog's calc.even and calc.result say the same). */
 export function averageResult(ev: number): string {
-  if (Math.abs(ev) < 0.05) return "About break-even: calling and folding have about the same average result.";
-  return `${ev > 0 ? "+" : "−"}${Math.abs(ev).toFixed(1)} chips per call → ${ev > 0 ? "call" : "fold"}`;
+  const r = averageResultParts(ev);
+  if (r.even) return "About break-even: calling and folding have about the same average result.";
+  return `${r.sign}${r.amount} chips per call → ${r.action}`;
 }
 
 /** Lesson 13's grid: Lesson 9's two calls, and how many river cards win (checked against the evaluator in tests). */

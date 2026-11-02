@@ -715,7 +715,7 @@ These hold only in this toy game. Real hands have many in-between holdings, more
 - A. You grow twice as fast
 - B. **A typical run doesn't grow; over a long run it slowly shrinks** ✓
 - C. You can't lose
-- *Why:* Betting too much makes the losses hurt more than the wins help. At twice Kelly, growth per bet is slightly below zero: after 100 bets you're about where you started, and after many more you slowly shrink. A few lucky runs pull the average up, but a typical run shrinks.
+- *Why:* Betting too much makes the losses hurt more than the wins help. At twice Kelly, the typical compound growth rate per bet is slightly below zero: after 100 bets you're about where you started, and after many more you slowly shrink. A few lucky runs pull the average up, but a typical run shrinks.
 - *Checked by:* math
 
 **L14-Q3.** Why do poker players usually risk less than Kelly suggests?
@@ -824,5 +824,5 @@ So the shortest stack can win at most the main pot.
 - A. **A side pot is a separate pot some players can't win; a split pot is one pot shared by tied hands** ✓
 - B. They're the same thing
 - C. A split pot only happens with side pots
-- *Why:* Side pots exist when someone is all-in for less. Splits happen when hands tie.
+- *Why:* A side pot forms when at least two other players match extra chips beyond a shorter all-in. A split pot is shared by tied winners.
 - *Checked by:* review

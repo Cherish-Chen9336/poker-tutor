@@ -3,11 +3,19 @@
 import { describe, expect, it } from "vitest";
 import lessonsDoc from "../../docs/lessons.md?raw";
 import coachSource from "../game/coach.ts?raw";
+import handsSource from "../game/hands.ts?raw";
+import randomSource from "../game/random.ts?raw";
+import simulateSource from "../game/simulate.ts?raw";
 import cardNamesSource from "../learn/card-names.ts?raw";
+import afterPlayLessons from "../learn/content/after-play-lessons.tsx?raw";
 import rulesLessons from "../learn/content/rules-lessons.tsx?raw";
+import tableLessons from "../learn/content/table-lessons.tsx?raw";
+import thinkingLessons from "../learn/content/thinking-lessons.tsx?raw";
 import diagramDataSource from "../learn/diagram-data.ts?raw";
 import diagramsSource from "../learn/diagrams.tsx?raw";
+import thinkingSource from "../learn/thinking.tsx?raw";
 import visualsSource from "../learn/visuals.tsx?raw";
+import yourHandsSource from "../learn/YourHands.tsx?raw";
 import coachTextSource from "./coach-text.tsx?raw";
 import { text as jaQuiz } from "../learn/quiz-text/ja";
 import { text as zhQuiz } from "../learn/quiz-text/zh-Hans";
@@ -27,9 +35,15 @@ function fingerprint(text: string): string {
 
 /** Translated lesson files by language and lesson number. */
 const LESSON_FILES = import.meta.glob<string>("../learn/content/{zh-Hans,ja}/lesson*.tsx", { query: "?raw", import: "default", eager: true });
-const TRANSLATED_LESSONS = [1, 2, 3, 4, 5, 6, 7];
+const TRANSLATED_LESSONS = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16];
+/** The English lesson components, one after another. */
+const ENGLISH_LESSONS = [rulesLessons, thinkingLessons, afterPlayLessons, tableLessons].join("\n");
 const lessonFile = (locale: string, n: number) => LESSON_FILES[`../learn/content/${locale}/lesson${n}.tsx`];
-const between = (text: string, from: string, to: string) => text.slice(text.indexOf(from), to ? text.indexOf(to) : undefined);
+/** The text from `from` up to `to`, or to the end when `to` isn't there. */
+const between = (text: string, from: string, to: string) => {
+  const end = text.indexOf(to, text.indexOf(from) + 1);
+  return text.slice(text.indexOf(from), end < 0 ? undefined : end);
+};
 
 /** Everything a review checked, by name, so a test can show that changing any one of them invalidates it. */
 type Inputs = Record<string, string>;
@@ -43,12 +57,14 @@ function inputs(): Inputs {
     cardNames: cardNamesSource,
     coach: coachSource,
     coachText: coachTextSource,
-    diagrams: diagramsSource + visualsSource,
+    diagrams: diagramsSource + visualsSource + thinkingSource + yourHandsSource,
     diagramData: diagramDataSource,
+    // The calculations behind facts the lessons show: equity, the streak simulation, and its random source.
+    facts: handsSource + simulateSource + randomSource,
   };
   for (const n of TRANSLATED_LESSONS) {
     all[`lesson${n}Doc`] = between(lessonsDoc, `## Lesson ${n}:`, `## Lesson ${n + 1}:`);
-    all[`lesson${n}Page`] = between(rulesLessons, `export function Lesson${n}()`, n < 7 ? `export function Lesson${n + 1}()` : "");
+    all[`lesson${n}Page`] = between(ENGLISH_LESSONS, `export function Lesson${n}()`, "\nexport function ");
     all[`lesson${n}Quiz`] = JSON.stringify(QUIZZES[n]);
     all[`zhLesson${n}`] = lessonFile("zh-Hans", n) + JSON.stringify(QUIZZES[n].map((q) => zhQuiz[q.id]));
     all[`jaLesson${n}`] = lessonFile("ja", n) + JSON.stringify(QUIZZES[n].map((q) => jaQuiz[q.id]));
@@ -58,8 +74,8 @@ function inputs(): Inputs {
 /** Which inputs are the English source and which the translation, for each unit. Shared code counts on both sides. */
 const SCOPE: Record<string, (locale: ReviewRecord["locale"]) => { source: string[]; translation: string[] }> = {
   messages: (locale) => ({
-    source: ["enMessages", "glossary", "coach", "coachText", "diagrams", "diagramData"],
-    translation: [locale === "ja" ? "jaMessages" : "zhMessages", "glossary", "cardNames", "coachText", "diagrams", "diagramData"],
+    source: ["enMessages", "glossary", "coach", "coachText", "diagrams", "diagramData", "facts"],
+    translation: [locale === "ja" ? "jaMessages" : "zhMessages", "glossary", "cardNames", "coachText", "diagrams", "diagramData", "facts"],
   }),
 };
 for (const n of TRANSLATED_LESSONS) {

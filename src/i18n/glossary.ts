@@ -1,10 +1,10 @@
-// The poker glossary for translations (version 3, 2026-11-02). One entry per
+// The poker glossary for translations (version 4, 2026-11-02). One entry per
 // concept: every translation uses the preferred term, so a learner sees one
 // name per idea. These are editorial choices for this app, made by Claude and
 // cross-checked by Codex (machine-assisted; no human translator reviewed them).
 // `avoid` lists terms a translation must not use for this concept (tested).
 
-export const GLOSSARY_VERSION = 3;
+export const GLOSSARY_VERSION = 4;
 
 export interface Term {
   id: string;
@@ -92,6 +92,17 @@ export const GLOSSARY: Term[] = [
   { id: "potOdds", en: "pot odds", zh: "底池赔率", ja: "ポットオッズ" },
   { id: "ev", en: "expected value (EV)", zh: "期望值（EV）", ja: "期待値（EV）" },
   { id: "bluff", en: "bluff", zh: "诈唬", ja: "ブラフ" },
+  { id: "breakEven", en: "break even", zh: "盈亏平衡", ja: "損益分岐" },
+  { id: "impliedOdds", en: "implied odds", zh: "隐含赔率", ja: "インプライドオッズ" },
+  { id: "gamblersFallacy", en: "the gambler's fallacy", zh: "赌徒谬误", ja: "ギャンブラーの誤謬" },
+  { id: "premiumHand", en: "premium hand", zh: "顶级起手牌", ja: "プレミアムハンド", note: "Here: A-A, K-K, Q-Q, or A-K." },
+  { id: "gameTheory", en: "game theory", zh: "博弈论", ja: "ゲーム理論" },
+  { id: "mixedStrategy", en: "mixed strategy", zh: "混合策略", ja: "混合戦略" },
+  { id: "valueBet", en: "bet for value", zh: "价值下注", ja: "バリューベット" },
+  { id: "sunkCost", en: "sunk cost", zh: "沉没成本", ja: "サンクコスト" },
+  { id: "resulting", en: "resulting", zh: "结果论", ja: "結果論" },
+  { id: "bankroll", en: "bankroll", zh: "资金", ja: "バンクロール", note: "Money set aside for playing." },
+  { id: "kelly", en: "the Kelly criterion", zh: "凯利公式", ja: "ケリー基準" },
 ];
 
 export function term(id: string): Term {

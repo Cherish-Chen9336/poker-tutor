@@ -1,73 +1,12 @@
 // Lessons 11–14, for after the learner has played some hands. The text matches
 // docs/lessons.md, which the owner reviewed.
 import type { ReactNode } from "react";
-import { useHands } from "../../app/hand-store";
-import { useHref } from "../../i18n/hooks";
 import { C } from "../cards";
-import { BluffTokens, KellyBars, PotCompare, ResultGrid } from "../visuals";
+import { BluffTokens, BluffTree, KellyBars, PotCompare, ResultGrid } from "../visuals";
+import { YourHands } from "../YourHands";
 
 function T({ children }: { children: ReactNode }) {
   return <b className="term">{children}</b>;
-}
-
-/** A pointer to the learner's own saved hands, when there are any. */
-function YourHands({ children }: { children: ReactNode }) {
-  const { hands } = useHands();
-  const href = useHref();
-  return (
-    <p className="note">
-      {hands.length ? (
-        <>
-          {children} You have {hands.length} saved {hands.length === 1 ? "hand" : "hands"}: <a href={href({ area: "review" })}>open Review</a>.
-        </>
-      ) : (
-        <>
-          {children} Once you've played a few hands in <a href={href({ area: "play" })}>Play</a>, you can look back at them in Review.
-        </>
-      )}
-    </p>
-  );
-}
-
-/** Lesson 11's toy game as a small decision tree, with your result at each end. */
-function BluffTree() {
-  const leaf = (label: string, result: string, tone: "win" | "lose" | "zero") => (
-    <li className={`leaf ${tone}`}>
-      <span>{label}</span>
-      <b>{result}</b>
-    </li>
-  );
-  return (
-    <figure className="diagram">
-      <div className="tree">
-        <div className="branch">
-          <p className="node">
-            <b>You have the best hand</b> (half the time)
-          </p>
-          <p className="node sub">You bet 50</p>
-          <ul>
-            {leaf("Opponent calls", "you win 150", "win")}
-            {leaf("Opponent folds", "you win 100", "win")}
-          </ul>
-        </div>
-        <div className="branch">
-          <p className="node">
-            <b>You have nothing</b> (half the time)
-          </p>
-          <p className="node sub">You check, or bluff 50</p>
-          <ul>
-            {leaf("Check: the cards are shown", "you win nothing", "zero")}
-            {leaf("Bluff, opponent calls", "you lose 50", "lose")}
-            {leaf("Bluff, opponent folds", "you win 100", "win")}
-          </ul>
-        </div>
-      </div>
-      <figcaption>
-        The pot is 100 before the river bet. "Win" counts the chips you take from the middle beyond your own bet. Your
-        opponent's medium hand beats nothing and loses to your best hand.
-      </figcaption>
-    </figure>
-  );
 }
 
 export function Lesson11() {

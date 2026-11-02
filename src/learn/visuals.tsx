@@ -41,6 +41,7 @@ export function SituationCards() {
 
 /** Lesson 12: the same call in a small pot and a big one. */
 export function PotCompare() {
+  const t = useT();
   const call = 20;
   const pots = [
     { pot: 40, earlier: 10 },
@@ -49,7 +50,7 @@ export function PotCompare() {
   const max = Math.max(...pots.map((p) => p.pot)) + call; // the widest bar: the bigger pot plus the call
   return (
     <figure className="diagram">
-      <p className="visual-setup">Heads-up. Each pot includes the opponent's bet, and calling {call} ends the betting.</p>
+      <p className="visual-setup">{t("potCompare.setup", { call })}</p>
       <ul className="pot-compare">
         {pots.map(({ pot, earlier }) => {
           const need = breakEven(pot, call);
@@ -61,17 +62,24 @@ export function PotCompare() {
                 <span className="pot-call" style={{ width: `${(call / max) * 100}%` }} />
               </div>
               <p>
-                <b>Pot {pot}</b>, call {call}: you need {call} ÷ ({pot} + {call}) {Number.isInteger(need * 100) ? "=" : "≈"}{" "}
-                <b>{pct(need, Number.isInteger(need * 100) ? 0 : 1)}</b>. {earlier} of the pot came from you earlier.
+                {t("potCompare.row", {
+                  pot,
+                  call,
+                  eq: Number.isInteger(need * 100) ? "=" : "≈",
+                  need: pct(need, Number.isInteger(need * 100) ? 0 : 1),
+                  earlier,
+                })}
               </p>
             </li>
           );
         })}
       </ul>
       <figcaption>
-        <span className="key mine" /> yours earlier, now the pot's <span className="key pot" /> the rest of the pot{" "}
-        <span className="key call" /> your call. Pot size and call price set the chance you need. Who put the chips in
-        doesn't.
+        {t("potCompare.caption", {
+          mineKey: <span key="m" className="key mine" />,
+          potKey: <span key="p" className="key pot" />,
+          callKey: <span key="c" className="key call" />,
+        })}
       </figcaption>
     </figure>
   );
@@ -79,45 +87,48 @@ export function PotCompare() {
 
 /** Lesson 13: decision quality against result, on Lesson 9's example. */
 export function ResultGrid() {
+  const t = useT();
   const { you, opponent, board } = LESSON9_EXAMPLE;
   const { winCards, unseen } = LESSON13_CALLS;
   const win = winCards / unseen;
   return (
     <figure className="diagram">
       <p className="visual-setup">
-        You hold <C c={you[0]} /> <C c={you[1]} />, your opponent <C c={opponent[0]} /> <C c={opponent[1]} />. Board:{" "}
-        {board.map((c) => (
-          <C key={c} c={c} />
-        ))}
-        . One card to come, and your call ends the betting. For this example, both hands are known before the call. You win
-        only if a heart comes ({winCards} of the {unseen} unseen cards, {pct(win)}).
+        {t("grid.setup", {
+          y1: <C key="y1" c={you[0]} />,
+          y2: <C key="y2" c={you[1]} />,
+          o1: <C key="o1" c={opponent[0]} />,
+          o2: <C key="o2" c={opponent[1]} />,
+          board: board.map((c) => <C key={c} c={c} />),
+          winCards,
+          unseen,
+          win: pct(win),
+        })}
       </p>
       <div className="table-wrap">
         <table className="result-grid">
           <thead>
             <tr>
               <td />
-              <th scope="col">A heart comes (you win)</th>
-              <th scope="col">No heart (you lose)</th>
+              <th scope="col">{t("grid.heart")}</th>
+              <th scope="col">{t("grid.noHeart")}</th>
             </tr>
           </thead>
           <tbody>
             {LESSON13_CALLS.calls.map((c) => {
               const good = win > breakEven(c.pot, c.call);
-              const kind = good ? "Good call" : "Bad call";
+              const kind = good ? t("grid.good") : t("grid.bad");
               return (
                 <tr key={c.pot} className={good ? "good" : "bad"}>
                   <th scope="row">
                     <b>{kind}</b>
-                    <span>
-                      pot {c.pot}, call {c.call}: you need {pct(breakEven(c.pot, c.call))}
-                    </span>
+                    <span>{t("grid.row", { pot: c.pot, call: c.call, need: pct(breakEven(c.pot, c.call)) })}</span>
                   </th>
                   <td>
-                    <b className="mono">+{c.pot}</b> {kind}, winning result.
+                    <b className="mono">+{c.pot}</b> {t("grid.winning", { kind })}
                   </td>
                   <td>
-                    <b className="mono">−{c.call}</b> {kind}, losing result.
+                    <b className="mono">−{c.call}</b> {t("grid.losing", { kind })}
                   </td>
                 </tr>
               );
@@ -125,20 +136,18 @@ export function ResultGrid() {
           </tbody>
         </table>
       </div>
-      <figcaption>
-        Amounts are chips won or lost by calling. Either call wins {pct(win)} of the time and loses {pct(1 - win)}; the
-        boxes' size doesn't show the chances.
-      </figcaption>
+      <figcaption>{t("grid.caption", { win: pct(win), lose: pct(1 - win) })}</figcaption>
     </figure>
   );
 }
 
 /** Lesson 14: the bankroll after 55 wins and 45 losses, at three fractions. */
 export function KellyBars() {
+  const t = useT();
   const rows = [
-    { label: "Half Kelly (5%)", f: 0.05 },
-    { label: "Kelly (10%)", f: 0.1 },
-    { label: "Twice Kelly (20%)", f: 0.2 },
+    { label: t("kelly.half"), f: 0.05 },
+    { label: t("kelly.full"), f: 0.1 },
+    { label: t("kelly.twice"), f: 0.2 },
   ].map((r) => ({ ...r, end: Math.round(kellyBalance(r.f)) }));
   const scale = 180;
   return (
@@ -157,35 +166,34 @@ export function KellyBars() {
           </li>
         ))}
       </ul>
-      <p className="kelly-chain mono">100 → lose 20% → 80 → win 20% → 96</p>
-      <figcaption>
-        <span className="key start" /> the starting 100. Rounded balances after 55 wins and 45 losses, starting from 100.
-        Real results vary.
-      </figcaption>
+      <p className="kelly-chain mono">{t("kelly.chain")}</p>
+      <figcaption>{t("kelly.caption", { startKey: <span key="s" className="key start" /> })}</figcaption>
     </figure>
   );
 }
 
 /** Lesson 10: what the demo counts as one case. */
 export function StreakStrip() {
-  const steps = ["Hand 1: lost", "Hand 2: lost", "Hand 3: lost", "Hand 4: premium?"];
+  const t = useT();
+  const steps = [t("strip.lost", { n: 1 }), t("strip.lost", { n: 2 }), t("strip.lost", { n: 3 }), t("strip.check")];
   return (
     <figure className="diagram">
       <ol className="streak-strip">
         {steps.map((step, i) => (
-          <li key={step} className={i === steps.length - 1 ? "check" : ""}>
+          <li key={i} className={i === steps.length - 1 ? "check" : ""}>
             {step}
           </li>
         ))}
       </ol>
-      <figcaption>Hands are dealt in separate groups of 4, so every case is independent. A tie breaks the streak.</figcaption>
+      <figcaption>{t("strip.caption")}</figcaption>
     </figure>
   );
 }
 
 /** Lesson 11: the balance point as six equally likely cases. */
 export function BluffTokens() {
-  const best = ["Best hand: bet", "Best hand: bet", "Best hand: bet"];
+  const t = useT();
+  const best = [t("tokens.best"), t("tokens.best"), t("tokens.best")];
   return (
     <figure className="diagram">
       <ul className="bluff-tokens">
@@ -194,15 +202,50 @@ export function BluffTokens() {
             {t}
           </li>
         ))}
-        <li className="token bet bluff">Nothing: bluff</li>
-        <li className="token">Nothing: check</li>
-        <li className="token">Nothing: check</li>
+        <li className="token bet bluff">{t("tokens.bluff")}</li>
+        <li className="token">{t("tokens.check")}</li>
+        <li className="token">{t("tokens.check")}</li>
       </ul>
       <div className="bluff-brackets">
-        <p className="bracket bets">1 of the 4 bets is a bluff</p>
-        <p className="bracket nothing">1 of the 3 "nothing" hands is a bluff</p>
+        <p className="bracket bets">{t("tokens.bets")}</p>
+        <p className="bracket nothing">{t("tokens.nothing")}</p>
       </div>
-      <figcaption>Six equally likely cases, showing proportions, not six hands in a row.</figcaption>
+      <figcaption>{t("tokens.caption")}</figcaption>
+    </figure>
+  );
+}
+
+/** Lesson 11's toy game as a small decision tree, with your result at each end. */
+export function BluffTree() {
+  const t = useT();
+  const leaf = (label: string, result: string, tone: "win" | "lose" | "zero") => (
+    <li className={`leaf ${tone}`}>
+      <span>{label}</span>
+      <b>{result}</b>
+    </li>
+  );
+  return (
+    <figure className="diagram">
+      <div className="tree">
+        <div className="branch">
+          <p className="node">{t("tree.best")}</p>
+          <p className="node sub">{t("tree.bet")}</p>
+          <ul>
+            {leaf(t("tree.calls"), t("tree.win150"), "win")}
+            {leaf(t("tree.folds"), t("tree.win100"), "win")}
+          </ul>
+        </div>
+        <div className="branch">
+          <p className="node">{t("tree.nothing")}</p>
+          <p className="node sub">{t("tree.checkOrBluff")}</p>
+          <ul>
+            {leaf(t("tree.check"), t("tree.zero"), "zero")}
+            {leaf(t("tree.bluffCalled"), t("tree.lose50"), "lose")}
+            {leaf(t("tree.bluffFolds"), t("tree.win100"), "win")}
+          </ul>
+        </div>
+      </div>
+      <figcaption>{t("tree.caption")}</figcaption>
     </figure>
   );
 }

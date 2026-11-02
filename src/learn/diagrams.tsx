@@ -314,6 +314,7 @@ export function KickerCompare() {
 
 /** Lesson 16: three all-in stacks sliced into the main pot, the side pot, and the returned chips. */
 export function SidePotBars() {
+  const t = useT();
   const rows = [
     { name: "A", stack: 30 },
     { name: "B", stack: 80 },
@@ -325,9 +326,7 @@ export function SidePotBars() {
       <div className="bars" aria-hidden="true">
         {rows.map((r) => (
           <div key={r.name} className="bar-row">
-            <span className="bar-label">
-              {r.name} puts in {r.stack}
-            </span>
+            <span className="bar-label">{t("sidePot.puts", { name: r.name, stack: r.stack })}</span>
             <span className="bar-track">
               <span className="seg-a" style={{ width: width(30) }}>30</span>
               {r.stack > 30 && <span className="seg-b" style={{ width: width(50) }}>50</span>}
@@ -338,13 +337,13 @@ export function SidePotBars() {
       </div>
       <ul className="pot-labels">
         <li>
-          <span className="key call" /> <b>Main pot: 30 × 3 = 90.</b> A, B, or C can win it.
+          <span className="key call" /> {t("sidePot.main")}
         </li>
         <li>
-          <span className="key pot" /> <b>Side pot: 50 × 2 = 100.</b> Only B or C can win it.
+          <span className="key pot" /> {t("sidePot.side")}
         </li>
         <li>
-          <span className="key returned" /> <b>Returned: 20 to C.</b> Nobody matched it.
+          <span className="key returned" /> {t("sidePot.returned")}
         </li>
       </ul>
     </figure>
