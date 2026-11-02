@@ -16,15 +16,14 @@ export function Lesson15() {
       <SeatMap />
       <ul>
         <li>
-          <T>"Under the gun"</T> is the first player to act before the flop. The name comes from feeling the pressure of
-          acting first.
+          <T>"Under the gun"</T> is the first player to act before the flop. The name comes from the pressure of acting first.
         </li>
         <li>
           The <T>cutoff</T> is the seat just before the button, and the <T>hijack</T> is the one before that.
         </li>
         <li>After the flop, start left of the button and skip anyone who folded or is all-in.</li>
         <li>
-          The names stay with the seats for the whole hand, even after other players fold. They move one seat to the left
+          The names stay with the seats for the whole hand. They move one seat to the left
           with the button for the next hand.
         </li>
       </ul>

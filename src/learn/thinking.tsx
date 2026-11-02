@@ -7,23 +7,34 @@ import { addTally, EMPTY_TALLY, interval95, PREMIUM_CHANCE, runBlocks, secureRan
 
 const pct = (x: number, digits = 1) => `${(x * 100).toFixed(digits)}%`;
 
-/** A pie with one slice for `part` out of `whole`, starting at 12 o'clock. */
-function Pie({ part, whole, label }: { part: number; whole: number; label: string }) {
-  const share = whole > 0 ? part / whole : 0;
-  const angle = share * 2 * Math.PI;
-  const r = 60;
-  const x = 70 + r * Math.sin(angle);
-  const y = 70 - r * Math.cos(angle);
-  const large = share > 0.5 ? 1 : 0;
+/** Words for a call's average result. The choice uses the unrounded `ev`; one that rounds to 0.0 is called even. */
+export function averageResult(ev: number): string {
+  if (Math.abs(ev) < 0.05) return "About break-even: calling and folding have about the same average result.";
+  return `${ev > 0 ? "+" : "−"}${Math.abs(ev).toFixed(1)} chips per call → ${ev > 0 ? "call" : "fold"}`;
+}
+
+/** The final pot split into the call and the pot, and the chance needed against the chance you have. */
+function PriceBars({ pot, call, need, have }: { pot: number; call: number; need: number; have: number }) {
   return (
-    <svg viewBox="0 0 140 140" className="pie" role="img" aria-label={label}>
-      <circle cx="70" cy="70" r={r} className="pie-pot" />
-      {share >= 1 ? (
-        <circle cx="70" cy="70" r={r} className="pie-call" />
-      ) : share > 0 ? (
-        <path d={`M70 70 L70 ${70 - r} A${r} ${r} 0 ${large} 1 ${x} ${y} Z`} className="pie-call" />
-      ) : null}
-    </svg>
+    <div className="price" aria-hidden="true">
+      <div className="price-strip">
+        <span className="seg-a" style={{ flexGrow: call }} />
+        <span className="seg-b" style={{ flexGrow: pot }} />
+      </div>
+      <p className="price-note">Final pot: {pot + call}</p>
+      {[
+        ["You need", need],
+        ["You have", have],
+      ].map(([label, share]) => (
+        <div key={label} className="price-row">
+          <span>{label}</span>
+          <span className="price-track">
+            <span className={label === "You need" ? "price-need" : "price-have"} style={{ width: `${(share as number) * 100}%` }} />
+          </span>
+          <span className="mono">{pct(share as number)}</span>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -36,6 +47,7 @@ export function PotOddsCalculator() {
   const valid = pot > 0 && call > 0;
   const breakEven = valid ? call / (pot + call) : 0;
   const ev = odds.equity * (pot + call) - call;
+  const even = Math.abs(ev) < 0.05; // rounds to 0.0 chips
   const presets = [
     { label: "Case 1", pot: 100, call: 50 },
     { label: "Case 2", pot: 200, call: 25 },
@@ -61,7 +73,6 @@ export function PotOddsCalculator() {
         </div>
       </div>
       <div className="calc-body">
-        <Pie part={call} whole={pot + call} label={`Your call is ${pct(breakEven)} of the total you could win.`} />
         <div className="calc-fields">
           <label htmlFor={potId}>Pot, including the bet (P)</label>
           <input id={potId} type="number" min={1} step={1} inputMode="numeric" value={pot} onChange={(e) => setPot(Math.max(0, Math.round(Number(e.target.value))))} />
@@ -74,11 +85,10 @@ export function PotOddsCalculator() {
           <dt>Your chance (9 of 44 river cards)</dt>
           <dd>{pct(odds.equity)}</dd>
           <dt>Average result of calling</dt>
-          <dd className={valid ? (ev >= 0 ? "good" : "bad") : ""}>
-            {valid ? `${ev >= 0 ? "+" : "−"}${Math.abs(ev).toFixed(1)} chips per call → ${ev >= 0 ? "call" : "fold"}` : "—"}
-          </dd>
+          <dd className={!valid || even ? "" : ev > 0 ? "good" : "bad"}>{valid ? averageResult(ev) : "—"}</dd>
         </dl>
       </div>
+      {valid && <PriceBars pot={pot} call={call} need={breakEven} have={odds.equity} />}
       <figcaption>
         <span className="key call" /> your call (C) <span className="key pot" /> the pot (P). If your chance of winning is
         bigger than your call's share, calling earns more on average than folding.
@@ -108,7 +118,7 @@ function RateBar({ label, hits, trials }: { label: string; hits: number; trials:
       </div>
       {trials > 0 && (
         <span className="rate-note">
-          95% margin of error: {pct(low, 1)} to {high > SCALE ? `${pct(high, 1)} (beyond this chart)` : pct(high, 1)}
+          95% range: {pct(low, 1)} to {high > SCALE ? `${pct(high, 1)} (beyond this chart)` : pct(high, 1)}
         </span>
       )}
     </div>
@@ -175,11 +185,10 @@ export function StreakDemo() {
         <span>6%</span>
       </div>
       <figcaption>
-        <span className="key expected" /> the true chance, 2.56% (34 of 1,326 starting hands).{" "}
-        <span className="key ci" /> the 95% margin of error: the range of rates that fit the hands dealt so far. If the
-        dashed line falls inside it, the results agree with 2.56%, and a small gap from 2.56% is just chance. (Even with a
-        fair shuffle, about 1 run in 20 lands outside.) Each hand is a fresh shuffle from the browser's secure random
-        source.
+        <span className="key expected" /> the true chance, 2.56% (34 of the 1,326 two-card combinations).{" "}
+        <span className="key ci" /> a 95% range for the underlying chance, given the hands dealt so far. If the dashed line
+        falls inside it, the results fit ordinary random variation. (Even with a fair shuffle, about 1 run in 20 lands
+        outside.) Each hand is a fresh shuffle from the browser's secure random source.
       </figcaption>
     </figure>
   );

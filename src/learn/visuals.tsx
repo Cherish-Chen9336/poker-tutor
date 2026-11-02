@@ -169,3 +169,44 @@ export function KellyBars() {
     </figure>
   );
 }
+
+/** Lesson 10: what the demo counts as one case. */
+export function StreakStrip() {
+  const steps = ["Hand 1: lost", "Hand 2: lost", "Hand 3: lost", "Hand 4: premium?"];
+  return (
+    <figure className="diagram">
+      <ol className="streak-strip">
+        {steps.map((step, i) => (
+          <li key={step} className={i === steps.length - 1 ? "check" : ""}>
+            {step}
+          </li>
+        ))}
+      </ol>
+      <figcaption>Hands are dealt in separate groups of 4, so every case is independent. A tie breaks the streak.</figcaption>
+    </figure>
+  );
+}
+
+/** Lesson 11: the balance point as six equally likely cases. */
+export function BluffTokens() {
+  const best = ["Best hand: bet", "Best hand: bet", "Best hand: bet"];
+  return (
+    <figure className="diagram">
+      <ul className="bluff-tokens">
+        {best.map((t, i) => (
+          <li key={i} className="token bet">
+            {t}
+          </li>
+        ))}
+        <li className="token bet bluff">Nothing: bluff</li>
+        <li className="token">Nothing: check</li>
+        <li className="token">Nothing: check</li>
+      </ul>
+      <div className="bluff-brackets">
+        <p className="bracket bets">1 of the 4 bets is a bluff</p>
+        <p className="bracket nothing">1 of the 3 "nothing" hands is a bluff</p>
+      </div>
+      <figcaption>Six equally likely cases, showing proportions, not six hands in a row.</figcaption>
+    </figure>
+  );
+}

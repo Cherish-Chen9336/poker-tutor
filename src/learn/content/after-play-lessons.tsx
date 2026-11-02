@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { useHands } from "../../app/hand-store";
 import { C } from "../cards";
-import { KellyBars, PotCompare, ResultGrid } from "../visuals";
+import { BluffTokens, KellyBars, PotCompare, ResultGrid } from "../visuals";
 
 function T({ children }: { children: ReactNode }) {
   return <b className="term">{children}</b>;
@@ -78,33 +78,27 @@ export function Lesson11() {
       </p>
       <h2>A tiny game to see why</h2>
       <p>
-        It's the river. The pot is 100. You either have the best possible hand or nothing at all, with equal chances, and
+        It's the river. The pot is 100. You have either the best possible hand or nothing at all, with equal chances, and
         your opponent knows that. Your opponent always holds a medium hand: it beats nothing and loses to your best hand.
-        You may check (then the cards are shown) or bet exactly 50. If you bet, your opponent calls or folds. Nothing else
-        can happen.
+        You may check (then the cards are shown) or bet exactly 50. If you bet, your opponent calls or folds.
       </p>
       <BluffTree />
       <ul>
         <li>
-          <b>If you never bluff,</b> every bet means the best hand. Your opponent simply folds to every bet, so your strong
-          hands win only the 100 that was already there.
+          <b>If you never bluff,</b> every bet means the best hand. Your opponent folds to every bet, so your strong hands win only the 100 already there.
         </li>
         <li>
-          <b>If you always bluff,</b> your bets mean nothing. Your opponent calls every time, and each bluff loses 50.
+          <b>If you always bluff,</b> your opponent calls every time, and each bluff loses 50.
         </li>
         <li>
           <b>In between, there's a balance.</b> Calling costs 50 to win 150 (the pot plus your bet), so your opponent's call
           breaks even when 1 bet in 4 is a bluff. You get there by betting all your best hands and bluffing with 1 in 3 of
-          your "nothing" hands. Then your opponent can't do better by always calling or always folding.
-        </li>
-        <li>
-          <b>The same balance works the other way.</b> If your opponent calls 2 times in 3, your bluffs break even: you win
+          your "nothing" hands. Then your opponent can't do better by always calling or always folding. </li> </ul> <BluffTokens /> <ul> <li> <b>The same balance works the other way.</b> If your opponent calls 2 times in 3, your bluffs break even: you win
           100 one time in 3 and lose 50 two times in 3.
         </li>
       </ul>
       <p>
-        Choosing between moves at random, in fixed proportions, is called a <T>mixed strategy</T>. The point isn't to be
-        random for its own sake; it's to keep your bets from telling your opponent what you hold.
+        Choosing between moves at random, in fixed proportions, is called a <T>mixed strategy</T>. The point is to keep your bets from telling your opponent what you hold.
       </p>
       <h2>The formulas from this game</h2>
       <p>With pot P, bet B, and no other choices:</p>

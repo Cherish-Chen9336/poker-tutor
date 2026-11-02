@@ -1,6 +1,6 @@
 # Step 1b, batch 2b: simpler text and visuals (lessons 8, 9, 10, 11, 15)
 
-Each lesson below is the complete proposed text; it replaces the lesson's current text (quizzes unchanged except one wording change noted in Lesson 10). **[Visual: …]** describes a new or changed picture. Pinned facts (the sentences the tests check) are kept word for word.
+Each lesson below is the complete proposed text; it replaces the lesson's current text (quizzes unchanged except one wording change noted in Lesson 10). **[Visual: …]** describes a new or changed picture. Pinned facts (the sentences the tests check) are kept word for word. Reviewed by Codex ("approve with changes"; changes applied, except Lesson 9 omits "heads-up" from the formula condition because it also holds at a bigger table when the call ends all betting, and Lesson 10's caption is shortened).
 
 ---
 
@@ -23,11 +23,11 @@ At each step, the app asks for one move and explains it. These are example moves
 **Expected value (EV)** is how much a decision wins or loses on average, if you could repeat it many times.
 
 **Pot odds** compare the price of a call with the pot you could win:
-- **P** = the pot, including your opponent's bet.
+- **P** = the pot, including your opponent's bet, but not chips that will be returned.
 - **C** = what you must put in to call.
-- If you win, you receive **P + C** (the pot plus your own call back), a profit of P. If you lose, you lose **C**.
+- If you win, you receive **P + C**, including your call back. Compared with folding now, winning gains **P**, and losing costs **C**.
 
-**When your call ends the betting,** the break-even chance is **C ÷ (P + C)**. If your chance of winning is higher, calling earns more on average than folding.
+**When your call ends all betting in the hand,** the break-even chance is **C ÷ (P + C)**. If your chance of winning is higher, calling earns more on average than folding.
 
 **An example.** It's heads-up on the turn, with one card to come. Your opponent has gone all-in, so your call ends the betting. To make the math exact, **we'll pretend you know your opponent's cards**. In real play you don't, but the method is the same.
 - Board: K♥ 9♥ 2♣ 3♠. You hold 7♥ 6♥; your opponent holds K♠ J♦ (a pair of kings).
@@ -43,7 +43,7 @@ Same cards, different prices, different answers. Try other amounts:
 [Visual: the existing calculator (Case 1 / Case 2 buttons, pot and call fields), with the pie replaced by:
 - a strip split into "your call (C)" and "the pot (P)", labeled with the final pot;
 - two bars on one 0–100% scale: "You need" and "You have 20.5%".
-The results stay as text: break-even chance, your chance, average result. If the average result is about 0: "calling and folding are about equal."]
+The results stay as text: break-even chance, your chance, average result, calculated from the exact 9/44. If the average result rounds to 0.0: "About break-even: calling and folding have about the same average result." Otherwise it says call or fold from the unrounded result.]
 
 **Ties count as half** when two players tie: if a river card would split the pot between you and one opponent, count it as half a win. (With more players, a tie pays your share: a third in a three-way tie.)
 
@@ -65,10 +65,10 @@ The results stay as text: break-even chance, your chance, average result. If the
 
 [Visual: a four-step strip above the existing demo: "Hand 1: lost → Hand 2: lost → Hand 3: lost → Hand 4: premium?" Caption: "Hands are dealt in separate groups of 4, so every case is independent. A tie breaks the streak."]
 
-[Visual: the existing live demo. Its "95% margin of error" label becomes "95% range".]
+[Visual: the existing live demo. Its "95% margin of error" label becomes "95% range". New caption: "The dashed line is the true chance, 2.56% (34 of the 1,326 two-card combinations). The bracket is a 95% range for the underlying chance, given the hands dealt so far. If the line falls inside it, the results fit ordinary random variation. (Even with a fair shuffle, about 1 run in 20 lands outside.) Each hand is a fresh shuffle from the browser's secure random source."]
 
 - **The chance** of a premium hand is 34 of the 1,326 two-card combinations, about **2.56%** (1 in 39). This doesn't change after losses.
-- **The counts will wobble.** Over a few hundred cases, a bar might show 2% or 3.5%. That's normal randomness, not a pattern. The 95% range shows how much wobble to expect. With more hands, the bars tend toward 2.56% and the ranges generally get shorter.
+- **The counts will wobble.** Over a few hundred cases, a bar might show 2% or 3.5%. That's normal randomness, not a pattern. The 95% range shows the uncertainty in the estimated chance. With more hands, the bars tend toward 2.56% and the ranges generally get shorter.
 
 **Within one hand, though, seen cards do matter.** If you see 4 hearts, fewer hearts are left in the deck. That's how outs work in Lesson 9. The fallacy is about *separate* shuffles, not cards in the same hand.
 
@@ -90,7 +90,7 @@ The results stay as text: break-even chance, your chance, average result. If the
 - **If you always bluff,** your opponent calls every time, and each bluff loses 50.
 - **In between, there's a balance.** Calling costs 50 to win 150 (the pot plus your bet), so your opponent's call breaks even when 1 bet in 4 is a bluff. You get there by betting all your best hands and bluffing with 1 in 3 of your "nothing" hands. Then your opponent can't do better by always calling or always folding.
 
-[Visual: six tokens for six equally likely cases: three "best hand: bet", one "nothing: bluff", two "nothing: check". Two brackets: "1 of the 3 'nothing' hands is a bluff" and "1 of the 4 bets is a bluff". Text equivalent in the caption.]
+[Visual: six tokens for six equally likely cases: three "best hand: bet", one "nothing: bluff", two "nothing: check". One bracket covers the three "nothing" tokens ("1 of the 3 'nothing' hands is a bluff"); the other covers the four bets ("1 of the 4 bets is a bluff"). They overlap at the bluff. Caption: "Six equally likely cases, showing proportions, not six hands in a row."]
 
 - **The same balance works the other way.** If your opponent calls 2 times in 3, your bluffs break even: you win 100 one time in 3 and lose 50 two times in 3.
 

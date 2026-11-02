@@ -357,11 +357,11 @@ At the showdown, the remaining players show their cards, and the best five-card 
 
 ## Lesson 8: Guided practice hands
 
-You'll play 4 short hands against a bot. Each one teaches a different way a hand can end. The cards are fixed so the coach can walk you through each step. The coach only talks about what you can see, just like in a real game, and never peeks at the bot's cards.
+You'll play 4 short hands against a bot, and each one ends a different way. The cards are fixed so the coach can guide you. The coach only talks about what you can see, and never peeks at the bot's cards.
 
-**Setup for every hand:** heads-up, blinds 1/2, both players start with 200. The hands alternate which of you has the button, so you practice both seats.
+**Every hand:** heads-up, blinds 1/2, both players start with 200. You take turns having the button.
 
-At each step, the app asks you for one move and explains it. These moves are chosen to show each part of a hand. They're reasonable plays, but not always the only good ones. (Random hands come in the Play area, Step 5.)
+At each step, the app asks for one move and explains it. These are example moves, not the only good choices. Random hands come in the Play area.
 
 ### Hand 1: Winning at the showdown
 
@@ -455,42 +455,37 @@ The bot has the button, so you're the big blind. **Your cards:** A♦ 4♣
 
 ## Lesson 9: Expected value and pot odds
 
-**Will a call pay off on average?** You'll face this question again and again. Even a call that loses this time can be right if it wins enough over many repeats.
+**Will a call pay off on average?** A call that loses this time can still be right if it wins enough over many repeats.
 
 **Expected value (EV)** is how much a decision wins or loses on average, if you could repeat it many times.
 
-**Pot odds** compare the price of a call with the pot you could win.
-- **P** = the pot, including your opponent's bet.
+**Pot odds** compare the price of a call with the pot you could win:
+- **P** = the pot, including your opponent's bet, but not chips that will be returned.
 - **C** = what you must put in to call.
-- If you call, you win **P + C** in total (the pot plus your own call back) or lose **C**.
+- If you win, you receive **P + C**, including your call back. Compared with folding now, winning gains **P**, and losing costs **C**.
 
-**The break-even chance** is **C ÷ (P + C)**. If your chance of winning is higher, calling earns more on average than folding.
+**When your call ends all betting in the hand,** the break-even chance is **C ÷ (P + C)**. If your chance of winning is higher, calling earns more on average than folding.
 
-[Diagram: a pie split into "your call" (C) and "the pot" (P), labeled with the break-even percentage.]
-
-**Example (the rules of this example):** It's heads-up on the turn, with one card to come. Your opponent has gone all-in, so your call ends the betting. To make the math exact, **we'll pretend you know your opponent's cards**. In real play you don't, but the method is the same.
-
+**An example.** It's heads-up on the turn, with one card to come. Your opponent has gone all-in, so your call ends the betting. To make the math exact, **we'll pretend you know your opponent's cards**. In real play you don't, but the method is the same.
 - Board: K♥ 9♥ 2♣ 3♠. You hold 7♥ 6♥; your opponent holds K♠ J♦ (a pair of kings).
-- You're behind, but any heart on the river gives you a flush. 9 hearts are left among the 44 unseen cards, and no other card helps you. These winning cards are called **outs**.
+- Any heart on the river gives you a flush. 9 hearts are left among the 44 unseen cards, and no other card helps you. These winning cards are called **outs**.
 - Your chance of winning: 9 ÷ 44 ≈ **20.5%**. No river card makes a tie.
 
-**Case 1:** the pot is 100 (including the bet), and you must call 50.
-- Break-even: 50 ÷ 150 = 33.3%. Your 20.5% is lower, so **fold**.
-- EV of calling: 20.5% × 150 − 50 ≈ **−19 chips** per call, on average.
+**Case 1:** the pot is 100 (including the bet), and you must call 50. You need 50 ÷ 150 = 33.3% and have 20.5%, so **fold**. Calling loses about **19 chips** on average: 20.5% × 150 − 50.
 
-**Case 2:** the pot is 200, and you must call 25.
-- Break-even: 25 ÷ 225 = 11.1%. Your 20.5% is higher, so **call**.
-- EV of calling: 20.5% × 225 − 25 ≈ **+21 chips** per call, on average.
+**Case 2:** the pot is 200, and you must call 25. You need 25 ÷ 225 = 11.1% and have 20.5%, so **call**. Calling earns about **21 chips** on average: 20.5% × 225 − 25.
 
-Same cards, different prices, different answers. The price matters as much as your hand.
+Same cards, different prices, different answers. Try other amounts:
+
+[Diagram: the existing calculator (Case 1 / Case 2 buttons, pot and call fields), with the pie replaced by: a strip split into "your call (C)" and "the pot (P)", labeled with the final pot; two bars on one 0–100% scale: "You need" and "You have 20.5%". The results stay as text: break-even chance, your chance, average result, calculated from the exact 9/44. If the average result rounds to 0.0: "About break-even: calling and folding have about the same average result." Otherwise it says call or fold from the unrounded result.]
 
 **Ties count as half** when two players tie: if a river card would split the pot between you and one opponent, count it as half a win. (With more players, a tie pays your share: a third in a three-way tie.)
 
 **A shortcut: the rule of 2 and 4.** Count your outs. With one card to come, multiply by 2. With two cards to come and no more betting (for example, heads-up after an all-in on the flop), multiply by 4. It's only an estimate. For a flush draw on the flop (9 outs, 47 unseen cards, and every out a winner), 9 × 4 = 36%, while the exact chance is 35.0%. With many outs it overestimates more: 15 × 4 = 60%, but the exact chance is 54.1%.
 
-**Careful with outs:** some "outs" can still lose. For example, they might also give your opponent a better hand. The app's checks count every card exactly.
+**Careful with outs:** some "outs" can still lose. For example, they might also give your opponent a better hand.
 
-**Later:** in real play, you'll also think about chips you might win or lose on later rounds (called **implied odds**). That comes after you've played some hands.
+**Later:** in real play, you'll also think about chips you might win or lose on later rounds (called **implied odds**).
 
 ### Quick checks
 
@@ -526,15 +521,16 @@ Same cards, different prices, different answers. The price matters as much as yo
 
 **The gambler's fallacy** is the belief that past results change the chances of the next random event: "I've lost five hands in a row, so I'm due a win."
 
-**In poker, the deck is reshuffled every hand.** The cards don't remember the last hand. After a losing streak, your chance of getting good cards in the next hand is exactly the same as always.
+**In poker, the deck is reshuffled every hand.** The cards don't remember the last hand. After a losing streak, your chance of good cards in the next hand is exactly the same as always.
 
-**Try it.** The app deals thousands of heads-up hands, with both players' cards shown and no betting. It looks for moments when a player lost three showdowns in a row, and it checks their next starting hand. Is it a **premium hand** (A-A, K-K, Q-Q, or A-K)?
+**Try it.** The app deals thousands of heads-up hands, with no betting. It looks for three showdown losses in a row, then checks the next starting hand. Is it a **premium hand** (A-A, K-K, Q-Q, or A-K)?
 
-[Diagram, live: two bars. One shows "premium hands after 3 losses in a row." The other shows "premium hands in all hands." Both have a margin-of-error line and the expected 2.56% marked.]
+[Diagram: a four-step strip above the existing demo: "Hand 1: lost → Hand 2: lost → Hand 3: lost → Hand 4: premium?" Caption: "Hands are dealt in separate groups of 4, so every case is independent. A tie breaks the streak."]
 
-- **The chance** of a premium hand is 34 out of 1,326 starting hands, about **2.56%** (1 in 39). This doesn't change after losses.
-- **The counts will wobble.** Over a few hundred cases, the bar might show 2% or 3.5%. That's normal randomness, not a pattern. The margin-of-error line shows how much wobble to expect. With more hands, the bars tend toward 2.56% and the margin-of-error lines generally get shorter.
-- The demo deals hands in groups of 4. It looks for groups where the first 3 hands were losses (a tie breaks the streak), then checks the 4th. This keeps every case independent.
+[Diagram: the existing live demo. Its "95% margin of error" label becomes "95% range". New caption: "The dashed line is the true chance, 2.56% (34 of the 1,326 two-card combinations). The bracket is a 95% range for the underlying chance, given the hands dealt so far. If the line falls inside it, the results fit ordinary random variation. (Even with a fair shuffle, about 1 run in 20 lands outside.) Each hand is a fresh shuffle from the browser's secure random source."]
+
+- **The chance** of a premium hand is 34 of the 1,326 two-card combinations, about **2.56%** (1 in 39). This doesn't change after losses.
+- **The counts will wobble.** Over a few hundred cases, a bar might show 2% or 3.5%. That's normal randomness, not a pattern. The 95% range shows the uncertainty in the estimated chance. With more hands, the bars tend toward 2.56% and the ranges generally get shorter.
 
 **Within one hand, though, seen cards do matter.** If you see 4 hearts, fewer hearts are left in the deck. That's how outs work in Lesson 9. The fallacy is about *separate* shuffles, not cards in the same hand.
 
@@ -551,7 +547,7 @@ Same cards, different prices, different answers. The price matters as much as yo
 
 **L10-Q2.** After losing streaks, 31 of 1,000 hands are premium: 3.1% (95% range: 2.2% to 4.4%), compared with the true chance of 2.56%. What does that mean?
 - A. Losing streaks bring better cards
-- B. **Probably random wobble; check the margin of error** ✓
+- B. **Probably random wobble; check the 95% range** ✓
 - C. The shuffle is broken
 - *Why:* The range includes 2.56%, so this difference fits ordinary random wobble.
 - *Checked by:* review
@@ -572,16 +568,19 @@ These four lessons come after the Play area opens, so they can point back to han
 
 **A bluff** is a bet with a hand that's probably worse, hoping better hands fold. It can seem like a trick, but game theory (the math of decisions against an opponent who is also thinking) shows that good play *needs* some bluffs.
 
-**A tiny game to see why.** It's the river. The pot is 100. You either have the best possible hand or nothing at all, with equal chances, and your opponent knows that. Your opponent always holds a medium hand: it beats nothing and loses to your best hand. You may check (then the cards are shown) or bet exactly 50. If you bet, your opponent calls or folds. Nothing else can happen.
+**A tiny game to see why.** It's the river. The pot is 100. You have either the best possible hand or nothing at all, with equal chances, and your opponent knows that. Your opponent always holds a medium hand: it beats nothing and loses to your best hand. You may check (then the cards are shown) or bet exactly 50. If you bet, your opponent calls or folds.
 
-[Diagram: a two-branch tree. "Best hand" → bet. "Nothing" → bet (bluff) or check. Opponent → call or fold, with the chips won or lost at each end.]
+[Diagram: the existing decision tree.]
 
-- **If you never bluff,** every bet means the best hand. Your opponent simply folds to every bet, so your strong hands win only the 100 that was already there.
-- **If you always bluff,** your bets mean nothing. Your opponent calls every time, and each bluff loses 50.
+- **If you never bluff,** every bet means the best hand. Your opponent folds to every bet, so your strong hands win only the 100 already there.
+- **If you always bluff,** your opponent calls every time, and each bluff loses 50.
 - **In between, there's a balance.** Calling costs 50 to win 150 (the pot plus your bet), so your opponent's call breaks even when 1 bet in 4 is a bluff. You get there by betting all your best hands and bluffing with 1 in 3 of your "nothing" hands. Then your opponent can't do better by always calling or always folding.
+
+[Diagram: six tokens for six equally likely cases: three "best hand: bet", one "nothing: bluff", two "nothing: check". One bracket covers the three "nothing" tokens ("1 of the 3 'nothing' hands is a bluff"); the other covers the four bets ("1 of the 4 bets is a bluff"). They overlap at the bluff. Caption: "Six equally likely cases, showing proportions, not six hands in a row."]
+
 - **The same balance works the other way.** If your opponent calls 2 times in 3, your bluffs break even: you win 100 one time in 3 and lose 50 two times in 3.
 
-Choosing between moves at random, in fixed proportions, is called a **mixed strategy**. The point isn't to be random for its own sake; it's to keep your bets from telling your opponent what you hold.
+Choosing between moves at random, in fixed proportions, is called a **mixed strategy**. The point is to keep your bets from telling your opponent what you hold.
 
 **The formulas from this game** (pot P, bet B, no other choices):
 - A bluff breaks even when your opponent folds exactly **B ÷ (P + B)** of the time, and profits if they fold more often.
@@ -734,12 +733,12 @@ These two lessons come with the 6-player table in Play.
 
 With six players, each seat has a name, counted clockwise from the button. Switch between "Before the flop" and "After the flop" to see when each seat acts:
 
-[Diagram: the six-seat table with each seat's short and full name, the dealer button, an arrow showing play moves clockwise, and each seat's turn number before or after the flop. Before the flop: UTG, HJ, CO, BTN, SB, BB. After the flop: SB, BB, UTG, HJ, CO, BTN.]
+[Diagram: the existing six-seat diagram.]
 
-- **"Under the gun"** is the first player to act before the flop. The name comes from feeling the pressure of acting first.
+- **"Under the gun"** is the first player to act before the flop. The name comes from the pressure of acting first.
 - The **cutoff** is the seat just before the button, and the **hijack** is the one before that.
 - After the flop, start left of the button and skip anyone who folded or is all-in.
-- The names stay with the seats for the whole hand, even after other players fold. They move one seat to the left with the button for the next hand.
+- The names stay with the seats for the whole hand. They move one seat to the left with the button for the next hand.
 
 **Why position matters even more with six players:**
 - **Acting first is harder.** From under the gun, five players act after you, and any of them could hold a strong hand. A common guideline is to play only your stronger starting hands from early seats.

@@ -338,7 +338,7 @@ export const QUIZZES: Record<number, Question[]> = {
     {
       id: "L10-Q2",
       prompt: "After losing streaks, 31 of 1,000 hands are premium: 3.1% (95% range: 2.2% to 4.4%), compared with the true chance of 2.56%. What does that mean?",
-      choices: ["Losing streaks bring better cards", "Probably random wobble; check the margin of error", "The shuffle is broken"],
+      choices: ["Losing streaks bring better cards", "Probably random wobble; check the 95% range", "The shuffle is broken"],
       answer: 1,
       why: "The range includes 2.56%, so this difference fits ordinary random wobble.",
       checkedBy: "review",

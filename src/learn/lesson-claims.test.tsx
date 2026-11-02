@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import lessonsDoc from "../../docs/lessons.md?raw";
 import { allBoardsOdds, compareHands, handName } from "../game/hands";
 import { Table } from "../game/table";
+import { averageResult } from "./thinking";
 import { breakEven, kellyBalance, LESSON9_EXAMPLE, LESSON13_CALLS } from "./diagram-data";
 import type { Move } from "../game/types";
 import { Lesson3, Lesson5, Lesson6 } from "./content/rules-lessons";
@@ -146,6 +147,19 @@ describe("lesson text claims", () => {
     expect(100 * 0.8 * 1.2).toBeCloseTo(96);
     stated(Lesson14, "so over thousands of bets it slowly shrinks (100 becomes about 25 after 10,000 bets).");
     expect(Math.round(100 * Math.exp(10_000 * rate(0.2)))).toBe(25);
+  });
+
+  it("lesson 9: the calculator's verdict, from the exact chance", () => {
+    const chance = 9 / 44;
+    const ev = (pot: number, call: number) => chance * (pot + call) - call;
+    expect(averageResult(ev(100, 50))).toBe("−19.3 chips per call → fold");
+    expect(averageResult(ev(200, 25))).toBe("+21.0 chips per call → call");
+    // Pot 35, call 9: exactly break-even at 9 of 44.
+    expect(averageResult(ev(35, 9))).toMatch(/^About break-even/);
+    expect(averageResult(0.04)).toMatch(/^About break-even/);
+    expect(averageResult(0.06)).toBe("+0.1 chips per call → call");
+    stated(Lesson9, "Calling loses about 19 chips on average: 20.5% × 150 − 50.");
+    stated(Lesson9, "Calling earns about 21 chips on average: 20.5% × 225 − 25.");
   });
 
   it("lesson 5: the situation cards match the legal moves", () => {
