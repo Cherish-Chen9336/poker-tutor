@@ -200,6 +200,12 @@ export default function PlayPage() {
   const log = record ? handFacts(record).map(word) : [];
   const t = useT();
   const locale = useLocale();
+  // The hand history scrolls inside its own box; each new line scrolls it to the bottom so the latest move shows.
+  const logRef = useRef<HTMLOListElement>(null);
+  useEffect(() => {
+    const list = logRef.current;
+    if (list) list.scrollTop = list.scrollHeight;
+  }, [log.length, record]);
 
   // After a move, the pressed button may be gone: move focus to what comes next.
   useEffect(() => {
@@ -370,7 +376,8 @@ export default function PlayPage() {
           </div>
           <details className="glog" open>
             <summary>{t("play.thisHand")}</summary>
-            <ol>
+            {/* Focusable so the list can be scrolled from the keyboard too. */}
+            <ol ref={logRef} className="log-scroll" tabIndex={0} aria-label={t("play.thisHand")}>
               {log.map((line, i) => (
                 <li key={i}>
                   <CardText text={line} />
