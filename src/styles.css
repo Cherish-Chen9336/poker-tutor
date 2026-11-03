@@ -498,6 +498,10 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   position: absolute; left: calc(50% + (var(--sx) - 50) * 0.62%); top: calc(50% + (var(--sy) - 50) * 0.56%); transform: translate(-50%, -50%);
   display: flex; align-items: center; gap: 5px; font: 500 12.5px var(--f-mono); background: rgba(0, 0, 0, 0.35); padding: 2px 9px 2px 3px; border-radius: 999px;
 }
+/* The upper side seats' bets go above the board's corners: level with the board, there's no room between the plate
+   and the board at most widths. */
+.rt-bet.p2 { left: 29%; top: 16%; }
+.rt-bet.p4 { left: 71%; top: 16%; }
 .chip { width: 16px; height: 16px; border-radius: 50%; background: var(--brass); border: 3px dashed var(--card); flex: none; }
 /* The dealer button sits inside the button player's plate, to the right of the chip count. Outside the plate it ran
    into the side seats' bets or the learner's cards at some widths. */
@@ -620,6 +624,8 @@ main:has(> .loading) { min-height: 70vh; }
   .rt-felt { aspect-ratio: 16 / 10; }
   .rt-center { top: 48%; }
   .rt-center .pc-row .pc, .rt-center .slot.md { --w: 40px; width: 40px; }
+  /* The top seat's bet a little lower, clear of that seat's cards on this flatter oval. */
+  .rt-bet.p3 { top: 26%; }
 }
 /* Compact: a taller oval with the side seats at the edges. */
 @container (max-width: 600px) {
@@ -634,6 +640,10 @@ main:has(> .loading) { min-height: 70vh; }
   .rt-hand .pc.sm { --w: 24px; }
   .rt-center .pc-row .pc, .rt-center .slot.md { --w: 38px; width: 38px; }
   .rt-bet { left: calc(50% + (var(--sx) - 50) * 0.5%); top: calc(50% + (var(--sy) - 50) * 0.6%); }
+  /* On the tall oval the board sits a little lower, so the upper side seats' bets and "folded" labels clear it. */
+  .rt-center { top: 50%; }
+  .rt-bet.p2 { left: 30%; top: 31%; }
+  .rt-bet.p4 { left: 70%; top: 31%; }
   .rt-dealer { width: 16px; height: 16px; font-size: 9.5px; }
 }
 /* Tablet-sized: the compact seats on a rounder oval (the phone oval is taller than this width needs). */
@@ -642,16 +652,22 @@ main:has(> .loading) { min-height: 70vh; }
   .rt-center { top: 52%; }
   .p1 { --sy: 80; } .p2 { --sy: 20; } .p4 { --sy: 20; } .p5 { --sy: 80; }
 }
-/* Very narrow: smaller board cards and seat plates, and the top seats moved clear of the board. */
-@container (max-width: 320px) {
+/* Narrow phones: smaller board cards and seat plates, and the top seats moved clear of the board. */
+@container (max-width: 380px) {
   .rt-wrap { padding: 66px 22px 100px; }
   .rt-seat { width: 74px; }
   .rt-name { font-size: 11.5px; }
-  .rt-center { top: 46%; }
-  .rt-center .pc-row .pc, .rt-center .slot.md { --w: 30px; width: 30px; }
+  /* Smaller board cards, a little below the middle: full-size, the board filled the felt's width and left the
+     bets no room. The upper side bets sit above the board's corners, the lower ones beside those seats' cards. */
+  .rt-center { top: 51%; }
+  .rt-center .pc-row .pc, .rt-center .slot.md { --w: 28px; width: 28px; }
+  .rt-center .gpot { max-width: 120px; white-space: normal; text-align: center; }
   .rt-center .pc-row { gap: 3px; }
   .p2 { --sy: 8; } .p4 { --sy: 8; } .p3 { --sy: -6; }
   .p1 { --sy: 88; } .p5 { --sy: 88; }
+  .rt-bet.p2 { left: 32%; top: 32%; } .rt-bet.p4 { left: 68%; top: 32%; }
+  .rt-bet.p1 { left: 35%; top: 81%; } .rt-bet.p5 { left: 65%; top: 81%; }
+  .rt-bet.p0 { top: 71%; }
   .rt-hand .pc.sm { --w: 20px; }
 }
 @media (prefers-reduced-motion: reduce) {
