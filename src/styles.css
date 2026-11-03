@@ -539,36 +539,26 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 .feedback:focus-visible, .gcoach:focus-visible { outline: 2px solid var(--brass-dim); outline-offset: 3px; }
 .done-note { border-left: 3px solid var(--good); }
 
-/* Loading: a card in the middle of the screen, flipping to the next suit every 0.6 s. It fades in after a moment, so
-   quick loads don't flash. Clicks pass through to the header underneath. */
+/* Loading: the four suits in a row in the middle of the screen, bouncing one after another like a wave. They fade in
+   quickly, and clicks pass through to the header underneath. */
 .loading {
   position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; pointer-events: none;
-  animation: loading-in 0.3s ease 0.15s both;
+  animation: loading-in 0.2s ease 0.05s both;
 }
-.loader-card {
-  position: relative; width: 56px; height: 78px; border-radius: 7px; background: var(--card);
-  border: 1px solid var(--card-edge); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
-  animation: loader-flip 0.6s ease-in-out infinite;
-}
-.loader-card span {
-  position: absolute; inset: 0; display: grid; place-items: center; font-size: 34px; line-height: 1;
-  color: #1a1a1a; opacity: 0; animation: loader-suit 2.4s step-end infinite;
-}
-.loader-card span.red { color: var(--suit-red); }
-/* Each suit shows for one flip, changing while the card is edge-on. */
-.loader-card span:nth-child(1) { animation-delay: -0.3s; }
-.loader-card span:nth-child(2) { animation-delay: -2.1s; }
-.loader-card span:nth-child(3) { animation-delay: -1.5s; }
-.loader-card span:nth-child(4) { animation-delay: -0.9s; }
+.loader-suits { display: flex; gap: 12px; font-size: 34px; line-height: 1; }
+.loader-suits span { display: block; color: var(--ink); animation: loader-bounce 1.1s ease-in-out infinite; }
+.loader-suits span.red { color: var(--bad); }
+.loader-suits span:nth-child(2) { animation-delay: 0.12s; }
+.loader-suits span:nth-child(3) { animation-delay: 0.24s; }
+.loader-suits span:nth-child(4) { animation-delay: 0.36s; }
 /* Keeps the footer down at the bottom while a page loads, instead of jumping up under the header. */
 main:has(> .loading) { min-height: 70vh; }
 @keyframes loading-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes loader-flip { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.04); } }
-@keyframes loader-suit { 0% { opacity: 1; } 25% { opacity: 0; } }
+@keyframes loader-bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-14px); } }
 @media (prefers-reduced-motion: reduce) {
-  .loading, .loader-card, .loader-card span { animation: none; }
-  .loader-card span:nth-child(1) { opacity: 1; }
+  .loading, .loader-suits span { animation: none; }
 }
+
 
 /* Footer */
 .foot { display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); padding-top: 8px; border-top: 1px solid var(--line); }

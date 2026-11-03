@@ -1,20 +1,21 @@
 import type { ReactNode } from "react";
 
+// "\uFE0E" asks for the plain text symbol, not a colored emoji (some phones draw ♥ and ♦ as emoji otherwise).
 const SUITS = [
-  { symbol: "♠", red: false },
-  { symbol: "♥", red: true },
-  { symbol: "♣", red: false },
-  { symbol: "♦", red: true },
+  { symbol: "♠\uFE0E", red: false },
+  { symbol: "♥\uFE0E", red: true },
+  { symbol: "♣\uFE0E", red: false },
+  { symbol: "♦\uFE0E", red: true },
 ];
 
 /**
- * Shown while something loads: a card in the middle of the screen that flips through the four suits.
- * The words are for screen readers only; the card says "loading" to everyone else.
+ * Shown while something loads: the four suits in a row in the middle of the screen, bouncing one after another
+ * like a wave. The words are for screen readers only; the suits say "loading" to everyone else.
  */
 export function Loading({ children }: { children: ReactNode }) {
   return (
     <div className="loading" role="status">
-      <span className="loader-card" aria-hidden="true">
+      <span className="loader-suits" aria-hidden="true">
         {SUITS.map((s) => (
           <span key={s.symbol} className={s.red ? "red" : undefined}>
             {s.symbol}
