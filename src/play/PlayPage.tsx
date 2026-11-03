@@ -311,7 +311,7 @@ export default function PlayPage() {
           })}
         </p>
       </div>
-      <div className={size === 6 ? "guided six" : "guided"}>
+      <div className={size === 6 ? "guided six play" : "guided play"}>
         <div className="play-main">
           <PokerTable view={view} youSeat={YOU_SEAT} names={names} />
           <div ref={actionsRef} tabIndex={-1} className="play-controls">
@@ -357,6 +357,8 @@ export default function PlayPage() {
                 {t("play.hintsSwitch")}
               </label>
             </div>
+            {/* The hints scroll under the coach's heading when they don't fit; focusable for keyboard scrolling. */}
+            <div className="coach-body" tabIndex={0} aria-label={t("play.coach")}>
             {coachOn ? (
               yourTurn ? (
                 <>
@@ -373,6 +375,7 @@ export default function PlayPage() {
             ) : (
               <p className="mono">{t("play.hintsOff")}</p>
             )}
+            </div>
           </div>
           <details className="glog" open>
             <summary>{t("play.thisHand")}</summary>

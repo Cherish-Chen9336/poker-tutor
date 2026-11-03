@@ -468,6 +468,29 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 @media (max-width: 900px) {
   .guided.six { grid-template-columns: minmax(0, 1fr); }
 }
+/* Play, side by side: the coach column is exactly as tall as the table column (size containment keeps its own
+   content from setting the row's height), and the hints and the hand history scroll inside it. */
+.guided.play { align-items: stretch; }
+.guided.play > .gside { contain: size; min-height: 0; }
+.guided.play .gcoach { flex: 1 1 auto; min-height: 180px; }
+.guided.play .coach-body {
+  flex: 1 1 0; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+  padding-right: 6px; scrollbar-width: thin; scrollbar-color: var(--muted) transparent;
+}
+.guided.play .coach-body > * { flex-shrink: 0; }
+.guided.play .coach-body:focus-visible { outline: 2px solid var(--brass-dim); outline-offset: 2px; }
+.guided.play .glog .log-scroll { max-height: 240px; }
+/* Stacked (coach below the table): everything at its natural height again. */
+@media (max-width: 900px) {
+  .guided.six.play > .gside { contain: none; }
+  .guided.six.play .coach-body { flex: none; overflow-y: visible; }
+  .guided.six.play .glog .log-scroll { max-height: 320px; }
+}
+@media (max-width: 640px) {
+  .guided.play > .gside { contain: none; }
+  .guided.play .coach-body { flex: none; overflow-y: visible; }
+  .guided.play .glog .log-scroll { max-height: 320px; }
+}
 /* In Review the hand list already takes a column, so the six-seat table gets the full width. */
 .guided.stacked { grid-template-columns: minmax(0, 1fr); }
 .rt-felt {
