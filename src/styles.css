@@ -417,6 +417,8 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 .sizer-note { margin: 0; font-size: 13px; color: var(--muted); }
 .hand-done { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; padding: 12px; background: var(--panel-hi); border-radius: 10px; }
 .hand-done p { margin: 0; }
+/* The next steps sit on the right, after the result: review the hand, or deal the next one. */
+.hand-next { align-self: stretch; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px 18px; }
 .coach-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 .switch { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); cursor: pointer; min-height: 32px; }
 .switch input { accent-color: var(--brass); width: 18px; height: 18px; }

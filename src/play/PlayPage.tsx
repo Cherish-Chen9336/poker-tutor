@@ -316,20 +316,14 @@ export default function PlayPage() {
                 <p>
                   <CardText text={log.at(-1) ?? ""} />
                 </p>
-                <a href={href({ area: "review" })}>{t("play.reviewThis")}</a>
                 {!saved && <p className="mono">{t("play.noSave")}</p>}
-                {match.matchOver ? (
-                  <>
-                    <p>{t("play.out", { who: stack === 0 ? "you" : "bot", size: size === 2 ? "two" : "six" })}</p>
-                    <button ref={nextRef} type="button" className="button primary" onClick={deal}>
-                      {t("play.newMatch")}
-                    </button>
-                  </>
-                ) : (
+                {match.matchOver && <p>{t("play.out", { who: stack === 0 ? "you" : "bot", size: size === 2 ? "two" : "six" })}</p>}
+                <div className="hand-next">
+                  <a href={href({ area: "review" })}>{t("play.reviewThis")}</a>
                   <button ref={nextRef} type="button" className="button primary" onClick={deal}>
-                    {t("play.next")}
+                    {match.matchOver ? t("play.newMatch") : t("play.next")}
                   </button>
-                )}
+                </div>
               </div>
             ) : (
               <p className="mono">{t("play.thinking", { size: size === 2 ? "two" : "six" })}</p>
