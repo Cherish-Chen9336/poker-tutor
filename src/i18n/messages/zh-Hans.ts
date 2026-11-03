@@ -350,6 +350,7 @@ export const zhHans: Partial<Record<MessageId, string>> = {
   "play.coach": "教练",
   "play.hintsSwitch": "在我行动前给出提示",
   "play.hintsLater": "轮到你时会显示提示。",
+  "play.lastHints": "你上一次决策时的提示：",
   "play.hintsOff": "提示已关闭。",
   "play.thisHand": "这手牌",
   "play.yourMove": "你的行动",

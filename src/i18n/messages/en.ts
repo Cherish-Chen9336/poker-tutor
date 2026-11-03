@@ -366,6 +366,7 @@ export const en = {
   "play.coach": "Coach",
   "play.hintsSwitch": "Hints before my move",
   "play.hintsLater": "Hints appear when it's your turn.",
+  "play.lastHints": "Hints from your last decision:",
   "play.hintsOff": "Hints are off.",
   "play.thisHand": "This hand",
   "play.yourMove": "Your move",

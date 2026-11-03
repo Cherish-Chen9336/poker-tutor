@@ -280,6 +280,10 @@ export default function PlayPage() {
   }
 
   const coach = coachOn ? coachLines(view) : [];
+  // Between your turns and after the hand, the hints from your last decision stay, worked out again from that
+  // moment's table; a new hand starts without them.
+  const lastMine = record?.moves.findLast((m) => m.actorSeat === YOU_SEAT);
+  const lastHints = coachOn && lastMine ? coachLines(lastMine.view) : [];
   const yourTurn = !match.handOver && view.actionTo === YOU_SEAT && legal;
   const hole = view.seats[YOU_SEAT]?.cards?.every(Boolean) ? (view.seats[YOU_SEAT]!.cards as string[]) : null;
   const stack = view.seats[YOU_SEAT]!.stack;
@@ -368,6 +372,15 @@ export default function PlayPage() {
                     ))}
                   </ul>
                   {hole && <OddsBox estimates={estimates} />}
+                </>
+              ) : lastHints.length ? (
+                <>
+                  <p className="mono">{t("play.lastHints")}</p>
+                  <ul className="coach-list">
+                    {lastHints.map((line, i) => (
+                      <CoachHint key={i} line={line} phrase={coachLine} />
+                    ))}
+                  </ul>
                 </>
               ) : (
                 <p className="mono">{t("play.hintsLater")}</p>

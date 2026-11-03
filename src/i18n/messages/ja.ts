@@ -350,6 +350,7 @@ export const ja: Partial<Record<MessageId, string>> = {
   "play.coach": "コーチ",
   "play.hintsSwitch": "自分のアクションの前にヒントを表示",
   "play.hintsLater": "あなたの番になるとヒントが表示されます。",
+  "play.lastHints": "直前の判断のときのヒント：",
   "play.hintsOff": "ヒントはオフです。",
   "play.thisHand": "このハンド",
   "play.yourMove": "あなたのアクション",
