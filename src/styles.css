@@ -458,8 +458,12 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 
 /* Six-seat table (the design preview's layout). Seats are placed clockwise from the learner at the bottom. */
 .rt-wrap { position: relative; padding: 70px 84px 120px; }
-/* The six-seat table needs more room than the coach beside it. */
-.guided.six { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+/* The six-seat table takes most of the width; the coach beside it keeps a readable column of at most 300px. */
+.guided.six { grid-template-columns: minmax(0, 1fr) minmax(240px, 300px); }
+/* Up to 900px of screen there isn't room for both side by side, so the coach goes below the table. */
+@media (max-width: 900px) {
+  .guided.six { grid-template-columns: minmax(0, 1fr); }
+}
 /* In Review the hand list already takes a column, so the six-seat table gets the full width. */
 .guided.stacked { grid-template-columns: minmax(0, 1fr); }
 .rt-felt {
