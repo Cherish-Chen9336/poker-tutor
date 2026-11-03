@@ -223,12 +223,9 @@ h1:focus { outline: none; }
 .ladder-odds { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; align-items: baseline; font-variant-numeric: tabular-nums; }
 .ladder-odds .pct { font: 500 14px var(--f-mono); }
 .ladder-odds .one-in { font-size: 12.5px; color: var(--muted); text-align: right; white-space: nowrap; }
-/* The track is 0–100%, with a faint mark at 50%. No minimum width: a near-empty bar is the honest picture of a rare
-   hand, and its number says how rare. */
-.odds-bar {
-  grid-column: 1 / -1; height: 8px; border-radius: 4px; overflow: hidden;
-  background: linear-gradient(to right, transparent calc(50% - 1px), var(--muted) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)), var(--line);
-}
+/* The track is 0–100%. No minimum width: a near-empty bar is the honest picture of a rare hand, and its number says
+   how rare. */
+.odds-bar { grid-column: 1 / -1; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
 .odds-bar i { display: block; height: 100%; background: var(--brass); border-radius: 0 4px 4px 0; }
 .seg-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .seg { display: inline-flex; gap: 2px; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }

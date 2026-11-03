@@ -131,7 +131,7 @@ export const en = {
   "best5.caption": "Highlighted cards make the best 5. Faded cards don't count.",
   "ladder.head": "How often (7 cards)",
   "ladder.oneIn": "1 in {n}",
-  "ladder.caption": "Strongest at the top. Each hand beats every hand below it. Each bar shows how often 7 cards make that hand, on a scale from 0 to 100% (the mark is 50%).",
+  "ladder.caption": "Strongest at the top. Each hand beats every hand below it. Each bar shows how often 7 cards make that hand, on a scale from 0 to 100%.",
   "hand.royalFlush": "Royal Flush",
   "hand.royalFlush.meaning": "The highest straight flush: 10 to ace, all one suit",
   "hand.straightFlush": "Straight Flush",
