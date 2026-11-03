@@ -485,7 +485,7 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 }
 .rt-name { font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .rt-pos { font: 600 11px var(--f-mono); color: var(--brass); letter-spacing: 0.06em; }
-.rt-stack { grid-column: 1 / -1; font-size: 12.5px; }
+.rt-stack { grid-column: 1; grid-row: 2; font-size: 12.5px; }
 .rt-seat.you .rt-plate { border-color: var(--brass-dim); }
 .rt-seat.acting .rt-plate { border-color: var(--brass); box-shadow: 0 0 0 3px var(--brass-dim), 0 6px 16px var(--shadow); }
 .rt-seat.winner .rt-plate { border-color: var(--good); }
@@ -499,15 +499,13 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   display: flex; align-items: center; gap: 5px; font: 500 12.5px var(--f-mono); background: rgba(0, 0, 0, 0.35); padding: 2px 9px 2px 3px; border-radius: 999px;
 }
 .chip { width: 16px; height: 16px; border-radius: 50%; background: var(--brass); border: 3px dashed var(--card); flex: none; }
-/* The dealer button sits just outside the button player's plate, on the side facing the table, so it never
-   reaches the board whatever the width. */
-.rt-plate { position: relative; }
+/* The dealer button sits inside the button player's plate, to the right of the chip count. Outside the plate it ran
+   into the side seats' bets or the learner's cards at some widths. */
 .rt-dealer {
-  position: absolute; left: calc(100% + 5px); top: 50%; transform: translateY(-50%);
-  width: 24px; height: 24px; border-radius: 50%; background: var(--card); color: var(--suit-black); font: 700 12px var(--f-body);
-  display: grid; place-items: center; box-shadow: 0 2px 4px var(--shadow), inset 0 0 0 2px var(--card-edge);
+  grid-column: 2; grid-row: 2; justify-self: end;
+  width: 18px; height: 18px; border-radius: 50%; background: var(--card); color: var(--suit-black); font: 700 10.5px var(--f-body);
+  display: grid; place-items: center; box-shadow: 0 1px 3px var(--shadow), inset 0 0 0 2px var(--card-edge);
 }
-.rt-seat.p4 .rt-dealer, .rt-seat.p5 .rt-dealer { left: auto; right: calc(100% + 5px); }
 
 .odds-box { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .odds-title { font: 500 12px var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--brass); }
@@ -636,7 +634,7 @@ main:has(> .loading) { min-height: 70vh; }
   .rt-hand .pc.sm { --w: 24px; }
   .rt-center .pc-row .pc, .rt-center .slot.md { --w: 38px; width: 38px; }
   .rt-bet { left: calc(50% + (var(--sx) - 50) * 0.5%); top: calc(50% + (var(--sy) - 50) * 0.6%); }
-  .rt-dealer { width: 20px; height: 20px; font-size: 11px; }
+  .rt-dealer { width: 16px; height: 16px; font-size: 9.5px; }
 }
 /* Tablet-sized: the compact seats on a rounder oval (the phone oval is taller than this width needs). */
 @container (min-width: 460px) and (max-width: 600px) {
@@ -655,8 +653,6 @@ main:has(> .loading) { min-height: 70vh; }
   .p2 { --sy: 8; } .p4 { --sy: 8; } .p3 { --sy: -6; }
   .p1 { --sy: 88; } .p5 { --sy: 88; }
   .rt-hand .pc.sm { --w: 20px; }
-  /* The bottom side seats sit beside your cards here, so their dealer button goes higher. */
-  .rt-seat.p1 .rt-dealer, .rt-seat.p5 .rt-dealer { top: -6px; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
