@@ -301,7 +301,8 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 .glog ol { margin: 8px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; font-size: 14px; color: var(--muted); }
 .glog li:last-child { color: var(--ink); }
 /* Play's hand history keeps a fixed height and scrolls; a long hand doesn't push the page down. */
-.glog .log-scroll { max-height: 320px; overflow-y: auto; padding-right: 6px; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
+/* The line numbers sit in the left padding; a scrolling box cuts off anything outside it, so the padding fits "100.". */
+.glog .log-scroll { max-height: 320px; overflow-y: auto; padding-left: 2.6em; padding-right: 6px; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
 .glog .log-scroll > li { flex-shrink: 0; }
 .glog .log-scroll:focus-visible { outline: 2px solid var(--brass-dim); outline-offset: 2px; }
 .next-hand { align-self: flex-start; }
