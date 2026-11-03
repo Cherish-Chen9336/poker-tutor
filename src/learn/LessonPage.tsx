@@ -9,6 +9,7 @@ import { findLesson, LESSONS } from "./lessons";
 import { Quiz } from "./Quiz";
 import { QUIZZES } from "./quizzes";
 import { localizeQuestion, quizText } from "./quizzes-i18n";
+import { Loading } from "../ui/Loading";
 
 interface Props {
   lessonId: number;
@@ -64,7 +65,7 @@ export default function LessonPage({ lessonId, progress, onComplete }: Props) {
 
       {content && Content ? (
         <div className="prose">
-          <Suspense fallback={<p className="loading">{t("app.loadingLesson")}</p>}>
+          <Suspense fallback={<Loading>{t("app.loadingLesson")}</Loading>}>
             {content.translated ? <Content /> : <EnglishFallback><Content /></EnglishFallback>}
           </Suspense>
         </div>

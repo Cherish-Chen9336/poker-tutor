@@ -7,6 +7,7 @@ import { focusPageHeading } from "./app/focus";
 import { useProgress } from "./app/progress";
 import { LearnHome } from "./learn/LearnHome";
 import { findLesson } from "./learn/lessons";
+import { Loading } from "./ui/Loading";
 
 // Lesson pages include the hand evaluator, which is large, so they load on first visit.
 const LessonPage = lazy(() => import("./learn/LessonPage"));
@@ -89,17 +90,17 @@ function Shell() {
           <LearnHome progress={progress} saved={saved} onReset={reset} />
         )}
         {route.area === "learn" && route.lesson !== null && (
-          <Suspense fallback={<p className="loading">{t("app.loadingLesson")}</p>}>
+          <Suspense fallback={<Loading>{t("app.loadingLesson")}</Loading>}>
             <LessonPage key={route.lesson} lessonId={route.lesson} progress={progress} onComplete={complete} />
           </Suspense>
         )}
         {route.area === "play" && (
-          <Suspense fallback={<p className="loading">{t("app.loadingTable")}</p>}>
+          <Suspense fallback={<Loading>{t("app.loadingTable")}</Loading>}>
             <PlayPage />
           </Suspense>
         )}
         {route.area === "review" && (
-          <Suspense fallback={<p className="loading">{t("app.loadingHands")}</p>}>
+          <Suspense fallback={<Loading>{t("app.loadingHands")}</Loading>}>
             <ReviewPage />
           </Suspense>
         )}
