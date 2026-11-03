@@ -547,7 +547,7 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 }
 .loader-suits { display: flex; gap: 12px; font-size: 34px; line-height: 1; }
 .loader-suits span { display: block; color: var(--ink); animation: loader-bounce 1.1s ease-in-out infinite; }
-.loader-suits span.red { color: var(--bad); }
+.loader-suits span.red { color: var(--brass); }
 .loader-suits span:nth-child(2) { animation-delay: 0.12s; }
 .loader-suits span:nth-child(3) { animation-delay: 0.24s; }
 .loader-suits span:nth-child(4) { animation-delay: 0.36s; }
