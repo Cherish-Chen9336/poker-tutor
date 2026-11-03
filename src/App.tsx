@@ -7,7 +7,6 @@ import { focusPageHeading } from "./app/focus";
 import { useProgress } from "./app/progress";
 import { LearnHome } from "./learn/LearnHome";
 import { findLesson } from "./learn/lessons";
-import { Loading } from "./ui/Loading";
 
 // Lesson pages include the hand evaluator, which is large, so they load on first visit.
 const LessonPage = lazy(() => import("./learn/LessonPage"));
@@ -21,21 +20,25 @@ const AREAS: { area: Route["area"]; label: MessageId }[] = [
   { area: "review", label: "app.review" },
 ];
 
+// One loading screen for everything: a page's language, its code, and its lesson text all wait here. On the first load
+// it stays up until all of them are ready; after that, moving to another page keeps the current one on screen until
+// the next is ready (see useHash), with the loading screen over it only if that takes a while.
 export default function App() {
-  const { locale, route } = parseLocation(useHash());
+  const [hash, navigating] = useHash();
+  const { locale, route } = parseLocation(hash);
   return (
     <LanguageErrorBoundary locale={locale} englishHref={routeHref(route)}>
       <Suspense fallback={<LoadingLanguage />}>
         <I18nProvider locale={locale}>
-          <Shell />
+          <Shell hash={hash} />
         </I18nProvider>
       </Suspense>
+      {navigating && <LoadingLanguage later />}
     </LanguageErrorBoundary>
   );
 }
 
-function Shell() {
-  const hash = useHash();
+function Shell({ hash }: { hash: string }) {
   const { route } = parseLocation(hash);
   const t = useT();
   const href = useHref();
@@ -90,20 +93,10 @@ function Shell() {
           <LearnHome progress={progress} saved={saved} onReset={reset} />
         )}
         {route.area === "learn" && route.lesson !== null && (
-          <Suspense fallback={<Loading>{t("app.loadingLesson")}</Loading>}>
-            <LessonPage key={route.lesson} lessonId={route.lesson} progress={progress} onComplete={complete} />
-          </Suspense>
+          <LessonPage key={route.lesson} lessonId={route.lesson} progress={progress} onComplete={complete} />
         )}
-        {route.area === "play" && (
-          <Suspense fallback={<Loading>{t("app.loadingTable")}</Loading>}>
-            <PlayPage />
-          </Suspense>
-        )}
-        {route.area === "review" && (
-          <Suspense fallback={<Loading>{t("app.loadingHands")}</Loading>}>
-            <ReviewPage />
-          </Suspense>
-        )}
+        {route.area === "play" && <PlayPage />}
+        {route.area === "review" && <ReviewPage />}
       </main>
 
       <footer className="foot">

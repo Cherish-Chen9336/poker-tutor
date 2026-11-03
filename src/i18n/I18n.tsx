@@ -45,10 +45,10 @@ function PageText({ locale, children }: { locale: Locale; children: ReactNode })
   return <PageContext value={{ locale, intl }}>{children}</PageContext>;
 }
 
-/** Shown while a language's text loads, in every language since none is loaded yet. */
-export function LoadingLanguage() {
+/** The loading screen, worded in every language since the next language may not be loaded yet. */
+export function LoadingLanguage({ later = false }: { later?: boolean }) {
   return (
-    <Loading>
+    <Loading later={later}>
       <span lang="en">Loading…</span> <span lang="zh-Hans">加载中…</span> <span lang="ja">読み込み中…</span>
     </Loading>
   );

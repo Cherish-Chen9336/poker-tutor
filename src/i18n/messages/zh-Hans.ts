@@ -10,9 +10,6 @@ export const zhHans: Partial<Record<MessageId, string>> = {
   "app.review": "复盘",
   "app.footer": "学习项目，绝不涉及真钱。",
   "app.source": "源代码",
-  "app.loadingLesson": "加载课程…",
-  "app.loadingTable": "加载牌桌…",
-  "app.loadingHands": "加载你的牌局…",
   "app.title": "{page} · Poker Tutor",
 
   "lang.label": "语言",

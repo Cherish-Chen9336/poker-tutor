@@ -554,10 +554,13 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 .loader-suits span:nth-child(4) { animation-delay: 0.36s; }
 /* Keeps the footer down at the bottom while a page loads, instead of jumping up under the header. */
 main:has(> .loading) { min-height: 70vh; }
+.loading.later { animation-delay: 0.4s; }
 @keyframes loading-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes loader-bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-14px); } }
+/* Reduced motion: the suits stay still, but the mask keeps its fade and delay (a fade isn't movement, and the delay
+   keeps quick page changes from flashing). */
 @media (prefers-reduced-motion: reduce) {
-  .loading, .loader-suits span { animation: none; }
+  .loader-suits span { animation: none; }
 }
 
 

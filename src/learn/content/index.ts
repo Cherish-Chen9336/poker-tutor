@@ -3,7 +3,7 @@ import type { Locale } from "../../i18n/locales";
 import { Lesson1, Lesson2, Lesson3, Lesson4, Lesson5, Lesson6, Lesson7 } from "./rules-lessons";
 
 // Lessons 8 and 10 use the full game engine, which is large, so lessons 8–14
-// load only when opened. LessonPage shows them inside a Suspense boundary.
+// load only when opened. they wait behind App's loading screen.
 const thinking = () => import("./thinking-lessons");
 const afterPlay = () => import("./after-play-lessons");
 const bigTable = () => import("./table-lessons");

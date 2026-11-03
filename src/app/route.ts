@@ -1,6 +1,6 @@
 // Hash-based URLs (e.g. "#/learn/3") work on GitHub Pages without server
 // routing: a refresh or a bookmark always loads index.html.
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { isLocale, type Locale } from "../i18n/locales";
 
 export type Route =
@@ -38,12 +38,22 @@ export function routeHref(route: Route, locale: Locale = "en", named = false): s
   return locale === "en" && !named ? `#/${path}` : `#/${locale}/${path}`;
 }
 
-function subscribe(onChange: () => void): () => void {
-  window.addEventListener("hashchange", onChange);
-  return () => window.removeEventListener("hashchange", onChange);
-}
-
-/** The current location hash, updated when it changes. */
-export function useHash(): string {
-  return useSyncExternalStore(subscribe, () => window.location.hash);
+/**
+ * The current location hash, and whether the app is moving to a new one. Each change is a transition: the page on
+ * screen stays until the next page, its language, and its code have all loaded, so there's no loading flash between
+ * steps. (A plain store subscription can't be a transition; React would swap the page for the loading screen.)
+ */
+export function useHash(): [hash: string, navigating: boolean] {
+  const [hash, setHash] = useState(() => window.location.hash);
+  const [navigating, startNavigation] = useTransition();
+  useEffect(() => {
+    const onChange = () => startNavigation(() => setHash(window.location.hash));
+    window.addEventListener("hashchange", onChange);
+    // Catches a change between the first render and now.
+    if (window.location.hash !== hash) onChange();
+    return () => window.removeEventListener("hashchange", onChange);
+    // Subscribes once; the check above only needs the first render's hash.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return [hash, navigating];
 }

@@ -11,9 +11,6 @@ export const en = {
   "app.review": "Review",
   "app.footer": "A learning project. No real money, ever.",
   "app.source": "Source code",
-  "app.loadingLesson": "Loading the lesson…",
-  "app.loadingTable": "Loading the table…",
-  "app.loadingHands": "Loading your hands…",
   "app.title": "{page} · Poker Tutor",
 
   // Language
