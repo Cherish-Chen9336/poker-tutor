@@ -137,6 +137,23 @@ describe("the hand log from facts", () => {
     expect(listed).toBeGreaterThan(0);
   });
 
+  it("shows the blinds and your cards before anyone has moved (heads-up, you often act first)", () => {
+    const match = new Match({ bot: practiceBot, random: seeded(7), botRandom: seeded(8) });
+    let checked = 0;
+    for (let hand = 0; hand < 20; hand++) {
+      match.dealNext();
+      const record = match.current!;
+      if (record.moves.length === 0 && !match.handOver) {
+        // Nothing recorded yet: the live table supplies the opening lines.
+        expect(handFacts(record).map((f) => f.kind)).toEqual([]);
+        expect(handFacts(record, match.view()).map((f) => f.kind)).toEqual(["blinds", "yourCards"]);
+        checked++;
+      }
+      while (!match.handOver) match.act(match.legalMoves()!.check ? { type: "check" } : { type: "fold" });
+    }
+    expect(checked).toBeGreaterThan(3);
+  });
+
   it("words hands saved before per-pot results, too", () => {
     const record = records.find((r) => r.seats.length === 2 && r.final!.potResults?.length === 1)!;
     for (const winners of [[{ seat: 0, amount: 4, bestHand: null, description: "One Pair" }], [{ seat: 0, amount: 2, bestHand: null, description: null }, { seat: 1, amount: 2, bestHand: null, description: null }]]) {

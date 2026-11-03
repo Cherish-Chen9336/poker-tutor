@@ -98,11 +98,14 @@ export function moveFactAt(record: HandRecord, index: number): LogFact {
   return moveFact(record.seats, record.moves[index]);
 }
 
-/** Every fact for a hand so far, oldest first (the same events as handLog's lines). */
-export function handFacts(record: HandRecord): LogFact[] {
+/**
+ * Every fact for a hand so far, oldest first (the same events as handLog's lines). `live` is the table now: before
+ * the first move (heads-up, you often act first) it supplies the blinds and your cards.
+ */
+export function handFacts(record: HandRecord, live?: TableView): LogFact[] {
   const seats = record.seats;
   const n = seats.length;
-  const first = record.moves[0]?.view ?? record.final;
+  const first = record.moves[0]?.view ?? record.final ?? live;
   const facts: LogFact[] = [];
   for (const seat of record.toppedUp) facts.push({ kind: "topUp", who: whoAt(seats, seat), amount: record.startStacks[seat] });
   if (first) {

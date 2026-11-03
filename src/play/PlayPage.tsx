@@ -197,7 +197,7 @@ export default function PlayPage() {
   const legal = started ? match.legalMoves() : null;
   const record = match.current;
   const word = useLog();
-  const log = record ? handFacts(record).map(word) : [];
+  const log = record ? handFacts(record, view).map(word) : [];
   const t = useT();
   const locale = useLocale();
   // The hand history scrolls inside its own box; each new line scrolls it to the bottom so the latest move shows.
@@ -215,7 +215,7 @@ export default function PlayPage() {
   }, [focusTick, match]);
 
   function afterChange(linesBefore: number) {
-    const lines = match.current ? handFacts(match.current).map(word) : [];
+    const lines = match.current ? handFacts(match.current, match.view()).map(word) : [];
     setAnnouncement({ text: spokenText(lines.slice(linesBefore).join(" "), locale), locale });
     const record = match.current;
     if (match.handOver && record && countFinished(size, record)) {
@@ -235,7 +235,7 @@ export default function PlayPage() {
   }
 
   function move(m: Move) {
-    const before = record ? handFacts(record).length : 0;
+    const before = record ? handFacts(record, view).length : 0;
     const result = match.act(m);
     if (!result.ok) {
       setNotice({ kind: "rejected", reason: result.reason });
