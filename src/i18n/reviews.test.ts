@@ -88,7 +88,8 @@ function inputs(): Inputs {
     // The calculations behind facts the lessons show: equity, the streak simulation, and its random source.
     facts: handsSource + simulateSource + randomSource,
     // The table, Play screen, and hand log: the code that chooses which words appear.
-    play: Object.values(PLAY_SOURCES).join("\n"),
+    // Sorted by path: the file system's listing order differs between machines.
+    play: Object.keys(PLAY_SOURCES).sort().map((path) => PLAY_SOURCES[path]).join("\n"),
   };
   for (const n of TRANSLATED_LESSONS) {
     all[`lesson${n}Doc`] = between(lessonsDoc, `## Lesson ${n}:`, `## Lesson ${n + 1}:`);
