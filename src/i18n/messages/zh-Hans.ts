@@ -122,7 +122,7 @@ export const zhHans: Partial<Record<MessageId, string>> = {
   "best5.caption": "高亮的牌组成最好的五张，变淡的牌不算。",
   "ladder.head": "出现频率（7 张牌）",
   "ladder.oneIn": "{n} 次中 1 次",
-  "ladder.caption": "越往上越强，每种牌型都大过它下面的所有牌型。横条比较 7 张牌组成各牌型的频率。",
+  "ladder.caption": "越往上越强，每种牌型都大过它下面的所有牌型。每根横条表示 7 张牌组成该牌型的频率，刻度为 0 到 100%（中间的标记为 50%）。",
   "hand.royalFlush": "皇家同花顺",
   "hand.royalFlush.meaning": "最大的同花顺：10 到 A，同一花色",
   "hand.straightFlush": "同花顺",

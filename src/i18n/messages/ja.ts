@@ -122,7 +122,7 @@ export const ja: Partial<Record<MessageId, string>> = {
   "best5.caption": "強調されたカードが最も強い5枚です。薄いカードは使われません。",
   "ladder.head": "出現頻度（7枚）",
   "ladder.oneIn": "{n}回に1回",
-  "ladder.caption": "上ほど強く、各ハンドはそれより下のすべてのハンドに勝ちます。バーは、7枚で各ハンドができる頻度を比べたものです。",
+  "ladder.caption": "上ほど強く、各ハンドはそれより下のすべてのハンドに勝ちます。各バーは、7枚でそのハンドができる頻度を0〜100%の目盛りで示します（中央の印が50%）。",
   "hand.royalFlush": "ロイヤルフラッシュ",
   "hand.royalFlush.meaning": "最も強いストレートフラッシュ：10からAまで、同じスート",
   "hand.straightFlush": "ストレートフラッシュ",

@@ -90,7 +90,6 @@ const LADDER_IDS = ["royalFlush", "straightFlush", "fourOfAKind", "fullHouse", "
 /** Lesson 3: the ten hands, strongest first, with how often 7 cards make each. */
 export function RankLadder() {
   const t = useT();
-  const most = Math.max(...RANK_LADDER.map((row) => row.sevenCardCount));
   return (
     <figure className="diagram">
       <div className="ladder-head" aria-hidden="true">
@@ -109,7 +108,8 @@ export function RankLadder() {
               <span className="pct">{formatPercent(row.sevenCardCount, SEVEN_CARD_TOTAL)}</span>
               <span className="one-in">{t("ladder.oneIn", { n: oneInNumber(row.sevenCardCount, SEVEN_CARD_TOTAL) })}</span>
               <span className="odds-bar" aria-hidden="true">
-                <i style={{ width: `${(row.sevenCardCount / most) * 100}%` }} />
+                {/* On a 0–100% scale, so the bar's length matches the number beside it. */}
+                <i style={{ width: `${(row.sevenCardCount / SEVEN_CARD_TOTAL) * 100}%` }} />
               </span>
             </span>
           </li>
