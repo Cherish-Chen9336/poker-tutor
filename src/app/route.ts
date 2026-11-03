@@ -29,10 +29,13 @@ export function parseLocation(hash: string): { locale: Locale; route: Route } {
   return { locale: "en", route: parseRoute(hash) };
 }
 
-/** The link for a page. English links have no language part. */
-export function routeHref(route: Route, locale: Locale = "en"): string {
+/**
+ * The link for a page. English links have no language part, so they open in the learner's saved language,
+ * unless `named` is set (the language switch's links always name their language).
+ */
+export function routeHref(route: Route, locale: Locale = "en", named = false): string {
   const path = route.area === "learn" ? (route.lesson === null ? "learn" : `learn/${route.lesson}`) : route.area;
-  return locale === "en" ? `#/${path}` : `#/${locale}/${path}`;
+  return locale === "en" && !named ? `#/${path}` : `#/${locale}/${path}`;
 }
 
 function subscribe(onChange: () => void): () => void {

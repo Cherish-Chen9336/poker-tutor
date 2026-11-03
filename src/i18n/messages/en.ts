@@ -442,7 +442,7 @@ export const en = {
   "review.wholeHand": "The whole hand",
   "review.verdict": "{verdict, select, mistake {✗ Mistake} good {✓ Good} other {Note}}",
 
-  // The coach's position line (pilot: one coach sentence built from facts)
+  // The coach's hints, built from facts (src/i18n/coach-text.tsx)
   "coach.huCallEnds": "If you call, betting ends for this hand.",
   "coach.huPreflop": "{button, select, yes {You have the button: you act first before the flop, and last on every later round.} other {You're the big blind: you act last before the flop, and first on every later round.}}",
   "coach.huPostflop": "{button, select, yes {You act last this round, so you'll see the bot's choice first (in position).} other {You act first this round; the bot will see your choice before deciding.}}",

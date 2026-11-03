@@ -1,4 +1,4 @@
-// Checks that keep translations honest (pilot). They can't prove a translation
+// Checks that keep translations honest. They can't prove a translation
 // means the same; Codex's sentence-by-sentence review does that (docs/translation.md).
 import { parse, TYPE, type MessageFormatElement } from "@formatjs/icu-messageformat-parser";
 import { createIntl } from "react-intl";

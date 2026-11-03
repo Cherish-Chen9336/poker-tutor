@@ -6,6 +6,7 @@ import { routeHref, type Route } from "../app/route";
 import { LocaleContext, PageContext, usePage, useT } from "./hooks";
 import { LOCALE_NAMES, LOCALES, type Locale } from "./locales";
 import { en, type MessageId } from "./messages/en";
+import { browserStorage, saveLocale, switchesThisTab } from "./preference";
 
 type Catalog = Partial<Record<MessageId, string>>;
 
@@ -86,15 +87,26 @@ export class LanguageErrorBoundary extends Component<
   }
 }
 
-/** Switches language on the same page. Shown only on translated pages while translations are a pilot. */
+/**
+ * Switches language on the same page, and remembers the choice for links that name no language. Each link names its
+ * language, so one opened in a new tab shows that language; only a switch in this tab (a plain click) is remembered.
+ */
 export function LanguageSwitch({ route }: { route: Route }) {
   const { locale } = usePage();
   const t = useT();
-  if (locale === "en") return null;
   return (
     <nav className="lang" aria-label={t("lang.label")}>
       {LOCALES.map((l) => (
-        <a key={l} href={routeHref(route, l)} lang={l} hrefLang={l} aria-current={l === locale ? "page" : undefined}>
+        <a
+          key={l}
+          href={routeHref(route, l, true)}
+          lang={l}
+          hrefLang={l}
+          aria-current={l === locale ? "page" : undefined}
+          onClick={(e) => {
+            if (switchesThisTab(e)) saveLocale(browserStorage(), l);
+          }}
+        >
           {LOCALE_NAMES[l]}
         </a>
       ))}
