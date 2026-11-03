@@ -77,13 +77,18 @@ function newCardsLine(before: TableView, after: TableView): string | null {
   return `${STREET_NAMES[after.street] ?? "Board"}: ${cards}.`;
 }
 
+/** "1 chip", "2 chips". */
+function chips(n: number): string {
+  return n === 1 ? "1 chip" : `${n} chips`;
+}
+
 /**
  * The outcome, e.g. "You win 56 chips with one pair. You're 28 chips up." With
  * side pots, each pot is reported on its own; only several winners of one pot
  * is a split pot.
  */
 export function resultLine(final: TableView, net: number, seats: SeatInfo[] = HEADS_UP_SEATS): string {
-  const outcome = net > 0 ? `You're ${net} chips up.` : net < 0 ? `You're ${-net} chips down.` : "You're even.";
+  const outcome = net > 0 ? `You're ${chips(net)} up.` : net < 0 ? `You're ${chips(-net)} down.` : "You're even.";
   const how = (seat: number) => {
     const description = handDescription(final, seat);
     return description ? ` with ${handPhrase(description)}` : "";
@@ -107,11 +112,11 @@ export function resultLine(final: TableView, net: number, seats: SeatInfo[] = HE
   if (pots?.length === 1) {
     const pot = pots[0];
     if (pot.winners.length > 1) return `Split pot: ${pot.winners.map((w) => `${subject(seats, w.seat)} ${w.amount}`).join(", ")}. ${outcome}`;
-    return `${says(seats, pot.winners[0].seat, `win ${pot.amount} chips`)}${how(pot.winners[0].seat)}. ${outcome}`;
+    return `${says(seats, pot.winners[0].seat, `win ${chips(pot.amount)}`)}${how(pot.winners[0].seat)}. ${outcome}`;
   }
   // Hands saved before Step 6 have no per-pot results (heads-up: one pot).
   if (winners.length > 1) return `Split pot: ${winners.map((w) => w.amount).join(" and ")}. ${outcome}`;
-  return `${says(seats, winners[0]?.seat ?? 0, `win ${winners[0]?.amount ?? 0} chips`)}${how(winners[0]?.seat ?? -1)}. ${outcome}`;
+  return `${says(seats, winners[0]?.seat ?? 0, `win ${chips(winners[0]?.amount ?? 0)}`)}${how(winners[0]?.seat ?? -1)}. ${outcome}`;
 }
 
 /** The sentence for one recorded move, e.g. "Leo raises to 6." */
