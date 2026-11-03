@@ -1,5 +1,5 @@
 // The six-seat table, in the design preview's style: an oval felt with seats
-// clockwise from the learner at the bottom, each player's bet in front of
+// clockwise from the learner at the bottom, each player's bet right beside
 // them, the dealer button, and the board with its pots in the middle.
 import { useIntl } from "react-intl";
 import { positionOf } from "../game/positions";
@@ -48,11 +48,21 @@ function Seat({ seat, view, youSeat, names }: { seat: SeatView; view: TableView;
   ]
     .filter(Boolean)
     .reduce((a, b) => t("table.join", { a, b }));
+  // The bet goes beside the plate for side seats, and on the table side of the cards for the top seat and you.
+  const place = (seat.seat - youSeat + view.seats.length) % view.seats.length;
+  const bet =
+    seat.betThisStreet > 0 ? (
+      <span className={`rt-bet p${place}`} aria-hidden="true">
+        <span className="chip" />
+        {seat.betThisStreet}
+      </span>
+    ) : null;
+  const byCards = place === 0 || place === 3;
   return (
     <div
       role="group"
       aria-label={label}
-      className={`rt-seat p${(seat.seat - youSeat + view.seats.length) % view.seats.length} ${you ? "you" : ""} ${status} ${acting ? "acting" : ""} ${won ? "winner" : ""}`}
+      className={`rt-seat p${place} ${you ? "you" : ""} ${status} ${acting ? "acting" : ""} ${won ? "winner" : ""}`}
     >
       <div className="rt-hand" aria-hidden={!seat.cards?.some(Boolean)}>
         {seat.status === "folded"
@@ -60,6 +70,7 @@ function Seat({ seat, view, youSeat, names }: { seat: SeatView; view: TableView;
           : seat.cards
             ? seat.cards.map((c, i) => (c ? <Card key={c} code={c} size={you ? "md" : "sm"} /> : <Back key={i} />))
             : [<Back key="a" />, <Back key="b" />]}
+        {byCards && bet}
       </div>
       <div className="rt-plate">
         {view.buttonSeat === seat.seat && (
@@ -72,6 +83,7 @@ function Seat({ seat, view, youSeat, names }: { seat: SeatView; view: TableView;
           {position}
         </span>
         <span className="rt-stack mono">{seat.stack}</span>
+        {!byCards && bet}
       </div>
       {(status || won > 0) && <span className="rt-status">{won ? t("table.won", { amount: String(won) }) : statusWords}</span>}
     </div>
@@ -81,8 +93,6 @@ function Seat({ seat, view, youSeat, names }: { seat: SeatView; view: TableView;
 export function RoundTable({ view, youSeat, names }: { view: TableView; youSeat: number; names: string[] }) {
   const t = useT();
   const intl = useIntl();
-  const n = view.seats.length;
-  const place = (seat: number) => (seat - youSeat + n) % n;
   // A long result (several pots, different winners) goes in the list below; the felt shows only the total.
   const results = potResultParts(intl, view, youSeat, names);
   const potList = results.length ? results : pots(t, view, youSeat, names);
@@ -102,14 +112,6 @@ export function RoundTable({ view, youSeat, names }: { view: TableView; youSeat:
                 : potText(intl, view, youSeat, names)}
             </span>
           </div>
-          {view.seats.map((s) =>
-            s && s.betThisStreet > 0 ? (
-              <span key={`bet${s.seat}`} className={`rt-bet p${place(s.seat)}`} aria-hidden="true">
-                <span className="chip" />
-                {s.betThisStreet}
-              </span>
-            ) : null,
-          )}
           {view.seats.map((s) => (s ? <Seat key={s.seat} seat={s} view={view} youSeat={youSeat} names={names} /> : null))}
         </div>
       </div>
