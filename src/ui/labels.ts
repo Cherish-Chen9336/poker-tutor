@@ -26,33 +26,50 @@ export function potLabel(view: TableView, youSeat: number, names?: string[]): st
 
 /** potLabel's words in any language (potLabel stays as the English reference for tests). */
 export function potText(intl: IntlShape, view: TableView, youSeat: number, names?: string[]): string {
-  const t = (id: MessageId, values: Record<string, string | number> = {}) =>
-    intl.formatMessage({ id, defaultMessage: en[id] }, Object.fromEntries(Object.entries(values).map(([k, v]) => [k, String(v)])));
+  const t = translator(intl);
   if (!view.handOver) return t("pot.amount", { amount: potTotal(view) });
-  const name = (seat: number, start: boolean) => {
-    const who = seat === youSeat ? "you" : names?.[seat] ? "player" : "bot";
-    return t(start ? "pot.name" : "pot.nameMid", { who, name: names?.[seat] ?? "" });
-  };
+  const name = namer(t, youSeat, names);
   const join = (items: string[], id: MessageId) => items.reduce((a, b) => t(id, { a, b }));
   const pots = view.potResults;
   if (pots && pots.length > 1) {
     const winners = new Set(pots.flatMap((p) => p.winners.map((w) => w.seat)));
     const total = pots.reduce((sum, p) => sum + p.amount, 0);
     if (winners.size === 1) return t("pot.wonAll", { name: name([...winners][0], true), pots: pots.length, total });
-    return join(
-      pots.map((p, i) =>
-        t("pot.part", {
-          pot: i === 0 ? "main" : "side",
-          winners: join(
-            p.winners.map((w) => t("pot.winner", { name: name(w.seat, false), amount: w.amount })),
-            "pot.plus",
-          ),
-        }),
-      ),
-      "pot.dot",
-    );
+    return join(potResultParts(intl, view, youSeat, names), "pot.dot");
   }
   const winners = pots?.[0]?.winners ?? (view.winners ?? []).map((w) => ({ seat: w.seat, amount: w.amount }));
   if (winners.length > 1) return t("pot.split", { amounts: join(winners.map((w) => String(w.amount)), "pot.plus") });
   return t("pot.won", { name: name(winners[0]?.seat ?? -1, true), amount: winners[0]?.amount ?? 0 });
+}
+
+type Translate = (id: MessageId, values?: Record<string, string | number>) => string;
+
+function translator(intl: IntlShape): Translate {
+  return (id, values = {}) =>
+    intl.formatMessage({ id, defaultMessage: en[id] }, Object.fromEntries(Object.entries(values).map(([k, v]) => [k, String(v)])));
+}
+
+function namer(t: Translate, youSeat: number, names?: string[]) {
+  return (seat: number, start: boolean) => {
+    const who = seat === youSeat ? "you" : names?.[seat] ? "player" : "bot";
+    return t(start ? "pot.name" : "pot.nameMid", { who, name: names?.[seat] ?? "" });
+  };
+}
+
+/**
+ * After a hand with several pots won by different players: each pot's result ("Main pot: Ava 40"), or an empty
+ * list otherwise. The six-seat table lists these below the felt, where a long result can't run into the seats.
+ */
+export function potResultParts(intl: IntlShape, view: TableView, youSeat: number, names?: string[]): string[] {
+  const pots = view.potResults;
+  if (!view.handOver || !pots || pots.length <= 1) return [];
+  if (new Set(pots.flatMap((p) => p.winners.map((w) => w.seat))).size === 1) return [];
+  const t = translator(intl);
+  const name = namer(t, youSeat, names);
+  return pots.map((p, i) =>
+    t("pot.part", {
+      pot: i === 0 ? "main" : "side",
+      winners: p.winners.map((w) => t("pot.winner", { name: name(w.seat, false), amount: w.amount })).reduce((a, b) => t("pot.plus", { a, b })),
+    }),
+  );
 }

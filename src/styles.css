@@ -616,15 +616,16 @@ main:has(> .loading) { min-height: 70vh; }
   .calc-body { grid-template-columns: minmax(0, 1fr); }
 }
 /* The six-seat table follows its own width, not the screen's: beside the coach on a tablet or small laptop it
-   can be as narrow as on a phone. */
+   can be as narrow as on a phone. The ranges meet exactly (600px < width), so a fractional width like 600.5px
+   can't fall between two layouts. */
 .rt { container-type: inline-size; }
 /* At this width the full layout gets a taller oval, a lower board, and smaller board cards, so the top seat's
    cards and the bets stay clear of the board. */
-@container (min-width: 601px) and (max-width: 720px) {
+@container (600px < width <= 720px) {
   .rt-felt { aspect-ratio: 16 / 10; }
-  .rt-center { top: 48%; }
+  .rt-center { top: 51%; }
   .rt-center .pc-row .pc, .rt-center .slot.md { --w: 40px; width: 40px; }
-  /* The top seat's bet a little lower, clear of that seat's cards on this flatter oval. */
+  /* The board a little lower and the top seat's bet between it and that seat's cards, on this flatter oval. */
   .rt-bet.p3 { top: 26%; }
 }
 /* Compact: a taller oval with the side seats at the edges. */
@@ -647,7 +648,7 @@ main:has(> .loading) { min-height: 70vh; }
   .rt-dealer { width: 16px; height: 16px; font-size: 9.5px; }
 }
 /* Tablet-sized: the compact seats on a rounder oval (the phone oval is taller than this width needs). */
-@container (min-width: 460px) and (max-width: 600px) {
+@container (460px <= width <= 600px) {
   .rt-felt { aspect-ratio: 1 / 1; }
   .rt-center { top: 52%; }
   .p1 { --sy: 80; } .p2 { --sy: 20; } .p4 { --sy: 20; } .p5 { --sy: 80; }
@@ -668,6 +669,9 @@ main:has(> .loading) { min-height: 70vh; }
   .rt-bet.p2 { left: 32%; top: 32%; } .rt-bet.p4 { left: 68%; top: 32%; }
   .rt-bet.p1 { left: 35%; top: 81%; } .rt-bet.p5 { left: 65%; top: 81%; }
   .rt-bet.p0 { top: 71%; }
+  /* Slimmer bet pills, so two four-digit bets side by side still fit. */
+  .rt-bet { gap: 3px; font-size: 11px; padding: 1px 6px 1px 2px; }
+  .rt-bet .chip { width: 13px; height: 13px; border-width: 2px; }
   .rt-hand .pc.sm { --w: 20px; }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -6,7 +6,7 @@ import { positionOf } from "../game/positions";
 import type { SeatView, TableView } from "../game/types";
 import { useT } from "../i18n/hooks";
 import { Card } from "../learn/cards";
-import { potText } from "./labels";
+import { potResultParts, potText } from "./labels";
 
 type T = ReturnType<typeof useT>;
 
@@ -83,7 +83,9 @@ export function RoundTable({ view, youSeat, names }: { view: TableView; youSeat:
   const intl = useIntl();
   const n = view.seats.length;
   const place = (seat: number) => (seat - youSeat + n) % n;
-  const potList = pots(t, view, youSeat, names);
+  // A long result (several pots, different winners) goes in the list below; the felt shows only the total.
+  const results = potResultParts(intl, view, youSeat, names);
+  const potList = results.length ? results : pots(t, view, youSeat, names);
   return (
     <div className="rt">
       <div className="rt-wrap">
@@ -94,7 +96,11 @@ export function RoundTable({ view, youSeat, names }: { view: TableView; youSeat:
                 view.board[i] ? <Card key={view.board[i]} code={view.board[i]} /> : <span key={i} className="slot md" />,
               )}
             </span>
-            <span className="gpot mono">{potText(intl, view, youSeat, names)}</span>
+            <span className="gpot mono">
+              {results.length
+                ? t("pot.amount", { amount: String((view.potResults ?? []).reduce((sum, p) => sum + p.amount, 0)) })
+                : potText(intl, view, youSeat, names)}
+            </span>
           </div>
           {view.seats.map((s) =>
             s && s.betThisStreet > 0 ? (
@@ -110,8 +116,9 @@ export function RoundTable({ view, youSeat, names }: { view: TableView; youSeat:
       {/* Pot details go below the table, so long lists never push the board into the seats. */}
       {potList.length > 0 && (
         <ul className="rt-pots" aria-label={t("table.pots")}>
-          {potList.map((p) => (
-            <li key={p} className="mono">
+          {/* Keyed by position: two side pots can read the same ("Side: Leo 60"). */}
+          {potList.map((p, i) => (
+            <li key={i} className="mono">
               {p}
             </li>
           ))}

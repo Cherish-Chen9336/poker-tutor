@@ -9,7 +9,7 @@ import { handLog, moveSentence, resultLine } from "../game/hand-log";
 import { handFacts, moveFactAt, resultFact } from "../game/log-facts";
 import { Match, type HandRecord } from "../game/match";
 import type { LegalMoves, Move } from "../game/types";
-import { potLabel, potText } from "../ui/labels";
+import { potLabel, potResultParts, potText } from "../ui/labels";
 import { coachLines, type CoachFact } from "../game/coach";
 import { reviewHand } from "../game/review";
 import { phraseFact } from "./coach-text";
@@ -118,6 +118,23 @@ describe("the hand log from facts", () => {
         expect(potText(english, view, record.learnerSeat, names)).toBe(potLabel(view, record.learnerSeat, names));
       }
     }
+  });
+
+  it("lists each pot's result separately only when several pots go to different players", () => {
+    let listed = 0;
+    for (const record of records) {
+      const names = record.seats.length > 2 ? record.seats.map((s) => s.name) : undefined;
+      const final = record.final!;
+      const parts = potResultParts(english, final, record.learnerSeat, names);
+      const pots = final.potResults ?? [];
+      const several = pots.length > 1 && new Set(pots.flatMap((p) => p.winners.map((w) => w.seat))).size > 1;
+      expect(parts.length).toBe(several ? pots.length : 0);
+      // The list says exactly what the one-line result says, pot by pot.
+      if (several) expect(parts.join(" · ")).toBe(potText(english, final, record.learnerSeat, names));
+      if (several) listed++;
+      for (const m of record.moves) expect(potResultParts(english, m.view, record.learnerSeat, names)).toEqual([]);
+    }
+    expect(listed).toBeGreaterThan(0);
   });
 
   it("words hands saved before per-pot results, too", () => {
