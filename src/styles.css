@@ -539,10 +539,11 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
 .feedback:focus-visible, .gcoach:focus-visible { outline: 2px solid var(--brass-dim); outline-offset: 3px; }
 .done-note { border-left: 3px solid var(--good); }
 
-/* Loading: the four suits in a row in the middle of the screen, bouncing one after another like a wave. They fade in
-   quickly, and clicks pass through to the header underneath. */
+/* Loading: a dark, blurred mask over the page, with the four suits in a row in the middle, bouncing one after another
+   like a wave. It fades in quickly, and clicks pass through to the header underneath. */
 .loading {
   position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; pointer-events: none;
+  background: rgba(21, 17, 14, 0.72); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
   animation: loading-in 0.2s ease 0.05s both;
 }
 .loader-suits { display: flex; gap: 12px; font-size: 34px; line-height: 1; }
