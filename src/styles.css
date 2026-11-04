@@ -278,6 +278,9 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   background: radial-gradient(ellipse at 50% 45%, var(--felt) 0%, var(--felt-deep) 90%);
   box-shadow: 0 0 0 10px #3c2417, 0 0 0 11px var(--brass-dim), inset 0 6px 24px var(--shadow); margin: 11px;
 }
+/* In a wide column (Play and Review, heads-up), two seats stretched across the whole width looked sparse: the table
+   stops at a comfortable width and sits in the middle. */
+.gtable { width: calc(100% - 22px); max-width: 560px; align-self: center; margin-inline: auto; }
 .gseat { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: rgba(0, 0, 0, 0.28); border: 1px solid transparent; }
 .gseat.acting { border-color: var(--brass); }
 .gseat-info { display: flex; flex-direction: column; gap: 2px; }
@@ -659,7 +662,7 @@ main:has(> .loading) { min-height: 70vh; }
   .hand-list ol { max-height: 200px; }
   .hand-tabs { align-self: stretch; flex-wrap: nowrap; }
   .hand-tabs button { flex: 1; padding-inline: 4px; white-space: nowrap; }
-  .gtable { padding: 12px; margin: 8px; box-shadow: 0 0 0 7px #3c2417, 0 0 0 8px var(--brass-dim), inset 0 6px 24px var(--shadow); }
+  .gtable { width: calc(100% - 16px); padding: 12px; margin: 8px auto; box-shadow: 0 0 0 7px #3c2417, 0 0 0 8px var(--brass-dim), inset 0 6px 24px var(--shadow); }
   .gboard .pc, .gboard .slot { --w: 40px; width: 40px; }
   .calc-body { grid-template-columns: minmax(0, 1fr); }
 }
