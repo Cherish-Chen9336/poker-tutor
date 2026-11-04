@@ -61,7 +61,7 @@ function HandReplay({ record }: { record: HandRecord }) {
                 </b>
               </p>
               {comment ? (
-                <p className={`verdict ${comment.verdict}`}>
+                <p className={`verdict verdict-${comment.verdict}`}>
                   <span className="verdict-tag">{t("review.verdict", { verdict: comment.verdict })}</span>{" "}
                   <CardText text={wordComment(comment.fact)} />
                 </p>
