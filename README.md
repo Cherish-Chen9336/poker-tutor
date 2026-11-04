@@ -12,7 +12,9 @@ See `CLAUDE.md` for how it was planned and built, and `docs/rules-scenarios.md` 
 
 ## Privacy
 
-There are no accounts and no server of ours. Lesson progress, saved hands, the language choice, and the coach switch are kept in your browser's local storage, and you can reset lesson progress on the Learn page, delete saved hands on the Review page, or clear the site's data in your browser. The site is hosted on GitHub Pages and loads fonts from Google Fonts; like any web server, they receive your IP address.
+There are no accounts and no server of ours. Lesson progress, saved hands, the language choice, and the coach switch are kept in your browser's local storage, and you can reset lesson progress on the Learn page, delete saved hands on the Review page, or clear the site's data in your browser. Visits are counted with [GoatCounter](https://www.goatcounter.com/help/privacy) (`src/app/analytics.ts`, only on the published site): it sets no cookies, stores nothing in the browser, and keeps only totals per page (the referring site, browser, system, language, screen width, and country), not individual visits. The site is hosted on GitHub Pages, loads fonts from Google Fonts, and sends visits to GoatCounter; like any web server, they receive your IP address. GoatCounter doesn't save it to disk; it holds it (with the browser's identification) in memory for up to 8 hours so a visitor isn't counted twice. "Only totals" holds while the GoatCounter setting to collect individual pageviews stays off (the default).
+
+The visit counts are at https://poker-tutor.goatcounter.com/ (sign-in needed). To stop counting your own visits in a browser, open https://cherish-chen9336.github.io/poker-tutor/#toggle-goatcounter there once (open it again to undo); this saves one setting in that browser only.
 
 ## Run it locally
 

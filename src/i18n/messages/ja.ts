@@ -13,7 +13,7 @@ export const ja: Partial<Record<MessageId, string>> = {
   "app.codeLicense": "コード：MIT",
   "app.contentLicense": "学習コンテンツ：CC BY 4.0",
   "app.thirdParty": "サードパーティのライセンス",
-  "app.privacy": "プライバシー：アカウントはありません。学習の進み具合、保存したハンド、設定はこのブラウザにだけ残り、こちらには送信されません。サイトは GitHub Pages で公開し、フォントは Google Fonts から読み込みます。一般的なウェブサーバーと同じく、どちらも IP アドレスを受け取ります。",
+  "app.privacy": "プライバシー：アカウントはありません。学習の進み具合、保存したハンド、設定はこのブラウザにだけ残ります。訪問数は GoatCounter で数えます。Cookie は使わず、合計の数（ページ、来訪元のサイト、ブラウザ、OS、言語、画面の幅、国・地域）だけを残します。サイトは GitHub Pages で公開し、フォントは Google Fonts から読み込み、訪問数は GoatCounter が数えます。一般的なウェブサーバーと同じく、どれも IP アドレスを受け取ります。GoatCounter はそれを保存せず、同じ訪問者を二重に数えないよう、最大 8 時間だけメモリに置きます。",
   "app.title": "{page} · Poker Tutor",
 
   "lang.label": "言語",
