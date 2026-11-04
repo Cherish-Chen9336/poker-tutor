@@ -496,7 +496,7 @@ table.moves tbody th { color: var(--brass); white-space: nowrap; }
   .guided.play .coach-body { flex: none; overflow-y: visible; }
   .guided.play .glog .log-scroll { max-height: 320px; }
 }
-/* In Review the hand list already takes a column, so the six-seat table gets the full width. */
+/* In Review the hand list already takes a column, so the table (either size) gets the full width. */
 .guided.stacked { grid-template-columns: minmax(0, 1fr); }
 .rt-felt {
   position: relative; aspect-ratio: 16 / 9; width: 100%; border-radius: 999px;

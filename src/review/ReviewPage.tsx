@@ -37,7 +37,7 @@ function HandReplay({ record }: { record: HandRecord }) {
   }, [steps]);
 
   return (
-    <div className={record.seats.length > 2 ? "guided stacked" : "guided"}>
+    <div className="guided stacked">
       <div className="play-main">
         <PokerTable view={view} youSeat={record.learnerSeat} names={record.seats.map((seat) => seat.name)} />
         <div className="replay-nav">
