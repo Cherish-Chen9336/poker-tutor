@@ -11,6 +11,9 @@ export const en = {
   "app.review": "Review",
   "app.footer": "A learning project. No real money, ever.",
   "app.source": "Source code",
+  "app.codeLicense": "Code: MIT",
+  "app.contentLicense": "Content: CC BY 4.0",
+  "app.thirdParty": "Third-party licenses",
   "app.title": "{page} · Poker Tutor",
 
   // Language

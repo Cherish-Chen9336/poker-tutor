@@ -16,5 +16,8 @@ export default defineConfig({
     // together). They load only on the pages that need them (see App.tsx and
     // src/learn/content/index.ts), so a bigger chunk there is expected.
     chunkSizeWarningLimit: 700,
+    // The bundled libraries' copyright notices and license texts, which their licenses (MIT, BSD-3-Clause) require
+    // to ship with the site. Minifying strips them from the code; the footer links to this file.
+    license: { fileName: 'third-party-licenses.txt' },
   },
 })

@@ -10,6 +10,9 @@ export const ja: Partial<Record<MessageId, string>> = {
   "app.review": "振り返り",
   "app.footer": "学習用アプリです。実際のお金は一切使いません。",
   "app.source": "ソースコード",
+  "app.codeLicense": "コード：MIT",
+  "app.contentLicense": "学習コンテンツ：CC BY 4.0",
+  "app.thirdParty": "サードパーティのライセンス",
   "app.title": "{page} · Poker Tutor",
 
   "lang.label": "言語",
