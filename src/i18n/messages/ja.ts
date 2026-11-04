@@ -13,6 +13,7 @@ export const ja: Partial<Record<MessageId, string>> = {
   "app.codeLicense": "コード：MIT",
   "app.contentLicense": "学習コンテンツ：CC BY 4.0",
   "app.thirdParty": "サードパーティのライセンス",
+  "app.privacy": "プライバシー：アカウントはありません。学習の進み具合、保存したハンド、設定はこのブラウザにだけ残り、こちらには送信されません。サイトは GitHub Pages で公開し、フォントは Google Fonts から読み込みます。一般的なウェブサーバーと同じく、どちらも IP アドレスを受け取ります。",
   "app.title": "{page} · Poker Tutor",
 
   "lang.label": "言語",

@@ -1,8 +1,18 @@
 # Poker Tutor
 
-A browser app for learning No-Limit Texas Hold'em from zero: short lessons, then play against simple bots with a coach that explains each decision.
+A browser app for learning No-Limit Texas Hold'em from zero. **Try it: https://cherish-chen9336.github.io/poker-tutor/**
 
-Work in progress. See `CLAUDE.md` for the roadmap and `docs/rules-scenarios.md` for the poker rules the engine is tested against.
+- **Learn:** 16 short lessons with diagrams and quick checks, from the rules and hand rankings to pot odds, position, side pots, and thinking traps like the gambler's fallacy.
+- **Play:** heads-up against one bot or at a six-seat table, with a coach that explains your situation before each move (only from what you can see) and estimates your share of the pot.
+- **Review:** step through up to your last 50 saved hands, with comments on each of your decisions that judge the decision, not the result.
+
+In English, Simplified Chinese, and Japanese (machine-assisted translations). Practice only: no real money, ever.
+
+See `CLAUDE.md` for how it was planned and built, and `docs/rules-scenarios.md` for the poker rules the engine is tested against.
+
+## Privacy
+
+There are no accounts and no server of ours. Lesson progress, saved hands, the language choice, and the coach switch are kept in your browser's local storage, and you can reset lesson progress on the Learn page, delete saved hands on the Review page, or clear the site's data in your browser. The site is hosted on GitHub Pages and loads fonts from Google Fonts; like any web server, they receive your IP address.
 
 ## Run it locally
 

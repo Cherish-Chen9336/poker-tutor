@@ -14,6 +14,7 @@ export const en = {
   "app.codeLicense": "Code: MIT",
   "app.contentLicense": "Content: CC BY 4.0",
   "app.thirdParty": "Third-party licenses",
+  "app.privacy": "Privacy: there are no accounts. Your progress, saved hands, and settings stay in this browser and are never sent to us. GitHub Pages hosts the site and Google Fonts serves its fonts; like any web server, they see your IP address.",
   "app.title": "{page} · Poker Tutor",
 
   // Language

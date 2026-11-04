@@ -13,6 +13,7 @@ export const zhHans: Partial<Record<MessageId, string>> = {
   "app.codeLicense": "代码：MIT",
   "app.contentLicense": "教学内容：CC BY 4.0",
   "app.thirdParty": "第三方许可",
+  "app.privacy": "隐私：无需账号。你的学习进度、已保存的牌局和设置只存在此浏览器中，不会发送给我们。网站由 GitHub Pages 托管，字体来自 Google Fonts；和任何网站服务器一样，它们能看到你的 IP 地址。",
   "app.title": "{page} · Poker Tutor",
 
   "lang.label": "语言",

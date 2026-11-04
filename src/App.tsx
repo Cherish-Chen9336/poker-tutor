@@ -116,6 +116,7 @@ function Shell({ hash }: { hash: string }) {
           <a href="./third-party-licenses.txt">{t("app.thirdParty")}</a>
           <a href={REPO}>{t("app.source")}</a>
         </span>
+        <p className="foot-note">{t("app.privacy")}</p>
       </footer>
     </div>
   );
