@@ -7,7 +7,7 @@ import { useHands } from "../app/hand-store";
 import { handFacts, moveFactAt, resultFact } from "../game/log-facts";
 import type { HandRecord } from "../game/match";
 import { reviewHand } from "../game/review";
-import { useHref, useT } from "../i18n/hooks";
+import { useHref, useT, useWhen } from "../i18n/hooks";
 import { useLog } from "../i18n/log-text";
 import { useComment } from "../i18n/review-text";
 import { CardText } from "../learn/cards";
@@ -95,21 +95,26 @@ function HandReplay({ record }: { record: HandRecord }) {
   );
 }
 
-/** A neutral title: your starting cards, but not the result (that comes at the end of the replay). */
-function handTitle(record: HandRecord, t: ReturnType<typeof useT>): string {
+/**
+ * A neutral title: the table size, when it was played, and your starting cards, but not the result (that comes at
+ * the end of the replay). Not the match and hand numbers: they restart with each visit, so several saved hands
+ * could share them.
+ */
+function handTitle(record: HandRecord, t: ReturnType<typeof useT>, when: ReturnType<typeof useWhen>): string {
   const first = record.moves[0]?.view ?? record.final!;
   const cards = (first.seats[0]?.cards ?? []).filter(Boolean).map((c) => `{${c}}`).join(" ");
   return t("review.handTitle", {
     table: record.seats.length > 2 ? "six" : "two",
     players: String(record.seats.length),
-    match: String(record.matchNumber),
-    hand: String(record.handNumber),
+    // A saved hand comes from browser storage, so its time may be missing or damaged; then the title just leaves it out.
+    when: typeof record.playedAt === "string" && !Number.isNaN(Date.parse(record.playedAt)) ? t("review.handWhen", { when: when(new Date(record.playedAt)) }) : "",
     cards: cards ? t("review.handCards", { cards }) : "",
   });
 }
 
 export default function ReviewPage() {
   const t = useT();
+  const when = useWhen();
   const href = useHref();
   const { hands, saved, clear } = useHands();
   const newestFirst = [...hands].reverse();
@@ -151,7 +156,7 @@ export default function ReviewPage() {
             {newestFirst.map((h) => (
               <li key={h.id}>
                 <button type="button" aria-current={h.id === selected.id ? "true" : undefined} onClick={() => setSelectedId(h.id!)}>
-                  <CardText text={handTitle(h, t)} />
+                  <CardText text={handTitle(h, t, when)} />
                 </button>
               </li>
             ))}
@@ -174,7 +179,7 @@ export default function ReviewPage() {
         </nav>
         <div>
           <h2 className="review-title">
-            <CardText text={handTitle(selected, t)} />
+            <CardText text={handTitle(selected, t, when)} />
           </h2>
           <p className="mono review-sub">
             {t("review.sub", {

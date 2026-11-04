@@ -37,6 +37,12 @@ export function useList() {
   return (items: string[]) => intl.formatList(items, { type: "conjunction" });
 }
 
+/** A short date and time like "Nov 4, 10:42 AM", in the page's language. */
+export function useWhen() {
+  const intl = useIntl();
+  return (date: Date) => intl.formatDate(date, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+}
+
 /** Links that keep the page's language. */
 export function useHref() {
   const { locale } = usePage();

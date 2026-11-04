@@ -70,6 +70,24 @@ describe("Review in every language", () => {
     });
   }
 
+  it("names a hand by table size and when it was played, not by match numbers that restart each visit", () => {
+    const [hand] = hands(1);
+    // Local noon, so the date is the same in every time zone the tests run in.
+    store.hands = [{ ...hand, playedAt: new Date(2026, 10, 4, 12, 5).toISOString() }];
+    expect(text(render("en"))).toMatch(/Heads-up · Nov 4, 12:05\sPM/);
+    expect(text(render("en"))).not.toMatch(/Match \d/);
+    expect(text(render("zh-Hans"))).toContain("单挑 · 11月4日 12:05");
+    expect(text(render("ja"))).toContain("ヘッズアップ · 11月4日 12:05");
+    // A hand saved without a valid time (storage can hold anything) still gets a title, just without the time.
+    const title = (html: string) => text(html.match(/<h2 class="review-title">(.*?)<\/h2>/)![1]!);
+    for (const playedAt of [undefined, "not a date", { toString: null }]) {
+      store.hands = [{ ...hand, playedAt: playedAt as never }];
+      const shown = title(render("en"));
+      expect(shown).toMatch(/^\s*Heads-up · /);
+      expect(shown).not.toMatch(/\d:\d\d|Nov/);
+    }
+  });
+
   it("says '1 decision', not '1 decisions'", () => {
     const one = hands(30).filter((h) => h.moves.filter((m) => m.actorSeat === h.learnerSeat).length === 1);
     expect(one.length).toBeGreaterThan(0);
