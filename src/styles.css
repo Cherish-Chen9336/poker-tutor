@@ -622,6 +622,9 @@ main:has(> .loading) { min-height: 70vh; }
 .foot .nowrap { white-space: nowrap; }
 .foot-note { flex-basis: 100%; margin: 0; font-size: 12.5px; }
 .foot-links { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+/* A button that looks like the links beside it. */
+.foot-toggle { font: inherit; color: var(--brass); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+.foot-toggle:hover { color: var(--ink); }
 .foot { display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); padding-top: 8px; border-top: 1px solid var(--line); }
 
 @media (max-width: 640px) {

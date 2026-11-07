@@ -14,7 +14,8 @@ export const en = {
   "app.codeLicense": "Code: MIT",
   "app.contentLicense": "Content: CC BY 4.0",
   "app.thirdParty": "Third-party licenses",
-  "app.privacy": "Privacy: there are no accounts. Your progress, saved hands, and settings stay in this browser. Visits are counted with GoatCounter, which sets no cookies and keeps only totals (pages, the site you came from, browser, system, language, screen width, and country). GitHub Pages hosts the site, Google Fonts serves its fonts, and GoatCounter counts visits; like any web server, they see your IP address. GoatCounter doesn't save it, only holds it in memory for up to 8 hours so a visitor isn't counted twice.",
+  "app.privacyLink": "Privacy",
+  "app.privacy": "There are no accounts. Your progress, saved hands, and settings stay in this browser. Visits are counted with GoatCounter, which sets no cookies and keeps only totals (pages, the site you came from, browser, system, language, screen width, and country). GitHub Pages hosts the site, Google Fonts serves its fonts, and GoatCounter counts visits; like any web server, they see your IP address. GoatCounter doesn't save it, only holds it in memory for up to 8 hours so a visitor isn't counted twice.",
   "app.title": "{page} · Poker Tutor",
 
   // Language

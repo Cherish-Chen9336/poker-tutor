@@ -8,6 +8,8 @@ A browser app for learning No-Limit Texas Hold'em from zero. **Try it: https://c
 
 In English, Simplified Chinese, and Japanese (machine-assisted translations). Practice only: no real money, ever.
 
+![The Play screen: a six-player table with your two cards at the bottom, the coach's notes on the right, and Fold, Call, and Raise controls below](docs/screenshot.png)
+
 See `CLAUDE.md` for how it was planned and built, and `docs/rules-scenarios.md` for the poker rules the engine is tested against.
 
 ## Privacy

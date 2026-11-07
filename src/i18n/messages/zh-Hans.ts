@@ -13,7 +13,8 @@ export const zhHans: Partial<Record<MessageId, string>> = {
   "app.codeLicense": "代码：MIT",
   "app.contentLicense": "教学内容：CC BY 4.0",
   "app.thirdParty": "第三方许可",
-  "app.privacy": "隐私：无需账号。你的学习进度、已保存的牌局和设置只存在此浏览器中。访问量由 GoatCounter 统计：它不使用 Cookie，只保留汇总数字（页面、来源网站、浏览器、操作系统、语言、屏幕宽度和国家/地区）。网站由 GitHub Pages 托管，字体来自 Google Fonts，访问由 GoatCounter 统计；和任何网站服务器一样，它们能看到你的 IP 地址。GoatCounter 不会保存它，只在内存中保留最多 8 小时，以免重复计算同一位访客。",
+  "app.privacyLink": "隐私",
+  "app.privacy": "无需账号。你的学习进度、已保存的牌局和设置只存在此浏览器中。访问量由 GoatCounter 统计：它不使用 Cookie，只保留汇总数字（页面、来源网站、浏览器、操作系统、语言、屏幕宽度和国家/地区）。网站由 GitHub Pages 托管，字体来自 Google Fonts，访问由 GoatCounter 统计；和任何网站服务器一样，它们能看到你的 IP 地址。GoatCounter 不会保存它，只在内存中保留最多 8 小时，以免重复计算同一位访客。",
   "app.title": "{page} · Poker Tutor",
 
   "lang.label": "语言",
